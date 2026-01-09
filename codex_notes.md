@@ -31,3 +31,5 @@
 [2026-01-10 01:37] Added CUDA debug logging in embed_texts and a --dry-run flag to index_cli to check device/model without embedding.
 [2026-01-10 01:45] CUDA check: embed_texts reports device=cpu, torch_cuda_available=False, torch build 2.9.1+cpu; need CUDA-enabled torch wheel to use GPU.
 [2026-01-10 01:52] Torch in .venv is CPU-only (2.9.1+cpu). Documented installing CUDA torch; pyproject unchanged (torch stays transient).
+[2026-01-10 02:05] User wants CUDA; will recreate venv with Python 3.12 to allow CUDA torch wheels (PyTorch not available for 3.13).
+[2026-01-10 02:15] Recreated .venv with Python 3.12, installed torch 2.2.2+cu121 and downgraded numpy to 1.26.4 for compatibility; torch now reports cuda available (12.1).
