@@ -16,3 +16,4 @@
 [2026-01-10 00:22] Committed initial scaffold and pipeline; pushed to origin/main.
 [2026-01-10 00:28] Installed runtime deps into .venv (bs4, lxml, requests, pytest, etc.) and editable package; mcp 1.25.0 now present after earlier lock error.
 [2026-01-10 00:28] Ran pytest tests/test_extraction.py successfully (2 tests passed).
+[2026-01-10 00:35] Added *.egg-info to .gitignore and removed editable install metadata to keep repo clean before push.

@@ -17,3 +17,4 @@ data/**
 *.faiss
 *.jsonl
 UnityDocumentation.zip
+*.egg-info/
