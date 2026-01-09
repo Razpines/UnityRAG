@@ -29,3 +29,4 @@
 [2026-01-10 01:24] Fixed NameError in bake (missing chunks_accum init) after parallelization refactor.
 [2026-01-10 01:30] User ran parallel bake (Manual-only) successfully; completed in ~11 seconds.
 [2026-01-10 01:37] Added CUDA debug logging in embed_texts and a --dry-run flag to index_cli to check device/model without embedding.
+[2026-01-10 01:45] CUDA check: embed_texts reports device=cpu, torch_cuda_available=False, torch build 2.9.1+cpu; need CUDA-enabled torch wheel to use GPU.
