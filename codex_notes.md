@@ -14,3 +14,5 @@
 [2026-01-10 00:18] Added hybrid index scaffolding (FTS/FAISS building), DocStore utilities, MCP server skeleton with tools search/open/list/related/status.
 [2026-01-10 00:20] Created GitHub repo UnityRAG via gh with origin remote pointing to https://github.com/Razpines/UnityRAG.
 [2026-01-10 00:22] Committed initial scaffold and pipeline; pushed to origin/main.
+[2026-01-10 00:28] Installed runtime deps into .venv (bs4, lxml, requests, pytest, etc.) and editable package; mcp 1.25.0 now present after earlier lock error.
+[2026-01-10 00:28] Ran pytest tests/test_extraction.py successfully (2 tests passed).
