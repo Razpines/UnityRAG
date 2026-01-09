@@ -135,6 +135,7 @@ def bake(config: Config) -> Dict[str, int]:
         for html_path in html_paths
     ]
 
+    chunks_accum: List[Dict] = []
     with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
         for page_record, chunk_dicts in tqdm(
             executor.map(_process_page, tasks), total=len(tasks), desc="Bake pages (parallel)"
@@ -142,8 +143,7 @@ def bake(config: Config) -> Dict[str, int]:
             if page_record is None:
                 continue
             pages.append(page_record)
-            for chunk in chunk_dicts:
-                chunks_accum.append(chunk)
+            chunks_accum.extend(chunk_dicts)
 
     baked_dir = paths.baked_dir
     baked_dir.mkdir(parents=True, exist_ok=True)
