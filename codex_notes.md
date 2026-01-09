@@ -17,3 +17,10 @@
 [2026-01-10 00:28] Installed runtime deps into .venv (bs4, lxml, requests, pytest, etc.) and editable package; mcp 1.25.0 now present after earlier lock error.
 [2026-01-10 00:28] Ran pytest tests/test_extraction.py successfully (2 tests passed).
 [2026-01-10 00:35] Added *.egg-info to .gitignore and removed editable install metadata to keep repo clean before push.
+[2026-01-10 00:40] Decision: run unitydocs-setup (ensure) to perform bake and index with default config into data/unity/6000.3; expect embeddings download (bge-small-en-v1.5) and FAISS/FTS artifacts.
+[2026-01-10 00:41] unitydocs-setup failed: missing numpy import; need to install full deps (numpy, faiss-cpu, sentence-transformers) into .venv before rerun.
+[2026-01-10 00:44] Installed numpy, faiss-cpu, sentence-transformers (and torch/scikit-learn deps) into .venv to satisfy bake/index requirements.
+[2026-01-10 00:50] unitydocs-setup ran bake but index failed: model id sentence-transformers/bge-small-en-v1.5 not found (HF 404). Need to switch embedder to BAAI/bge-small-en-v1.5 and rerun ensure.
+[2026-01-10 00:53] Switched embedder model to BAAI/bge-small-en-v1.5 in config/defaults; rerunning ensure was interrupted, need to re-run unitydocs-setup to finish indexing.
+[2026-01-10 00:56] Added embedder device auto-detection (CUDA if available) with runtime print; config exposes embedder.device and defaults to auto. Updated index/search to pass device through.
+[2026-01-10 01:05] unitydocs-setup rerun timed out mid-bake (timeout limit hit); need to rerun bake/index with higher timeout using new embedder model BAAI/bge-small-en-v1.5 and CUDA auto-detect.

@@ -25,7 +25,8 @@ index:
   vector: "faiss"
   embedder:
     provider: "local"
-    model: "bge-small-en-v1.5"
+    model: "BAAI/bge-small-en-v1.5"
+    device: "auto"
   rerank_enable: true
   candidate_pool: 80
 

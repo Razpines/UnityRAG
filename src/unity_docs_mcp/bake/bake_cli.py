@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import concurrent.futures
 import json
+import os
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from tqdm import tqdm
 
@@ -21,6 +23,75 @@ def load_html_paths(unzipped_root: Path) -> List[Path]:
     manual = list((base / "Manual").rglob("*.html"))
     scriptref = list((base / "ScriptReference").rglob("*.html"))
     return manual + scriptref
+
+
+def _process_page(
+    args: Tuple[
+        str,
+        Dict,
+        Dict,
+        List[str],
+        int,
+        Dict[str, int],
+        str,
+    ]
+) -> Tuple[Dict | None, List[Dict]]:
+    html_path_str, meta, options_dict, drop_sections, min_chars, chunk_cfg, raw_root = args
+    html_path = Path(html_path_str)
+    options = HtmlToTextOptions(**options_dict)
+    if meta["source_type"] == "manual":
+        extracted = extract_manual(html_path, options, drop_sections)
+    else:
+        extracted = extract_scriptref(html_path, options)
+
+    text_md = extracted["text_md"]
+    if len(text_md) < min_chars:
+        return None, []
+
+    links = []
+    for link in extracted.get("links", []):
+        resolved = resolve_internal_link(link["href_raw"], html_path, Path(raw_root))
+        target_doc_id = resolved["to_doc_id"] if resolved else None
+        link["target_doc_id"] = target_doc_id
+        links.append(link)
+
+    page_record = {
+        "doc_id": meta["doc_id"],
+        "source_type": meta["source_type"],
+        "title": extracted["title"],
+        "canonical_url": extracted.get("canonical_url"),
+        "origin_path": meta["origin_path"],
+        "text_md": text_md,
+        "metadata": {},
+        "out_links": links,
+    }
+
+    chunks = chunk_text_md(
+        doc_id=page_record["doc_id"],
+        title=page_record["title"],
+        text_md=page_record["text_md"],
+        origin_path=page_record["origin_path"],
+        canonical_url=page_record.get("canonical_url"),
+        max_chars=chunk_cfg["max_chars"],
+        overlap=chunk_cfg["overlap_chars"],
+    )
+
+    chunk_dicts = [
+        {
+            "chunk_id": chunk.chunk_id,
+            "doc_id": chunk.doc_id,
+            "source_type": meta["source_type"],
+            "title": chunk.title,
+            "heading_path": chunk.heading_path,
+            "text": chunk.text,
+            "char_start": chunk.char_start,
+            "char_end": chunk.char_end,
+            "origin_path": chunk.origin_path,
+            "canonical_url": chunk.canonical_url,
+        }
+        for chunk in chunks
+    ]
+    return page_record, chunk_dicts
 
 
 def bake(config: Config) -> Dict[str, int]:
@@ -46,37 +117,33 @@ def bake(config: Config) -> Dict[str, int]:
             "source_type": "scriptref" if "ScriptReference" in rel.parts else "manual",
         }
 
-    for html_path in tqdm(html_paths, desc="Bake pages"):
-        rel = html_path.relative_to(paths.raw_unzipped).as_posix()
-        meta = doc_map[html_path.as_posix()]
-        if meta["source_type"] == "manual":
-            extracted = extract_manual(html_path, options, config.bake.drop_sections)
-        else:
-            extracted = extract_scriptref(html_path, options)
+    # parallel extraction
+    max_workers = max(4, (os.cpu_count() or 4) - 1)
+    tasks = [
+        (
+            html_path.as_posix(),
+            doc_map[html_path.as_posix()],
+            {
+                "keep_images": options.keep_images,
+                "include_figure_captions": options.include_figure_captions,
+            },
+            config.bake.drop_sections,
+            config.bake.min_page_chars,
+            {"max_chars": config.chunking.max_chars, "overlap_chars": config.chunking.overlap_chars},
+            paths.raw_unzipped.as_posix(),
+        )
+        for html_path in html_paths
+    ]
 
-        text_md = extracted["text_md"]
-        if len(text_md) < config.bake.min_page_chars:
-            # skip pages that look empty
-            continue
-
-        links = []
-        for link in extracted.get("links", []):
-            resolved = resolve_internal_link(link["href_raw"], html_path, paths.raw_unzipped)
-            target_doc_id = resolved["to_doc_id"] if resolved else None
-            link["target_doc_id"] = target_doc_id
-            links.append(link)
-
-        page_record = {
-            "doc_id": meta["doc_id"],
-            "source_type": meta["source_type"],
-            "title": extracted["title"],
-            "canonical_url": extracted.get("canonical_url"),
-            "origin_path": rel,
-            "text_md": text_md,
-            "metadata": {},
-            "out_links": links,
-        }
-        pages.append(page_record)
+    with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
+        for page_record, chunk_dicts in tqdm(
+            executor.map(_process_page, tasks), total=len(tasks), desc="Bake pages (parallel)"
+        ):
+            if page_record is None:
+                continue
+            pages.append(page_record)
+            for chunk in chunk_dicts:
+                chunks_accum.append(chunk)
 
     baked_dir = paths.baked_dir
     baked_dir.mkdir(parents=True, exist_ok=True)
@@ -91,35 +158,9 @@ def bake(config: Config) -> Dict[str, int]:
         total_chunks = 0
         for page in pages:
             f_corpus.write(json.dumps(page, ensure_ascii=False) + "\n")
-            chunks = chunk_text_md(
-                doc_id=page["doc_id"],
-                title=page["title"],
-                text_md=page["text_md"],
-                origin_path=page["origin_path"],
-                canonical_url=page.get("canonical_url"),
-                max_chars=config.chunking.max_chars,
-                overlap=config.chunking.overlap_chars,
-            )
-            for chunk in chunks:
-                f_chunks.write(
-                    json.dumps(
-                        {
-                            "chunk_id": chunk.chunk_id,
-                            "doc_id": chunk.doc_id,
-                            "source_type": page["source_type"],
-                            "title": chunk.title,
-                            "heading_path": chunk.heading_path,
-                            "text": chunk.text,
-                            "char_start": chunk.char_start,
-                            "char_end": chunk.char_end,
-                            "origin_path": chunk.origin_path,
-                            "canonical_url": chunk.canonical_url,
-                        },
-                        ensure_ascii=False,
-                    )
-                    + "\n"
-                )
-                total_chunks += 1
+        for chunk in chunks_accum:
+            f_chunks.write(json.dumps(chunk, ensure_ascii=False) + "\n")
+        total_chunks = len(chunks_accum)
 
     edges = build_link_edges(pages)
     with link_graph_path.open("w", encoding="utf-8") as f_links:

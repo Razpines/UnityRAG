@@ -35,6 +35,7 @@ class HybridSearcher:
         self.vector_meta = self._load_vector_meta(base_path / "vectors_meta.jsonl")
         self.chunk_meta = self._load_chunk_meta(base_path.parent / "baked" / "chunks.jsonl")
         self.embed_model = config.index.embedder.model
+        self.embed_device = config.index.embedder.device
 
     def _load_vector_meta(self, path: Path) -> List[str]:
         ids: List[str] = []
@@ -71,7 +72,7 @@ class HybridSearcher:
         lexical_hits = search_fts(self.fts_conn, query, limit=self.config.index.candidate_pool)
         lexical_scores = {cid: 1.0 / (idx + 1) for idx, (cid, _) in enumerate(lexical_hits)}
 
-        query_vec = embed_texts([query], model_name=self.embed_model)
+        query_vec = embed_texts([query], model_name=self.embed_model, device=self.embed_device)
         distances, indices = search_faiss(self.faiss_index, query_vec, k=self.config.index.candidate_pool)
         vector_scores: Dict[str, float] = {}
         for rank, idx in enumerate(indices[0]):

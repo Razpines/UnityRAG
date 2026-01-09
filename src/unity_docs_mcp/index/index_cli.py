@@ -54,7 +54,11 @@ def index(config: Config) -> Dict[str, int]:
     embed_texts_list = [
         f"{c['title']} {' '.join(c.get('heading_path', []))} {c['text']}" for c in chunks
     ]
-    vectors = embed_texts(embed_texts_list, model_name=config.index.embedder.model)
+    vectors = embed_texts(
+        embed_texts_list,
+        model_name=config.index.embedder.model,
+        device=config.index.embedder.device,
+    )
     index = build_faiss_index(vectors.astype("float32"))
     save_faiss(index, paths.index_dir / "vectors.faiss")
 

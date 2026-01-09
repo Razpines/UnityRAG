@@ -28,7 +28,7 @@ def drop_noise(root) -> None:
 
 def extract_scriptref(html_path: Path, options: HtmlToTextOptions) -> Dict:
     with html_path.open("r", encoding="utf-8", errors="ignore") as f:
-        soup = BeautifulSoup(f, "html.parser")
+        soup = BeautifulSoup(f, "lxml")
 
     main = soup.select_one("div#content-wrap div.section") or soup.select_one("div.section")
     if main is None and soup.body:

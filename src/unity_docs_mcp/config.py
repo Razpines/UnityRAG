@@ -36,7 +36,8 @@ class ChunkConfig:
 @dataclass
 class EmbedderConfig:
     provider: str = "local"
-    model: str = "bge-small-en-v1.5"
+    model: str = "BAAI/bge-small-en-v1.5"
+    device: str = "auto"  # auto|cpu|cuda
 
 
 @dataclass
