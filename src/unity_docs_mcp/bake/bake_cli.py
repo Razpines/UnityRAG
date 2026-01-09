@@ -21,8 +21,8 @@ from unity_docs_mcp.setup.detect_version import detect_version_info
 def load_html_paths(unzipped_root: Path) -> List[Path]:
     base = unzipped_root / "Documentation" / "en"
     manual = list((base / "Manual").rglob("*.html"))
-    scriptref = list((base / "ScriptReference").rglob("*.html"))
-    return manual + scriptref
+    print(f"Manual HTML pages found: {len(manual)}")
+    return manual
 
 
 def _process_page(
@@ -114,7 +114,7 @@ def bake(config: Config) -> Dict[str, int]:
         doc_map[html_path.as_posix()] = {
             "doc_id": doc_id,
             "origin_path": rel.as_posix(),
-            "source_type": "scriptref" if "ScriptReference" in rel.parts else "manual",
+            "source_type": "manual",
         }
 
     # parallel extraction

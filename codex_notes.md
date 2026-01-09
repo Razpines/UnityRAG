@@ -24,3 +24,5 @@
 [2026-01-10 00:53] Switched embedder model to BAAI/bge-small-en-v1.5 in config/defaults; rerunning ensure was interrupted, need to re-run unitydocs-setup to finish indexing.
 [2026-01-10 00:56] Added embedder device auto-detection (CUDA if available) with runtime print; config exposes embedder.device and defaults to auto. Updated index/search to pass device through.
 [2026-01-10 01:05] unitydocs-setup rerun timed out mid-bake (timeout limit hit); need to rerun bake/index with higher timeout using new embedder model BAAI/bge-small-en-v1.5 and CUDA auto-detect.
+[2026-01-10 01:14] Improved performance: bake now uses ProcessPoolExecutor with lxml parser via BeautifulSoup, parallel extraction/chunking; embedder uses auto device (prefers CUDA) and logs device/model.
+[2026-01-10 01:21] Updated bake to only ingest Manual HTMLs (print count) and set source_type=manual; Manual HTML count: 3426.
