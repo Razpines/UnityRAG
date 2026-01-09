@@ -28,3 +28,4 @@
 [2026-01-10 01:21] Updated bake to only ingest Manual HTMLs (print count) and set source_type=manual; Manual HTML count: 3426.
 [2026-01-10 01:24] Fixed NameError in bake (missing chunks_accum init) after parallelization refactor.
 [2026-01-10 01:30] User ran parallel bake (Manual-only) successfully; completed in ~11 seconds.
+[2026-01-10 01:37] Added CUDA debug logging in embed_texts and a --dry-run flag to index_cli to check device/model without embedding.

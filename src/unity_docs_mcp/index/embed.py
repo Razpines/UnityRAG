@@ -21,6 +21,12 @@ def _select_device(preference: str) -> str:
 
 def embed_texts(texts: Iterable[str], model_name: str, device: str = "auto") -> np.ndarray:
     resolved_device = _select_device(device)
-    print(f"[embed] using device={resolved_device} model={model_name}")
+    cuda_info = {
+        "torch_cuda_available": torch.cuda.is_available(),
+        "device_count": torch.cuda.device_count(),
+        "torch_version": torch.__version__,
+        "torch_cuda_version": torch.version.cuda,
+    }
+    print(f"[embed] using device={resolved_device} model={model_name} info={cuda_info}")
     model = _load_model(model_name, resolved_device)
     return np.array(model.encode(list(texts), normalize_embeddings=True, convert_to_numpy=True))

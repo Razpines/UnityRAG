@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 from typing import Dict, List
@@ -24,7 +25,7 @@ def load_chunks(chunks_path: Path) -> List[Dict]:
     return items
 
 
-def index(config: Config) -> Dict[str, int]:
+def index(config: Config, dry_run: bool = False) -> Dict[str, int]:
     paths = make_paths(config)
     baked_dir = paths.baked_dir
     chunks_path = baked_dir / "chunks.jsonl"
@@ -33,6 +34,13 @@ def index(config: Config) -> Dict[str, int]:
 
     chunks = load_chunks(chunks_path)
     fts_db = paths.index_dir / "fts.sqlite"
+    if dry_run:
+        print(
+            f"[dry-run] Loaded {len(chunks)} chunks. Would embed with model={config.index.embedder.model} "
+            f"device={config.index.embedder.device}"
+        )
+        return {"chunks": len(chunks)}
+
     conn = init_db(fts_db)
     ingest_chunks(
         conn,
@@ -80,8 +88,12 @@ def index(config: Config) -> Dict[str, int]:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dry-run", action="store_true", help="Load chunks and report device/model, then exit.")
+    args = parser.parse_args()
+
     config = load_config()
-    stats = index(config)
+    stats = index(config, dry_run=args.dry_run)
     print(f"Indexed {stats['chunks']} chunks.")
 
 
