@@ -13,3 +13,4 @@
 [2026-01-10 00:18] Implemented bake pipeline (manual/scriptref extractors, chunking, link graph, manifest) and ensured idempotent ensure_artifacts orchestration.
 [2026-01-10 00:18] Added hybrid index scaffolding (FTS/FAISS building), DocStore utilities, MCP server skeleton with tools search/open/list/related/status.
 [2026-01-10 00:20] Created GitHub repo UnityRAG via gh with origin remote pointing to https://github.com/Razpines/UnityRAG.
+[2026-01-10 00:22] Committed initial scaffold and pipeline; pushed to origin/main.
