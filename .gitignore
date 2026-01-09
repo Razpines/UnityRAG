@@ -1,0 +1,19 @@
+.venv
+env/
+.env
+__pycache__/
+.pytest_cache/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+
+# Data artifacts
+data/**
+!data/.gitkeep
+
+# Local indexes and corpora
+*.sqlite
+*.faiss
+*.jsonl
+UnityDocumentation.zip
