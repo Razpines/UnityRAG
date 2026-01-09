@@ -27,3 +27,4 @@
 [2026-01-10 01:14] Improved performance: bake now uses ProcessPoolExecutor with lxml parser via BeautifulSoup, parallel extraction/chunking; embedder uses auto device (prefers CUDA) and logs device/model.
 [2026-01-10 01:21] Updated bake to only ingest Manual HTMLs (print count) and set source_type=manual; Manual HTML count: 3426.
 [2026-01-10 01:24] Fixed NameError in bake (missing chunks_accum init) after parallelization refactor.
+[2026-01-10 01:30] User ran parallel bake (Manual-only) successfully; completed in ~11 seconds.
