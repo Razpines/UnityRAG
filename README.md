@@ -4,14 +4,16 @@ UnityRAG is a local Unity docs assistant for Codex/Claude that provides accurate
 
 MCP tools: `search` / `open` / `related` / `list_files` / `status`
 
-## Quick Start (non-technical)
+## Quick Start
 
 1) Run setup
 - Windows: double-click `setup.bat` (or run it in a terminal).
+- macOS/Linux: `bash setup.sh`
 - This downloads the Unity offline docs, builds the local index, and cleans up raw files to save space.
 
 2) Add the MCP server to your agent
 - Codex: copy `examples/codex_mcp_config.json` into your Codex MCP config.
+- Codex CLI: use `codex mcp ...` to add a server (see Codex CLI docs for exact syntax).
 - Claude Desktop: copy `examples/claude_desktop_config.json` into your Claude config.
 - Update the `UNITY_DOCS_MCP_ROOT` path to your clone.
 
