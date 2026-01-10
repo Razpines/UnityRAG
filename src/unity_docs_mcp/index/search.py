@@ -134,4 +134,7 @@ class HybridSearcher:
             )
 
         combined.sort(key=lambda x: x.score, reverse=True)
+        min_score = self.config.mcp.min_score
+        if min_score is not None:
+            combined = [item for item in combined if item.score >= min_score]
         return combined[:k]

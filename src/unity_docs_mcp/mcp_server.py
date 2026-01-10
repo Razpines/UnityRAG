@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import asyncio
 import os
+import sys
 from typing import List, Optional
 
 from mcp.server.fastmcp import FastMCP
@@ -130,6 +132,8 @@ def main_http() -> None:
     port = int(os.environ.get("UNITY_DOCS_MCP_PORT", "8765"))
     app.settings.host = host
     app.settings.port = port
+    if sys.platform.startswith("win"):
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     print(f"[unitydocs-mcp] starting streamable HTTP server on {host}:{port}/mcp")
     app.run(transport="streamable-http")
 

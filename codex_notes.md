@@ -40,3 +40,4 @@
 [2026-01-10 02:40] Fixed MCP server for current mcp package (no on_startup hook) by lazy-initializing DocStore per tool; unitydocs-mcp now runs without handshake failure.
 [2026-01-10 02:50] Added streamable HTTP entrypoint (unitydocs-mcp-http) with env-configurable host/port for external MCP clients and easier log visibility; defaults to 127.0.0.1:8765/mcp.
 [2026-01-10 02:55] Added start_server.bat to activate .venv, set UNITY_DOCS_MCP_ROOT, and launch unitydocs-mcp-http with optional port arg for visible logs.
+[2026-01-10 03:10] Added MCP min_score filter to suppress nonsense search results, improved link resolution for link_graph, and switched HTTP server to Windows selector loop to reduce WinError 10054 log noise.

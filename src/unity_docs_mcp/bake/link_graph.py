@@ -18,7 +18,16 @@ def resolve_internal_link(href: str, origin_path: Path, unzipped_root: Path) -> 
         return None
     if href.startswith("#"):
         return None
-    target = (origin_path.parent / href).resolve()
+    clean_href = href.split("#", 1)[0].split("?", 1)[0]
+    if not clean_href:
+        return None
+    if clean_href.startswith("/"):
+        rel_root = clean_href.lstrip("/")
+        target = (unzipped_root / "Documentation" / "en" / rel_root).resolve()
+    elif clean_href.lower().startswith(("manual/", "scriptreference/")):
+        target = (unzipped_root / "Documentation" / "en" / clean_href).resolve()
+    else:
+        target = (origin_path.parent / clean_href).resolve()
     try:
         rel = target.relative_to(unzipped_root)
     except ValueError:
