@@ -82,6 +82,40 @@ if not exist "%VENV%\Scripts\activate.bat" (
   call "%VENV%\Scripts\activate.bat"
 )
 
+set "CUDA_VER="
+set "CUDA_SELECTED="
+for /f "delims=" %%V in ('nvidia-smi --query-gpu=cuda_version --format=csv,noheader 2^>nul') do (
+  set "CUDA_VER=%%V"
+  goto :cuda_checked
+)
+:cuda_checked
+set "CUDA_MAJOR="
+set "CUDA_MINOR="
+if defined CUDA_VER (
+  for /f "tokens=1,2 delims=." %%A in ("%CUDA_VER%") do (
+    set "CUDA_MAJOR=%%A"
+    set "CUDA_MINOR=%%B"
+  )
+)
+if defined CUDA_MAJOR (
+  if %CUDA_MAJOR% GEQ 12 (
+    if %CUDA_MINOR% GEQ 1 (
+      call :print_color Cyan "[setup] Detected CUDA %CUDA_VER%. Installing torch cu121..."
+      python -m pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121
+      set "CUDA_SELECTED=1"
+    )
+  ) else if %CUDA_MAJOR% EQU 11 (
+    if %CUDA_MINOR% GEQ 8 (
+      call :print_color Cyan "[setup] Detected CUDA %CUDA_VER%. Installing torch cu118..."
+      python -m pip install --force-reinstall torch==2.2.2+cu118 --index-url https://download.pytorch.org/whl/cu118
+      set "CUDA_SELECTED=1"
+    )
+  )
+)
+if not defined CUDA_SELECTED (
+  call :print_color DarkYellow "[setup] WARNING: No compatible CUDA version detected. Using CPU embeddings; initial indexing may be slow."
+)
+
 set "DEFAULT_VER=6000.3"
 set "HINT_VER="
 if defined UNITY_VERSION set "HINT_VER=%UNITY_VERSION%"
