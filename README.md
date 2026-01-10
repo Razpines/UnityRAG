@@ -2,8 +2,6 @@
 
 [![CI](https://img.shields.io/github/actions/workflow/status/Razpines/UnityRAG/ci.yml?label=CI)](https://github.com/Razpines/UnityRAG/actions)
 [![License](https://img.shields.io/github/license/Razpines/UnityRAG)](LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/unityrag?label=PyPI)](https://pypi.org/project/unityrag/)
-
 Local, offline-ready Unity 6.3 documentation bake/index pipeline with an MCP server exposing search/open/list/related tools.
 
 MCP tools: `search` / `open` / `related` / `list_files` / `status`
