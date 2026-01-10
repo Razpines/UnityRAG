@@ -1,9 +1,6 @@
 @echo off
 setlocal
 
-REM Start the unity-docs MCP server over HTTP with a visible log window.
-REM Optional: pass a port as the first argument (default 8765).
-
 set "REPO=%~dp0"
 set "VENV=%REPO%\.venv"
 if not exist "%VENV%\Scripts\activate.bat" (
@@ -11,24 +8,11 @@ if not exist "%VENV%\Scripts\activate.bat" (
   exit /b 1
 )
 
-call "%VENV%\Scripts\activate.bat"
-
 set "UNITY_DOCS_MCP_ROOT=%REPO%"
 if "%~1" neq "" (
   set "UNITY_DOCS_MCP_PORT=%~1"
 )
 
-echo [start_server] UNITY_DOCS_MCP_ROOT=%UNITY_DOCS_MCP_ROOT%
-if defined UNITY_DOCS_MCP_PORT (
-  echo [start_server] Using port %UNITY_DOCS_MCP_PORT%
-) else (
-  echo [start_server] Using default port 8765
-)
+call "%VENV%\Scripts\activate.bat"
 
-set "MCP_EXE=%VENV%\Scripts\unitydocs-mcp-http.exe"
-if not exist "%MCP_EXE%" (
-  echo [start_server] MCP executable not found at %MCP_EXE%
-  exit /b 1
-)
-
-"%MCP_EXE%"
+python -c "from unity_docs_mcp.mcp_server import main_http; main_http()"
