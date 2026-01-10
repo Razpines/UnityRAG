@@ -37,44 +37,6 @@ unitydocs mcp
 ```
 Under the hood this runs download, bake, and index idempotently, then starts the HTTP MCP server.
 
-## Quickstart (manual steps)
-
-1) Create env & install deps
-```
-python -m venv .venv
-```
-
-2) Activate venv
-```
-Windows: .\.venv\Scripts\activate
-macOS/Linux: source .venv/bin/activate
-```
-
-3) Install deps
-```
-pip install -e .[dev]
-```
-
-4) Ensure Unity docs artifacts exist (download+unzip are idempotent)
-```
-unitydocs-setup
-```
-
-5) Bake HTML to LLM-friendly corpus/chunks/link graph
-```
-unitydocs-bake
-```
-
-6) Build hybrid indexes (SQLite FTS5 + FAISS vectors)
-```
-unitydocs-index
-```
-
-7) Run MCP server (HTTP)
-```
-unitydocs-mcp-http
-```
-
 ## Layout
 - `data/unity/6000.3/raw`: UnityDocumentation.zip + unzipped HTML (not committed)
 - `data/unity/6000.3/baked`: corpus.jsonl, chunks.jsonl, link_graph.jsonl, manifest.json
