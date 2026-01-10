@@ -77,35 +77,21 @@ if not exist "%VENV%\Scripts\activate.bat" (
 
 set "CUDA_TAG="
 set "CUDA_VER="
-for /f "tokens=9" %%A in ('nvidia-smi ^| findstr "CUDA Version"') do set "CUDA_VER=%%A"
-set "CUDA_MAJOR="
-set "CUDA_MINOR="
-if defined CUDA_VER (
-  for /f "tokens=1,2 delims=." %%A in ("%CUDA_VER%") do (
-    set "CUDA_MAJOR=%%A"
-    set "CUDA_MINOR=%%B"
-  )
+set "TEMP_CUDA_PS=%TEMP%\unitydocs_cuda_detect.ps1"
+> "%TEMP_CUDA_PS%" echo $out = ^& nvidia-smi 2^>$null
+>> "%TEMP_CUDA_PS%" echo $line = $out ^| Select-String 'CUDA Version' ^| Select-Object -First 1
+>> "%TEMP_CUDA_PS%" echo if ($line -and $line -match 'CUDA Version:\s*(\d+)\.(\d+)') {
+>> "%TEMP_CUDA_PS%" echo ^  $major = [int]$matches[1]
+>> "%TEMP_CUDA_PS%" echo ^  $minor = [int]$matches[2]
+>> "%TEMP_CUDA_PS%" echo ^  $ver = \"$($major).$($minor)\"
+>> "%TEMP_CUDA_PS%" echo ^  if ($major -gt 12 -or ($major -eq 12 -and $minor -ge 1)) { \"cu121|$ver\"; exit 0 }
+>> "%TEMP_CUDA_PS%" echo ^  if ($major -eq 11 -and $minor -ge 8) { \"cu118|$ver\"; exit 0 }
+>> "%TEMP_CUDA_PS%" echo }
+for /f "tokens=1,2 delims=|" %%A in ('powershell -NoProfile -ExecutionPolicy Bypass -File "%TEMP_CUDA_PS%"') do (
+  set "CUDA_TAG=%%A"
+  set "CUDA_VER=%%B"
 )
-if defined CUDA_MAJOR (
-  if not defined CUDA_MINOR set "CUDA_MINOR=0"
-  set "CUDA_MAJOR_NUM="
-  set "CUDA_MINOR_NUM="
-  set /a CUDA_MAJOR_NUM=%CUDA_MAJOR% 2>nul
-  if errorlevel 1 set "CUDA_MAJOR_NUM="
-  set /a CUDA_MINOR_NUM=%CUDA_MINOR% 2>nul
-  if errorlevel 1 set "CUDA_MINOR_NUM="
-  if defined CUDA_MAJOR_NUM if defined CUDA_MINOR_NUM (
-    if %CUDA_MAJOR_NUM% GEQ 12 (
-      if %CUDA_MINOR_NUM% GEQ 1 (
-        set "CUDA_TAG=cu121"
-      )
-    ) else if %CUDA_MAJOR_NUM% EQU 11 (
-      if %CUDA_MINOR_NUM% GEQ 8 (
-        set "CUDA_TAG=cu118"
-      )
-    )
-  )
-)
+del "%TEMP_CUDA_PS%" >nul 2>&1
 if defined CUDA_TAG (
   call :print_color Cyan "[setup] Detected CUDA %CUDA_VER%. Installing torch %CUDA_TAG%..."
   if "%CUDA_TAG%"=="cu121" python -m pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121
