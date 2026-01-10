@@ -119,11 +119,9 @@ if defined HINT_VER (
   for /f "tokens=1,2 delims=." %%A in ("!HINT_VER!") do (
     set "HINT_SHORT=%%A.%%B"
   )
-  for %%V in (6000.5 6000.4 6000.3 6000.0) do (
-    if /i "!HINT_SHORT!"=="%%V" (
-      set "DEFAULT_VER=%%V"
-      set "DETECTED_VER=%%V"
-    )
+  if defined HINT_SHORT (
+    set "DEFAULT_VER=!HINT_SHORT!"
+    set "DETECTED_VER=!HINT_SHORT!"
   )
 )
 
@@ -167,7 +165,7 @@ if defined DETECTED_VER (
 
 :choose_version
 echo.
-call :print_color Green "Unity version %DEFAULT_VER% detected. Press Enter to continue or choose a different version:"
+call :print_color Green "Select Unity docs version (default %DEFAULT_VER%):"
 echo.
 echo Options: 6000.5, 6000.4, 6000.3, 6000.0
 echo Note: Unity 2022 and older are likely already well-known by LLMs.
