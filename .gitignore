@@ -21,3 +21,4 @@ data/
 **/index/**/*.jsonl
 UnityDocumentation.zip
 *.egg-info/
+"data/" 

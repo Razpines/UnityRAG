@@ -1,10 +1,27 @@
 ﻿# UnityRAG
 
-[![CI](https://img.shields.io/github/actions/workflow/status/Razpines/UnityRAG/ci.yml?label=CI)](https://github.com/Razpines/UnityRAG/actions)
-[![License](https://img.shields.io/github/license/Razpines/UnityRAG)](LICENSE)
-Local, offline-ready Unity 6.3 documentation bake/index pipeline with an MCP server exposing search/open/list/related tools.
+UnityRAG is a local Unity docs assistant for Codex/Claude that provides accurate, versioned citations from Unity's official offline documentation.
 
 MCP tools: `search` / `open` / `related` / `list_files` / `status`
+
+## Quick Start (non-technical)
+
+1) Run setup
+- Windows: double-click `setup.bat` (or run it in a terminal).
+- This downloads the Unity offline docs, builds the local index, and cleans up raw files to save space.
+
+2) Add the MCP server to your agent
+- Codex: copy `examples/codex_mcp_config.json` into your Codex MCP config.
+- Claude Desktop: copy `examples/claude_desktop_config.json` into your Claude config.
+- Update the `UNITY_DOCS_MCP_ROOT` path to your clone.
+
+3) Restart your agent
+- It will auto-start the HTTP MCP server and connect at `http://127.0.0.1:8765/mcp`.
+
+4) Try it
+Ask: "How do I schedule an IJobParallelFor with batch size?"
+
+The model should call `unity_docs.search`, then cite the results.
 
 ## Why this exists
 - Problem: Unity MCPs and model knowledge can be stale; this uses the official Unity offline docs for your chosen version.
@@ -55,12 +72,6 @@ unitydocs-index
 ```
 unitydocs-mcp-http
 ```
-
-## 30-second smoke test
-Ask Codex/Claude:
-"How do I schedule an IJobParallelFor with batch size?"
-
-The model should call `unity_docs.search`, then cite the results.
 
 ## Layout
 - `data/unity/6000.3/raw`: UnityDocumentation.zip + unzipped HTML (not committed)
