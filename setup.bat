@@ -83,7 +83,7 @@ if not exist "%VENV%\Scripts\activate.bat" (
 )
 
 set "CUDA_TAG="
-set "TEMP_CUDA_PY=%TEMP%\\unitydocs_cuda_detect.py"
+set "TEMP_CUDA_PY=%TEMP%\unitydocs_cuda_detect.py"
 > "%TEMP_CUDA_PY%" echo import subprocess
 >> "%TEMP_CUDA_PY%" echo import re
 >> "%TEMP_CUDA_PY%" echo import sys
@@ -103,7 +103,7 @@ set "TEMP_CUDA_PY=%TEMP%\\unitydocs_cuda_detect.py"
 >> "%TEMP_CUDA_PY%" echo ^    elif major == 11 and minor ^>= 8:
 >> "%TEMP_CUDA_PY%" echo ^        tag = "cu118"
 >> "%TEMP_CUDA_PY%" echo print(tag)
-for /f "delims=" %%T in (`"%VENV%\\Scripts\\python.exe" "%TEMP_CUDA_PY%"`) do set "CUDA_TAG=%%T"
+for /f "delims=" %%T in ('python "%TEMP_CUDA_PY%"') do set "CUDA_TAG=%%T"
 del "%TEMP_CUDA_PY%" >nul 2>&1
 if defined CUDA_TAG (
   call :print_color Cyan "[setup] Detected CUDA. Installing torch %CUDA_TAG%..."
