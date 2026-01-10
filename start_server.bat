@@ -25,4 +25,10 @@ if defined UNITY_DOCS_MCP_PORT (
   echo [start_server] Using default port 8765
 )
 
-"%VENV%\Scripts\unitydocs-mcp-http.exe"
+set "MCP_EXE=%VENV%\Scripts\unitydocs-mcp-http.exe"
+if not exist "%MCP_EXE%" (
+  echo [start_server] MCP executable not found at %MCP_EXE%
+  exit /b 1
+)
+
+"%MCP_EXE%"
