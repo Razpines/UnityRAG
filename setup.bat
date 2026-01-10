@@ -131,7 +131,13 @@ goto :after_hint
 set "TEMP_PS=%TEMP%\unitydocs_hint_ver.ps1"
 > "%TEMP_PS%" echo $paths = @("C:\Program Files\Unity\Hub\Editor","C:\Program Files\Unity Hub\Editor",($env:LOCALAPPDATA + "\Unity\Hub\Editor"))
 >> "%TEMP_PS%" echo $versions = @()
->> "%TEMP_PS%" echo foreach ($p in $paths) { if (Test-Path $p) { Get-ChildItem -Path $p -Directory ^| ForEach-Object { if ($_.Name -match '^(\\d{4}\\.\\d+)') { $versions += $matches[1] } } } }
+>> "%TEMP_PS%" echo foreach ($p in $paths) {
+>> "%TEMP_PS%" echo ^  if (Test-Path $p) {
+>> "%TEMP_PS%" echo ^    foreach ($child in Get-ChildItem -Path $p -Directory) {
+>> "%TEMP_PS%" echo ^      if ($child.Name -match '^(\\d{4}\\.\\d+)') { $versions += $matches[1] }
+>> "%TEMP_PS%" echo ^    }
+>> "%TEMP_PS%" echo ^  }
+>> "%TEMP_PS%" echo }
 >> "%TEMP_PS%" echo if ($versions.Count -gt 0) { $versions ^| Sort-Object { [version]$_ } ^| Select-Object -Last 1 }
 for /f "delims=" %%V in ('powershell -NoProfile -ExecutionPolicy Bypass -File "%TEMP_PS%"') do set "HINT_VER=%%V"
 del "%TEMP_PS%" >nul 2>&1
