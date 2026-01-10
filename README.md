@@ -45,11 +45,8 @@ Unity states that code snippets are under the Unity Companion License, and other
 Do not commit `data/` artifacts to public repos.
 
 ## Advanced docs
-- `docs/README.md`
-- `docs/internal/requirements.md`
-- `docs/internal/improvements.md`
-- `docs/internal/codex_notes.md`
+- [docs/README.md](docs/README.md)
 
 ## About
 I’m a solo indie developer and I use coding agents every day. I built UnityRAG because quick, reliable doc lookups (especially for the newest Unity 6.3 features) were missing, and I wanted a frictionless way to cite the official docs.  
-More projects: [razpines.github.io]
+More projects: https://razpines.github.io
