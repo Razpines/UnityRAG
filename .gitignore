@@ -9,12 +9,15 @@ __pycache__/
 .DS_Store
 
 # Data artifacts
-data/**
+data/
 !data/.gitkeep
 
 # Local indexes and corpora
 *.sqlite
 *.faiss
 *.jsonl
+**/fts.sqlite
+**/baked/**/*.jsonl
+**/index/**/*.jsonl
 UnityDocumentation.zip
 *.egg-info/

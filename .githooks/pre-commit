@@ -1,0 +1,2 @@
+#!/bin/sh
+python scripts/check_no_data_tracked.py

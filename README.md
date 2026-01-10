@@ -2,7 +2,7 @@
 
 [![CI](https://img.shields.io/github/actions/workflow/status/Razpines/UnityRAG/ci.yml?label=CI)](https://github.com/Razpines/UnityRAG/actions)
 [![License](https://img.shields.io/github/license/Razpines/UnityRAG)](LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/unityrag?label=PyPI)](https://pypi.org/project/unityrag/)
+[![PyPI](https://img.shields.io/pypi/v/unity-docs-mcp?label=PyPI)](https://pypi.org/project/unity-docs-mcp/)
 
 Local, offline-ready Unity 6.3 documentation bake/index pipeline with an MCP server exposing search/open/list/related tools.
 
@@ -97,10 +97,15 @@ Reset a version:
 ## Configuration
 Edit `config.yaml` (optional). Defaults: Unity 6.3 URL, paths under `data/unity/6000.3`, heading-based chunking, bge-small-en-v1.5 local embeddings, FAISS vectors, FTS5 lexical.
 
-## Testing
-```
-pytest
-```
+## Examples
+- `examples/codex_mcp_config.json`
+- `examples/claude_desktop_config.json`
+
+## Content & licensing
+This project does not include Unity documentation. On setup, it downloads Unity’s official offline documentation zip and builds local artifacts on your machine.
+
+Unity states that code snippets are under the Unity Companion License, and other Manual/Scripting Reference content is under CC BY-NC-ND 4.0.
+Do not commit `data/` artifacts to public repos.
 
 ## Troubleshooting
 - `faiss-cpu` install fails: ensure you are on Python 3.12 and install with `pip install faiss-cpu`. On some platforms, use conda or build from source.
@@ -109,13 +114,12 @@ pytest
 - Port already used: set `UNITY_DOCS_MCP_PORT` (and `UNITY_DOCS_MCP_HOST` if needed).
 - Download blocked or slow: download UnityDocumentation.zip manually, place it under `data/unity/<version>/raw/`, then re-run setup.
 - `python` not found: install Python 3.12+ or run `setup.bat` to use the repo-local portable Python.
-- Wrong paths: set `UNITY_DOCS_MCP_ROOT` to your repo root.
+- Data artifacts accidentally tracked: run `python scripts/check_no_data_tracked.py` and remove listed files from git.
 
-## Content & licensing
-This project does not include Unity documentation. On setup, it downloads Unity’s official offline documentation zip and builds local artifacts on your machine.
-
-Unity states that code snippets are under the Unity Companion License, and other Manual/Scripting Reference content is under CC BY-NC-ND 4.0.
-Do not commit `data/` artifacts to public repos.
+## Testing
+```
+pytest
+```
 
 ## Notes
 - Bake/index steps are idempotent: existing artifacts with matching config/version skip work.
