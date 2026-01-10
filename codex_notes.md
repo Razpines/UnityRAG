@@ -43,3 +43,12 @@
 [2026-01-10 03:10] Added MCP min_score filter to suppress nonsense search results, improved link resolution for link_graph, and switched HTTP server to Windows selector loop to reduce WinError 10054 log noise.
 [2026-01-10 03:20] Improved MCP UX: sanitize FTS queries to avoid punctuation errors, allow source_types as string or list, and add open_max_chars/full mode to reduce partial-doc surprises.
 [2026-01-10 03:30] Ensure artifacts now runs at server start (stdio and HTTP) with an internal guard; tool calls no longer trigger bake/index unless startup didn't run.
+[2026-01-10 04:00] Added improvements.md capturing repo improvement ideas and MCP tool UX guidance, including when to use MCP vs skip for general knowledge.
+[2026-01-10 04:05] Decision: do not distribute pre-baked/indexed artifacts due to Unity docs CC BY-NC-ND; keep bake/index client-side.
+[2026-01-10 04:10] Implemented setup.bat for interactive version selection (6000.5/6000.4/6000.3/6000.0) with default 6000.3 and guidance that 2022 and older are likely well-known by LLMs.
+[2026-01-10 04:12] Added Unity Hub version hint detection (env vars or Hub install path scan) to preselect version.
+[2026-01-10 04:15] Added progress and status prints: download banner, unzip progress bar, bake/index stage messages; added cleanup to remove raw zip/unzipped docs after successful indexing when setup sets UNITY_DOCS_MCP_CLEANUP=1.
+[2026-01-10 04:18] Added embedding progress bar for indexing via SentenceTransformer show_progress_bar.
+[2026-01-10 04:20] setup.bat now creates .venv if missing, installs deps, checks free disk space, and supports optional repo-local portable Python 3.12 download (only if no 3.12 found).
+[2026-01-10 04:25] Added banner.txt and setup.bat displays banner; added colored output helpers and success/failure pauses for user-visible setup flow.
+[2026-01-10 04:30] Fixed setup.bat path normalization and removed where-python probing to avoid Windows path/volume label errors.

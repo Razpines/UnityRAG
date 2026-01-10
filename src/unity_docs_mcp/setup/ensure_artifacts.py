@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import os
+import shutil
 from pathlib import Path
 
 from unity_docs_mcp.bake.bake_cli import bake
@@ -26,6 +28,7 @@ def ensure(config: Config) -> None:
     paths.ensure_dirs()
 
     sig = config_signature(config)
+    ran_index = False
 
     if not paths.raw_zip.exists():
         download_zip(config.download_url, paths.raw_zip)
@@ -35,11 +38,25 @@ def ensure(config: Config) -> None:
 
     baked_manifest = paths.baked_dir / "manifest.json"
     if not _manifest_matches(baked_manifest, sig):
+        print("==> Baking docs (HTML -> cleaned text + chunks)...")
         bake(config)
 
     index_manifest = paths.index_dir / "manifest.json"
     if not _manifest_matches(index_manifest, sig):
+        print("==> Indexing docs (FTS + vectors)...")
         index(config)
+        ran_index = True
+
+    if os.environ.get("UNITY_DOCS_MCP_CLEANUP") == "1" and ran_index:
+        cleaned = False
+        if paths.raw_zip.exists():
+            paths.raw_zip.unlink()
+            cleaned = True
+        if paths.raw_unzipped.exists():
+            shutil.rmtree(paths.raw_unzipped, ignore_errors=True)
+            cleaned = True
+        if cleaned:
+            print("==> Cleaned up raw zip and unzipped docs to save space.")
 
 
 def main() -> None:

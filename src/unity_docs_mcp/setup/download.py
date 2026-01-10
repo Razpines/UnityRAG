@@ -14,6 +14,7 @@ def download_zip(url: str, destination: Path, overwrite: bool = False, progress:
     if destination.exists() and not overwrite:
         return destination
 
+    print(f"==> Downloading offline docs from {url}...")
     destination.parent.mkdir(parents=True, exist_ok=True)
     with requests.get(url, stream=True, timeout=30) as r:
         r.raise_for_status()

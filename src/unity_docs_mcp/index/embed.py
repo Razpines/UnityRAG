@@ -29,4 +29,11 @@ def embed_texts(texts: Iterable[str], model_name: str, device: str = "auto") -> 
     }
     print(f"[embed] using device={resolved_device} model={model_name} info={cuda_info}")
     model = _load_model(model_name, resolved_device)
-    return np.array(model.encode(list(texts), normalize_embeddings=True, convert_to_numpy=True))
+    return np.array(
+        model.encode(
+            list(texts),
+            normalize_embeddings=True,
+            convert_to_numpy=True,
+            show_progress_bar=True,
+        )
+    )
