@@ -75,45 +75,10 @@ if not exist "%VENV%\Scripts\activate.bat" (
   call "%VENV%\Scripts\activate.bat"
 )
 
-set "CUDA_LINE="
-set "CUDA_VER="
 set "CUDA_TAG="
-for /f "delims=" %%L in ('nvidia-smi 2^>nul ^| findstr /i "CUDA Version"') do (
-  set "CUDA_LINE=%%L"
-  goto :cuda_line_found
-)
-:cuda_line_found
-if defined CUDA_LINE (
-  for /f "tokens=2 delims=:" %%A in ("%CUDA_LINE%") do set "CUDA_VER=%%A"
-  for /f "tokens=1 delims=|" %%A in ("%CUDA_VER%") do set "CUDA_VER=%%A"
-  for /f "tokens=* delims= " %%A in ("%CUDA_VER%") do set "CUDA_VER=%%A"
-)
-set "CUDA_MAJOR="
-set "CUDA_MINOR="
-if defined CUDA_VER (
-  for /f "tokens=1,2 delims=." %%A in ("%CUDA_VER%") do (
-    set "CUDA_MAJOR=%%A"
-    set "CUDA_MINOR=%%B"
-  )
-)
-if defined CUDA_MAJOR (
-  if not defined CUDA_MINOR set "CUDA_MINOR=0"
-  for /f "delims=0123456789" %%X in ("%CUDA_MAJOR%") do set "CUDA_MAJOR="
-  for /f "delims=0123456789" %%X in ("%CUDA_MINOR%") do set "CUDA_MINOR="
-)
-if defined CUDA_MAJOR (
-  set /a CUDA_MAJOR_NUM=%CUDA_MAJOR%
-  set /a CUDA_MINOR_NUM=%CUDA_MINOR%
-  if %CUDA_MAJOR_NUM% GEQ 12 (
-    if %CUDA_MINOR_NUM% GEQ 1 (
-      set "CUDA_TAG=cu121"
-    )
-  ) else if %CUDA_MAJOR_NUM% EQU 11 (
-    if %CUDA_MINOR_NUM% GEQ 8 (
-      set "CUDA_TAG=cu118"
-    )
-  )
-)
+set "CUDA_VER="
+for /f "delims=" %%T in ('powershell -NoProfile -Command "$line = (nvidia-smi 2>$null | Select-String 'CUDA Version' | Select-Object -First 1).ToString(); if ($line -match 'CUDA Version:\\s*(\\d+)\\.(\\d+)') { $major=[int]$matches[1]; $minor=[int]$matches[2]; if ($major -gt 12 -or ($major -eq 12 -and $minor -ge 1)) { 'cu121' } elseif ($major -eq 11 -and $minor -ge 8) { 'cu118' } }"') do set "CUDA_TAG=%%T"
+for /f "delims=" %%V in ('powershell -NoProfile -Command "$line = (nvidia-smi 2>$null | Select-String 'CUDA Version' | Select-Object -First 1).ToString(); if ($line -match 'CUDA Version:\\s*(\\d+\\.\\d+)') { $matches[1] }"') do set "CUDA_VER=%%V"
 if defined CUDA_TAG (
   call :print_color Cyan "[setup] Detected CUDA %CUDA_VER%. Installing torch %CUDA_TAG%..."
   if "%CUDA_TAG%"=="cu121" python -m pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121
