@@ -48,5 +48,5 @@ Do not commit `data/` artifacts to public repos.
 - [docs/README.md](docs/README.md)
 
 ## About
-I’m a solo indie developer and I use coding agents every day. I built UnityRAG because quick, reliable doc lookups (especially for the newest Unity 6.3 features) were missing, and I wanted a frictionless way to cite the official docs.  
-More projects: https://razpines.github.io
+I’m working on an indie game in my spare time and I use coding agents every day. I built UnityRAG because quick, reliable doc lookups (especially for the newest Unity 6.3 features) were missing, and I wanted a frictionless way to cite the official docs.  
+[More projects here](https://razpines.github.io)
