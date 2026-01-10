@@ -77,8 +77,10 @@ if not exist "%VENV%\Scripts\activate.bat" (
 
 set "CUDA_TAG="
 set "CUDA_VER="
-for /f "delims=" %%T in ('powershell -NoProfile -Command "$line = (nvidia-smi 2>$null | Select-String 'CUDA Version' | Select-Object -First 1).ToString(); if ($line -match 'CUDA Version:\\s*(\\d+)\\.(\\d+)') { $major=[int]$matches[1]; $minor=[int]$matches[2]; if ($major -gt 12 -or ($major -eq 12 -and $minor -ge 1)) { 'cu121' } elseif ($major -eq 11 -and $minor -ge 8) { 'cu118' } }"') do set "CUDA_TAG=%%T"
-for /f "delims=" %%V in ('powershell -NoProfile -Command "$line = (nvidia-smi 2>$null | Select-String 'CUDA Version' | Select-Object -First 1).ToString(); if ($line -match 'CUDA Version:\\s*(\\d+\\.\\d+)') { $matches[1] }"') do set "CUDA_VER=%%V"
+for /f "tokens=1,2 delims=|" %%A in ('powershell -NoProfile -Command "$out = cmd /c nvidia-smi 2>$null; $line = $out | Select-String 'CUDA Version' | Select-Object -First 1; if ($line -and $line -match 'CUDA Version:\\s*(\\d+)\\.(\\d+)') { $major=[int]$matches[1]; $minor=[int]$matches[2]; $ver=\"$($matches[1]).$($matches[2])\"; if ($major -gt 12 -or ($major -eq 12 -and $minor -ge 1)) { \"cu121|$ver\" } elseif ($major -eq 11 -and $minor -ge 8) { \"cu118|$ver\" } }"') do (
+  set "CUDA_TAG=%%A"
+  set "CUDA_VER=%%B"
+)
 if defined CUDA_TAG (
   call :print_color Cyan "[setup] Detected CUDA %CUDA_VER%. Installing torch %CUDA_TAG%..."
   if "%CUDA_TAG%"=="cu121" python -m pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121
