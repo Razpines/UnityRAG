@@ -88,15 +88,21 @@ if defined CUDA_VER (
 )
 if defined CUDA_MAJOR (
   if not defined CUDA_MINOR set "CUDA_MINOR=0"
-  set /a CUDA_MAJOR_NUM=%CUDA_MAJOR%
-  set /a CUDA_MINOR_NUM=%CUDA_MINOR%
-  if %CUDA_MAJOR_NUM% GEQ 12 (
-    if %CUDA_MINOR_NUM% GEQ 1 (
-      set "CUDA_TAG=cu121"
-    )
-  ) else if %CUDA_MAJOR_NUM% EQU 11 (
-    if %CUDA_MINOR_NUM% GEQ 8 (
-      set "CUDA_TAG=cu118"
+  set "CUDA_MAJOR_NUM="
+  set "CUDA_MINOR_NUM="
+  set /a CUDA_MAJOR_NUM=%CUDA_MAJOR% 2>nul
+  if errorlevel 1 set "CUDA_MAJOR_NUM="
+  set /a CUDA_MINOR_NUM=%CUDA_MINOR% 2>nul
+  if errorlevel 1 set "CUDA_MINOR_NUM="
+  if defined CUDA_MAJOR_NUM if defined CUDA_MINOR_NUM (
+    if %CUDA_MAJOR_NUM% GEQ 12 (
+      if %CUDA_MINOR_NUM% GEQ 1 (
+        set "CUDA_TAG=cu121"
+      )
+    ) else if %CUDA_MAJOR_NUM% EQU 11 (
+      if %CUDA_MINOR_NUM% GEQ 8 (
+        set "CUDA_TAG=cu118"
+      )
     )
   )
 )
