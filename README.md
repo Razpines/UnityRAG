@@ -26,9 +26,9 @@ unitydocs-bake
 unitydocs-index
 ```
 
-5) Run MCP server
+5) Run MCP server (HTTP)
 ```
-unitydocs-mcp
+unitydocs-mcp-http
 ```
 
 ## Layout
@@ -58,19 +58,21 @@ pytest
 - Link extraction ignores external and anchor-only links; internal links are normalized to doc_ids for related lookups.
 - If you want CUDA for embeddings, install a CUDA-enabled torch wheel in the venv (e.g., `pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121`). The current torch in this venv may be CPU-only.
 
-## Codex MCP wiring
-- Add a server entry pointing to the console script inside the venv. Example (Windows):
+## Codex/Claude MCP wiring (HTTP server, auto-started)
+- Add a server entry pointing to the HTTP launcher inside the venv. Example (Windows):
   ```json
   {
     "servers": {
       "unity-docs": {
-        "command": ".\\\\.venv\\\\Scripts\\\\unitydocs-mcp.exe",
+        "command": ".\\\\.venv\\\\Scripts\\\\unitydocs-mcp-http.exe",
         "args": [],
         "env": {
-          "UNITY_DOCS_MCP_ROOT": "C:\\\\projects\\\\UnityRAG"
+          "UNITY_DOCS_MCP_ROOT": "C:\\\\projects\\\\UnityRAG",
+          "UNITY_DOCS_MCP_HOST": "127.0.0.1",
+          "UNITY_DOCS_MCP_PORT": "8765"
         }
       }
     }
   }
   ```
-  Adjust the `UNITY_DOCS_MCP_ROOT` path to your clone; with this env the server finds `config.yaml` and data without changing Codex’s working directory. Codex will auto-start the MCP server with tools: `unity-docs.search`, `open`, `list_files`, `related`, `status`.
+  Alternatively, you can point to `start_server.bat` if you want a visible console window. Adjust the `UNITY_DOCS_MCP_ROOT` path to your clone; with this env the server finds `config.yaml` and data without changing the working directory. Codex/Claude will auto-start the MCP server and connect over HTTP at `http://127.0.0.1:8765/mcp`.
