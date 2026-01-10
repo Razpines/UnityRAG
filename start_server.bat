@@ -25,4 +25,4 @@ if defined UNITY_DOCS_MCP_PORT (
   echo [start_server] Using default port 8765
 )
 
-unitydocs-mcp-http
+"%VENV%\Scripts\unitydocs-mcp-http.exe"
