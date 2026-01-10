@@ -164,6 +164,11 @@ exit /b 0
 
 :after_hint
 
+if defined HINT_VER (
+  set "SELECTED=%DEFAULT_VER%"
+  goto :write_config
+)
+
 :choose_version
 echo.
 call :print_color Green "Unity version %DEFAULT_VER% detected. Press Enter to continue or choose a different version:"
@@ -189,6 +194,7 @@ if not defined SELECTED (
   goto choose_version
 )
 
+:write_config
 set "TEMP_CFG=%TEMP%\unitydocs_config.yaml"
 (
   echo unity_version: "%SELECTED%"

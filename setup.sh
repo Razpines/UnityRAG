@@ -3,7 +3,50 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_DIR="$REPO_DIR/.venv"
-VERSION="${1:-6000.3}"
+
+detect_version() {
+  if [ -n "${UNITY_VERSION:-}" ]; then
+    echo "$UNITY_VERSION"
+    return
+  fi
+  if [ -n "${UNITY_EDITOR_VERSION:-}" ]; then
+    echo "$UNITY_EDITOR_VERSION"
+    return
+  fi
+  if command -v python3 >/dev/null 2>&1; then
+    python3 - <<'PY'
+import os, re, pathlib, sys
+paths = [
+    "/Applications/Unity/Hub/Editor",
+    os.path.expanduser("~/Applications/Unity/Hub/Editor"),
+    os.path.join(os.environ.get("HOME",""), ".local", "share", "UnityHub", "Editor"),
+]
+versions = set()
+for base in paths:
+    p = pathlib.Path(base)
+    if p.is_dir():
+        for child in p.iterdir():
+            if child.is_dir():
+                m = re.search(r"(\\d{4}\\.\\d+)", child.name)
+                if m:
+                    versions.add(m.group(1))
+if versions:
+    def key(v): return tuple(int(x) for x in v.split("."))
+    sys.stdout.write(sorted(versions, key=key)[-1])
+PY
+  fi
+}
+
+if [ -n "${1:-}" ]; then
+  VERSION="$1"
+else
+  DETECTED="$(detect_version || true)"
+  if [ -n "$DETECTED" ]; then
+    VERSION="$DETECTED"
+  else
+    VERSION="6000.3"
+  fi
+fi
 
 if command -v python3.12 >/dev/null 2>&1; then
   PYTHON=python3.12
