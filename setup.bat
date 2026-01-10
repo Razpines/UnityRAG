@@ -128,32 +128,13 @@ if defined HINT_VER (
 goto :after_hint
 
 :detect_hint
-set "TEMP_PY=%TEMP%\unitydocs_hint_ver.py"
-> "%TEMP_PY%" echo import os
->> "%TEMP_PY%" echo import re
->> "%TEMP_PY%" echo import pathlib
->> "%TEMP_PY%" echo import sys
->> "%TEMP_PY%" echo paths = [
->> "%TEMP_PY%" echo r"C:\Program Files\Unity\Hub\Editor",
->> "%TEMP_PY%" echo r"C:\Program Files\Unity Hub\Editor",
->> "%TEMP_PY%" echo os.path.join(os.environ.get("LOCALAPPDATA",""),"Unity","Hub","Editor"),
->> "%TEMP_PY%" echo "/Applications/Unity/Hub/Editor",
->> "%TEMP_PY%" echo os.path.expanduser("~/Applications/Unity/Hub/Editor"),
->> "%TEMP_PY%" echo ]
->> "%TEMP_PY%" echo versions = set()
->> "%TEMP_PY%" echo for base in paths:
->> "%TEMP_PY%" echo ^    p = pathlib.Path(base)
->> "%TEMP_PY%" echo ^    if p.is_dir():
->> "%TEMP_PY%" echo ^        for child in p.iterdir():
->> "%TEMP_PY%" echo ^            if child.is_dir():
->> "%TEMP_PY%" echo ^                m = re.search(r"(\\d{4}\\.\\d+)", child.name)
->> "%TEMP_PY%" echo ^                if m:
->> "%TEMP_PY%" echo ^                    versions.add(m.group(1))
->> "%TEMP_PY%" echo if versions:
->> "%TEMP_PY%" echo ^    def key(v): return tuple(int(x) for x in v.split("."))
->> "%TEMP_PY%" echo ^    sys.stdout.write(sorted(versions, key=key)[-1])
-for /f "usebackq delims=" %%V in (`"%VENV%\Scripts\python.exe" "%TEMP_PY%"`) do set "HINT_VER=%%V"
-del "%TEMP_PY%" >nul 2>&1
+set "TEMP_PS=%TEMP%\unitydocs_hint_ver.ps1"
+> "%TEMP_PS%" echo $paths = @("C:\Program Files\Unity\Hub\Editor","C:\Program Files\Unity Hub\Editor",($env:LOCALAPPDATA + "\Unity\Hub\Editor"))
+>> "%TEMP_PS%" echo $versions = @()
+>> "%TEMP_PS%" echo foreach ($p in $paths) { if (Test-Path $p) { Get-ChildItem -Path $p -Directory ^| ForEach-Object { if ($_.Name -match '^(\\d{4}\\.\\d+)') { $versions += $matches[1] } } } }
+>> "%TEMP_PS%" echo if ($versions.Count -gt 0) { $versions ^| Sort-Object { [version]$_ } ^| Select-Object -Last 1 }
+for /f "delims=" %%V in ('powershell -NoProfile -ExecutionPolicy Bypass -File "%TEMP_PS%"') do set "HINT_VER=%%V"
+del "%TEMP_PS%" >nul 2>&1
 exit /b 0
 
 :after_hint
