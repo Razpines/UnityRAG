@@ -16,6 +16,7 @@ MCP tools: `search` / `open` / `related` / `list_files` / `status`
 - Codex CLI: use `codex mcp ...` to add a server (see Codex CLI docs for exact syntax).
 - Claude Desktop: copy `examples/claude_desktop_config.json` into your Claude config.
 - Update the `UNITY_DOCS_MCP_ROOT` path to your clone.
+- macOS/Linux: use `start_server.sh` (edit the examples accordingly).
 
 3) Restart your agent
 - It will auto-start the HTTP MCP server and connect at `http://127.0.0.1:8765/mcp`.
@@ -71,8 +72,10 @@ Reset a version:
 Edit `config.yaml` (optional). Defaults: Unity 6.3 URL, paths under `data/unity/6000.3`, heading-based chunking, bge-small-en-v1.5 local embeddings, FAISS vectors, FTS5 lexical.
 
 ## Examples
-- `examples/codex_mcp_config.json`
-- `examples/claude_desktop_config.json`
+- `examples/codex_mcp_config.json` (Windows)
+- `examples/claude_desktop_config.json` (Windows)
+- `examples/codex_mcp_config_unix.json` (macOS/Linux)
+- `examples/claude_desktop_config_unix.json` (macOS/Linux)
 
 ## Content & licensing
 This project does not include Unity documentation. On setup, it downloads Unity's official offline documentation zip and builds local artifacts on your machine.

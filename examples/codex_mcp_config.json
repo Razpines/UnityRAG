@@ -1,7 +1,7 @@
 {
   "servers": {
     "unity-docs": {
-      "command": ".\\.venv\\Scripts\\unitydocs-mcp-http.exe",
+      "command": "start_server.bat",
       "args": [],
       "env": {
         "UNITY_DOCS_MCP_ROOT": "C:\\projects\\UnityRAG",
