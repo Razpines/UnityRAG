@@ -97,15 +97,20 @@ if defined CUDA_VER (
     set "CUDA_MINOR=%%B"
   )
 )
-if defined CUDA_MAJOR (
-  if %CUDA_MAJOR% GEQ 12 (
-    if %CUDA_MINOR% GEQ 1 (
+set "CUDA_MAJOR_NUM=%CUDA_MAJOR%"
+for /f "delims=0123456789" %%X in ("%CUDA_MAJOR_NUM%") do set "CUDA_MAJOR_NUM="
+set "CUDA_MINOR_NUM=%CUDA_MINOR%"
+for /f "delims=0123456789" %%X in ("%CUDA_MINOR_NUM%") do set "CUDA_MINOR_NUM="
+if defined CUDA_MAJOR_NUM (
+  if not defined CUDA_MINOR_NUM set "CUDA_MINOR_NUM=0"
+  if %CUDA_MAJOR_NUM% GEQ 12 (
+    if %CUDA_MINOR_NUM% GEQ 1 (
       call :print_color Cyan "[setup] Detected CUDA %CUDA_VER%. Installing torch cu121..."
       python -m pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121
       set "CUDA_SELECTED=1"
     )
-  ) else if %CUDA_MAJOR% EQU 11 (
-    if %CUDA_MINOR% GEQ 8 (
+  ) else if %CUDA_MAJOR_NUM% EQU 11 (
+    if %CUDA_MINOR_NUM% GEQ 8 (
       call :print_color Cyan "[setup] Detected CUDA %CUDA_VER%. Installing torch cu118..."
       python -m pip install --force-reinstall torch==2.2.2+cu118 --index-url https://download.pytorch.org/whl/cu118
       set "CUDA_SELECTED=1"
