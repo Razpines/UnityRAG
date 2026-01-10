@@ -42,3 +42,4 @@
 [2026-01-10 02:55] Added start_server.bat to activate .venv, set UNITY_DOCS_MCP_ROOT, and launch unitydocs-mcp-http with optional port arg for visible logs.
 [2026-01-10 03:10] Added MCP min_score filter to suppress nonsense search results, improved link resolution for link_graph, and switched HTTP server to Windows selector loop to reduce WinError 10054 log noise.
 [2026-01-10 03:20] Improved MCP UX: sanitize FTS queries to avoid punctuation errors, allow source_types as string or list, and add open_max_chars/full mode to reduce partial-doc surprises.
+[2026-01-10 03:30] Ensure artifacts now runs at server start (stdio and HTTP) with an internal guard; tool calls no longer trigger bake/index unless startup didn't run.

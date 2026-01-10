@@ -15,6 +15,7 @@ from unity_docs_mcp.tools.ops import DocStore
 app = FastMCP("unity-docs")
 
 _docstore: Optional[DocStore] = None
+_ensured: bool = False
 
 
 def _get_docstore() -> DocStore:
@@ -23,11 +24,23 @@ def _get_docstore() -> DocStore:
     initialize on first tool call and keep a singleton for reuse.
     """
     global _docstore
+    global _ensured
     if _docstore is None:
         config = load_config()
-        ensure(config)
+        if not _ensured:
+            ensure(config)
+            _ensured = True
         _docstore = DocStore(config)
     return _docstore
+
+
+def _ensure_startup() -> None:
+    global _ensured
+    if _ensured:
+        return
+    config = load_config()
+    ensure(config)
+    _ensured = True
 
 
 @app.tool()
@@ -137,10 +150,12 @@ def status() -> dict:
 
 
 def main() -> None:
+    _ensure_startup()
     app.run()
 
 
 def main_http() -> None:
+    _ensure_startup()
     host = os.environ.get("UNITY_DOCS_MCP_HOST", "127.0.0.1")
     port = int(os.environ.get("UNITY_DOCS_MCP_PORT", "8765"))
     app.settings.host = host
