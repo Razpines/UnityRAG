@@ -9,6 +9,10 @@ if [ ! -f "$VENV_DIR/bin/activate" ]; then
   exit 1
 fi
 
+if [ -f "$REPO_DIR/banner.txt" ]; then
+  cat "$REPO_DIR/banner.txt"
+fi
+
 export UNITY_DOCS_MCP_ROOT="$REPO_DIR"
 
 if [ -n "${1:-}" ]; then
