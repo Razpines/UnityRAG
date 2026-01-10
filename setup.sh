@@ -72,16 +72,18 @@ source "$VENV_DIR/bin/activate"
 CUDA_SELECTED=0
 if command -v nvidia-smi >/dev/null 2>&1; then
   CUDA_VER="$(nvidia-smi | grep \"CUDA Version\" | awk '{ print $9 }' | head -n1 | tr -d ' ')"
-  CUDA_MAJOR="${CUDA_VER%%.*}"
-  CUDA_MINOR="${CUDA_VER#*.}"
-  if [ -n "$CUDA_VER" ] && [ "$CUDA_MAJOR" -ge 12 ] && [ "$CUDA_MINOR" -ge 1 ]; then
-    echo "[setup] Detected CUDA $CUDA_VER. Installing torch cu121..."
-    python -m pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121
-    CUDA_SELECTED=1
-  elif [ -n "$CUDA_VER" ] && [ "$CUDA_MAJOR" -eq 11 ] && [ "$CUDA_MINOR" -ge 8 ]; then
-    echo "[setup] Detected CUDA $CUDA_VER. Installing torch cu118..."
-    python -m pip install --force-reinstall torch==2.2.2+cu118 --index-url https://download.pytorch.org/whl/cu118
-    CUDA_SELECTED=1
+  if [[ "$CUDA_VER" =~ ^[0-9]+\.[0-9]+$ ]]; then
+    CUDA_MAJOR="${CUDA_VER%%.*}"
+    CUDA_MINOR="${CUDA_VER#*.}"
+    if [ "$CUDA_MAJOR" -ge 12 ] && [ "$CUDA_MINOR" -ge 1 ]; then
+      echo "[setup] Detected CUDA $CUDA_VER. Installing torch cu121..."
+      python -m pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121
+      CUDA_SELECTED=1
+    elif [ "$CUDA_MAJOR" -eq 11 ] && [ "$CUDA_MINOR" -ge 8 ]; then
+      echo "[setup] Detected CUDA $CUDA_VER. Installing torch cu118..."
+      python -m pip install --force-reinstall torch==2.2.2+cu118 --index-url https://download.pytorch.org/whl/cu118
+      CUDA_SELECTED=1
+    fi
   fi
 fi
 
