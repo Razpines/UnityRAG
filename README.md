@@ -66,10 +66,11 @@ pytest
       "unity-docs": {
         "command": ".\\\\.venv\\\\Scripts\\\\unitydocs-mcp.exe",
         "args": [],
-        "env": {},
-        "workingDirectory": "C:\\\\projects\\\\UnityRAG"
+        "env": {
+          "UNITY_DOCS_MCP_ROOT": "C:\\\\projects\\\\UnityRAG"
+        }
       }
     }
   }
   ```
-  Adjust `workingDirectory` to your clone path. Codex will auto-start the MCP server with tools: `unity-docs.search`, `open`, `list_files`, `related`, `status`.
+  Adjust the `UNITY_DOCS_MCP_ROOT` path to your clone; with this env the server finds `config.yaml` and data without changing Codex’s working directory. Codex will auto-start the MCP server with tools: `unity-docs.search`, `open`, `list_files`, `related`, `status`.

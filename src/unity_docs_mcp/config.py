@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 import hashlib
 import json
@@ -125,9 +126,21 @@ def merge_config(base: Config, overrides: Dict[str, Any]) -> Config:
 
 
 def load_config(config_path: Optional[Path | str] = None) -> Config:
-    if config_path is None:
-        config_path = Path("config.yaml")
-    return Config.from_file(config_path)
+    env_override = os.environ.get("UNITY_DOCS_MCP_CONFIG")
+    search_paths = []
+    if config_path is not None:
+        search_paths.append(Path(config_path))
+    if env_override:
+        search_paths.append(Path(env_override))
+    search_paths.append(Path("config.yaml"))
+    # fallback to repo root (two parents up from this file's directory)
+    repo_root = Path(__file__).resolve().parents[2]
+    search_paths.append(repo_root / "config.yaml")
+
+    for candidate in search_paths:
+        if candidate.exists():
+            return Config.from_file(candidate)
+    return Config()
 
 
 def config_signature(cfg: Config) -> str:
