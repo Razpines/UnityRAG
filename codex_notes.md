@@ -33,3 +33,5 @@
 [2026-01-10 01:52] Torch in .venv is CPU-only (2.9.1+cpu). Documented installing CUDA torch; pyproject unchanged (torch stays transient).
 [2026-01-10 02:05] User wants CUDA; will recreate venv with Python 3.12 to allow CUDA torch wheels (PyTorch not available for 3.13).
 [2026-01-10 02:15] Recreated .venv with Python 3.12, installed torch 2.2.2+cu121 and downgraded numpy to 1.26.4 for compatibility; torch now reports cuda available (12.1).
+[2026-01-10 02:20] Added mcp.config.json with relative server command (.\\.venv\\Scripts\\unitydocs-mcp.exe) for Codex auto-start.
+[2026-01-10 02:24] Removed repo-level mcp.config.json (machine-specific). Will document Codex setup in README instead.

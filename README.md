@@ -57,3 +57,19 @@ pytest
 - Bake/index steps are idempotent: existing artifacts with matching config/version skip work.
 - Link extraction ignores external and anchor-only links; internal links are normalized to doc_ids for related lookups.
 - If you want CUDA for embeddings, install a CUDA-enabled torch wheel in the venv (e.g., `pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121`). The current torch in this venv may be CPU-only.
+
+## Codex MCP wiring
+- Add a server entry pointing to the console script inside the venv. Example (Windows):
+  ```json
+  {
+    "servers": {
+      "unity-docs": {
+        "command": ".\\\\.venv\\\\Scripts\\\\unitydocs-mcp.exe",
+        "args": [],
+        "env": {},
+        "workingDirectory": "C:\\\\projects\\\\UnityRAG"
+      }
+    }
+  }
+  ```
+  Adjust `workingDirectory` to your clone path. Codex will auto-start the MCP server with tools: `unity-docs.search`, `open`, `list_files`, `related`, `status`.
