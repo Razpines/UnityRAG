@@ -37,3 +37,4 @@
 [2026-01-10 02:24] Removed repo-level mcp.config.json (machine-specific). Will document Codex setup in README instead.
 [2026-01-10 02:28] Updated config/paths resolution to work without changing working dir: load_config searches env UNITY_DOCS_MCP_CONFIG and repo root; make_paths anchors relative paths using env UNITY_DOCS_MCP_ROOT or repo root. README shows Codex config using UNITY_DOCS_MCP_ROOT.
 [2026-01-10 02:35] Added Codex CLI MCP server entry (unity-docs) pointing to .venv\\Scripts\\unitydocs-mcp.exe with UNITY_DOCS_MCP_ROOT=C:\\projects\\UnityRAG to auto-start without changing working directory.
+[2026-01-10 02:40] Fixed MCP server for current mcp package (no on_startup hook) by lazy-initializing DocStore per tool; unitydocs-mcp now runs without handshake failure.

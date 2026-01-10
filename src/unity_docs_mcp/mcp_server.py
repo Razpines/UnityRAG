@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from typing import List, Optional
 
-from mcp.server.fastmcp import Context, FastMCP
+from mcp.server.fastmcp import FastMCP
 
 from unity_docs_mcp.config import load_config
 from unity_docs_mcp.setup.ensure_artifacts import ensure
@@ -14,19 +14,23 @@ app = FastMCP("unity-docs")
 _docstore: Optional[DocStore] = None
 
 
-@app.on_startup()
-def startup(_: Context) -> None:
+def _get_docstore() -> DocStore:
+    """
+    FastMCP version in this environment lacks startup hooks, so we lazily
+    initialize on first tool call and keep a singleton for reuse.
+    """
     global _docstore
-    config = load_config()
-    ensure(config)
-    _docstore = DocStore(config)
+    if _docstore is None:
+        config = load_config()
+        ensure(config)
+        _docstore = DocStore(config)
+    return _docstore
 
 
 @app.tool()
 def search(query: str, k: int = 6, source_types: Optional[List[str]] = None) -> List[dict]:
-    if _docstore is None:
-        raise RuntimeError("Docstore not initialized")
-    results = _docstore.search(query=query, k=k, source_types=source_types)
+    docstore = _get_docstore()
+    results = docstore.search(query=query, k=k, source_types=source_types)
     return [
         {
             "chunk_id": r.chunk_id,
@@ -45,9 +49,8 @@ def search(query: str, k: int = 6, source_types: Optional[List[str]] = None) -> 
 
 @app.tool()
 def open(doc_id: Optional[str] = None, path: Optional[str] = None, max_chars: Optional[int] = None) -> dict:
-    if _docstore is None:
-        raise RuntimeError("Docstore not initialized")
-    record = _docstore.open_doc(doc_id=doc_id, path=path)
+    docstore = _get_docstore()
+    record = docstore.open_doc(doc_id=doc_id, path=path)
     if not record:
         return {}
     text = record.text_md
@@ -65,9 +68,8 @@ def open(doc_id: Optional[str] = None, path: Optional[str] = None, max_chars: Op
 
 @app.tool()
 def list_files(pattern: str, limit: int = 20) -> List[dict]:
-    if _docstore is None:
-        raise RuntimeError("Docstore not initialized")
-    matches = _docstore.list_files(pattern=pattern, limit=limit)
+    docstore = _get_docstore()
+    matches = docstore.list_files(pattern=pattern, limit=limit)
     return [
         {
             "doc_id": m.doc_id,
@@ -82,9 +84,8 @@ def list_files(pattern: str, limit: int = 20) -> List[dict]:
 
 @app.tool()
 def related(doc_id: str, limit: int = 10) -> List[dict]:
-    if _docstore is None:
-        raise RuntimeError("Docstore not initialized")
-    neighbors = _docstore.related(doc_id=doc_id, limit=limit)
+    docstore = _get_docstore()
+    neighbors = docstore.related(doc_id=doc_id, limit=limit)
     return [
         {
             "doc_id": n.doc_id,
@@ -99,7 +100,8 @@ def related(doc_id: str, limit: int = 10) -> List[dict]:
 
 @app.tool()
 def status() -> dict:
-    config = load_config()
+    docstore = _get_docstore()
+    config = docstore.config
     from unity_docs_mcp.paths import make_paths
 
     paths = make_paths(config)
