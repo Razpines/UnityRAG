@@ -4,7 +4,7 @@ UnityRAG is a local Unity docs assistant for Codex/Claude that provides accurate
 
 MCP tools: `search` / `open` / `related` / `list_files` / `status`
 
-## Quick Start
+## Quick Start (recommended)
 
 1) Run setup
 - Windows: double-click `setup.bat` (or run it in a terminal).
@@ -35,7 +35,7 @@ The model should call `unity_docs.search`, then cite the results.
 unitydocs install --version 6000.3
 unitydocs mcp
 ```
-Under the hood this runs download, bake, and index idempotently, then starts the HTTP MCP server.
+Under the hood this runs download, bake, and index idempotently. Then start the HTTP MCP server.
 
 ## Layout
 - `data/unity/6000.3/raw`: UnityDocumentation.zip + unzipped HTML (not committed)
@@ -50,9 +50,9 @@ Under the hood this runs download, bake, and index idempotently, then starts the
 - Baked artifacts: `data/unity/<version>/baked/`
 - Index artifacts: `data/unity/<version>/index/`
 
-Typical sizes vary by version and model:
-- Zip: ~1-2 GB
-- Unzipped HTML: ~4-6 GB
+Typical sizes (approx):
+- Zip: ~743 MB (removed after setup completes)
+- Unzipped HTML: ~1.0 GB (removed after setup completes)
 - Baked JSONL: ~300-700 MB
 - Indexes (FTS + vectors): ~1-4 GB
 
