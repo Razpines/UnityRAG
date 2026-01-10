@@ -71,13 +71,6 @@ if not exist "%VENV%\Scripts\activate.bat" (
     exit /b 1
   )
   call "%VENV%\Scripts\activate.bat"
-  python -m pip install -U pip
-  python -m pip install -e .[dev]
-  if errorlevel 1 (
-    call :print_color Red "[setup] Failed to install dependencies."
-    pause
-    exit /b 1
-  )
 ) else (
   call "%VENV%\Scripts\activate.bat"
 )
@@ -127,6 +120,14 @@ if defined CUDA_TAG (
   if "%CUDA_TAG%"=="cu118" python -m pip install --force-reinstall torch==2.2.2+cu118 --index-url https://download.pytorch.org/whl/cu118
 ) else (
   call :print_color DarkYellow "[setup] WARNING: No compatible CUDA version detected. Using CPU embeddings; initial indexing may be slow."
+)
+
+python -m pip install -U pip
+python -m pip install -e .[dev]
+if errorlevel 1 (
+  call :print_color Red "[setup] Failed to install dependencies."
+  pause
+  exit /b 1
 )
 
 set "DEFAULT_VER=6000.3"

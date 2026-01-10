@@ -68,8 +68,6 @@ if [ ! -f "$VENV_DIR/bin/activate" ]; then
 fi
 
 source "$VENV_DIR/bin/activate"
-python -m pip install -U pip
-python -m pip install -e ".[dev]"
 
 CUDA_SELECTED=0
 if command -v nvidia-smi >/dev/null 2>&1; then
@@ -90,6 +88,9 @@ fi
 if [ "$CUDA_SELECTED" -eq 0 ]; then
   printf "\033[33m[setup] WARNING: No compatible CUDA version detected. Using CPU embeddings; initial indexing may be slow.\033[0m\n"
 fi
+
+python -m pip install -U pip
+python -m pip install -e ".[dev]"
 
 export UNITY_DOCS_MCP_ROOT="$REPO_DIR"
 export UNITY_DOCS_MCP_CLEANUP=1
