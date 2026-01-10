@@ -88,12 +88,11 @@ set "TEMP_CUDA_PY=%TEMP%\unitydocs_cuda_detect.py"
 >> "%TEMP_CUDA_PY%" echo import re
 >> "%TEMP_CUDA_PY%" echo import sys
 >> "%TEMP_CUDA_PY%" echo try:
->> "%TEMP_CUDA_PY%" echo ^    out = subprocess.check_output(["nvidia-smi","--query-gpu=cuda_version","--format=csv,noheader"], stderr=subprocess.DEVNULL, text=True).splitlines()
+>> "%TEMP_CUDA_PY%" echo ^    out = subprocess.check_output(["nvidia-smi"], stderr=subprocess.DEVNULL, text=True)
 >> "%TEMP_CUDA_PY%" echo except Exception:
 >> "%TEMP_CUDA_PY%" echo ^    print("")
 >> "%TEMP_CUDA_PY%" echo ^    sys.exit(0)
->> "%TEMP_CUDA_PY%" echo v = out[0].strip() if out else ""
->> "%TEMP_CUDA_PY%" echo m = re.match(r"^(\\d+)\\.(\\d+)", v)
+>> "%TEMP_CUDA_PY%" echo m = re.search(r"CUDA Version:\\s*(\\d+)\\.(\\d+)", out)
 >> "%TEMP_CUDA_PY%" echo tag = ""
 >> "%TEMP_CUDA_PY%" echo if m:
 >> "%TEMP_CUDA_PY%" echo ^    major = int(m.group(1))
