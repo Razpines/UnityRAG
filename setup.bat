@@ -82,42 +82,13 @@ if not exist "%VENV%\Scripts\activate.bat" (
   call "%VENV%\Scripts\activate.bat"
 )
 
-set "CUDA_VER="
-set "CUDA_SELECTED="
-for /f "delims=" %%V in ('nvidia-smi --query-gpu=cuda_version --format=csv,noheader 2^>nul') do (
-  set "CUDA_VER=%%V"
-  goto :cuda_checked
-)
-:cuda_checked
-set "CUDA_MAJOR="
-set "CUDA_MINOR="
-if defined CUDA_VER (
-  for /f "tokens=1,2 delims=." %%A in ("%CUDA_VER%") do (
-    set "CUDA_MAJOR=%%A"
-    set "CUDA_MINOR=%%B"
-  )
-)
-set "CUDA_MAJOR_NUM=%CUDA_MAJOR%"
-for /f "delims=0123456789" %%X in ("%CUDA_MAJOR_NUM%") do set "CUDA_MAJOR_NUM="
-set "CUDA_MINOR_NUM=%CUDA_MINOR%"
-for /f "delims=0123456789" %%X in ("%CUDA_MINOR_NUM%") do set "CUDA_MINOR_NUM="
-if defined CUDA_MAJOR_NUM (
-  if not defined CUDA_MINOR_NUM set "CUDA_MINOR_NUM=0"
-  if %CUDA_MAJOR_NUM% GEQ 12 (
-    if %CUDA_MINOR_NUM% GEQ 1 (
-      call :print_color Cyan "[setup] Detected CUDA %CUDA_VER%. Installing torch cu121..."
-      python -m pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121
-      set "CUDA_SELECTED=1"
-    )
-  ) else if %CUDA_MAJOR_NUM% EQU 11 (
-    if %CUDA_MINOR_NUM% GEQ 8 (
-      call :print_color Cyan "[setup] Detected CUDA %CUDA_VER%. Installing torch cu118..."
-      python -m pip install --force-reinstall torch==2.2.2+cu118 --index-url https://download.pytorch.org/whl/cu118
-      set "CUDA_SELECTED=1"
-    )
-  )
-)
-if not defined CUDA_SELECTED (
+set "CUDA_TAG="
+for /f "delims=" %%T in ('python -c "import subprocess,re,sys;\\ntry:\\n    out=subprocess.check_output([''nvidia-smi'',''--query-gpu=cuda_version'',''--format=csv,noheader''], stderr=subprocess.DEVNULL, text=True).splitlines()\\nexcept Exception:\\n    print(''); sys.exit(0)\\nv=out[0].strip() if out else ''\\nm=re.match(r'^(\\\\d+)\\\\.(\\\\d+)', v)\\ntag=''\\nif m:\\n    major=int(m.group(1)); minor=int(m.group(2))\\n    if major>12 or (major==12 and minor>=1): tag='cu121'\\n    elif major==11 and minor>=8: tag='cu118'\\nprint(tag)"') do set "CUDA_TAG=%%T"
+if defined CUDA_TAG (
+  call :print_color Cyan "[setup] Detected CUDA. Installing torch %CUDA_TAG%..."
+  if "%CUDA_TAG%"=="cu121" python -m pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121
+  if "%CUDA_TAG%"=="cu118" python -m pip install --force-reinstall torch==2.2.2+cu118 --index-url https://download.pytorch.org/whl/cu118
+) else (
   call :print_color DarkYellow "[setup] WARNING: No compatible CUDA version detected. Using CPU embeddings; initial indexing may be slow."
 )
 
