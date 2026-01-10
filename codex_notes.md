@@ -39,3 +39,4 @@
 [2026-01-10 02:35] Added Codex CLI MCP server entry (unity-docs) pointing to .venv\\Scripts\\unitydocs-mcp.exe with UNITY_DOCS_MCP_ROOT=C:\\projects\\UnityRAG to auto-start without changing working directory.
 [2026-01-10 02:40] Fixed MCP server for current mcp package (no on_startup hook) by lazy-initializing DocStore per tool; unitydocs-mcp now runs without handshake failure.
 [2026-01-10 02:50] Added streamable HTTP entrypoint (unitydocs-mcp-http) with env-configurable host/port for external MCP clients and easier log visibility; defaults to 127.0.0.1:8765/mcp.
+[2026-01-10 02:55] Added start_server.bat to activate .venv, set UNITY_DOCS_MCP_ROOT, and launch unitydocs-mcp-http with optional port arg for visible logs.
