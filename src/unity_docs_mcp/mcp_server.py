@@ -31,8 +31,14 @@ def _get_docstore() -> DocStore:
 
 
 @app.tool()
-def search(query: str, k: int = 6, source_types: Optional[List[str]] = None) -> List[dict]:
+def search(
+    query: str,
+    k: int = 6,
+    source_types: Optional[List[str] | str] = None,
+) -> List[dict]:
     docstore = _get_docstore()
+    if isinstance(source_types, str):
+        source_types = [s.strip() for s in source_types.split(",") if s.strip()]
     results = docstore.search(query=query, k=k, source_types=source_types)
     return [
         {
@@ -51,14 +57,21 @@ def search(query: str, k: int = 6, source_types: Optional[List[str]] = None) -> 
 
 
 @app.tool()
-def open(doc_id: Optional[str] = None, path: Optional[str] = None, max_chars: Optional[int] = None) -> dict:
+def open(
+    doc_id: Optional[str] = None,
+    path: Optional[str] = None,
+    max_chars: Optional[int] = None,
+    full: bool = False,
+) -> dict:
     docstore = _get_docstore()
     record = docstore.open_doc(doc_id=doc_id, path=path)
     if not record:
         return {}
     text = record.text_md
-    if max_chars and len(text) > max_chars:
-        text = text[:max_chars] + "..."
+    if not full:
+        cap = max_chars if max_chars is not None else docstore.config.mcp.open_max_chars
+        if cap and len(text) > cap:
+            text = text[:cap] + "..."
     return {
         "doc_id": record.doc_id,
         "title": record.title,

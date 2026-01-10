@@ -55,6 +55,7 @@ class MCPConfig:
     max_results_default: int = 6
     snippet_chars: int = 900
     min_score: float = 0.15
+    open_max_chars: int = 12000
 
 
 @dataclass

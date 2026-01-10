@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sqlite3
 from pathlib import Path
+import re
 from typing import Iterable, List, Tuple
 
 
@@ -50,8 +51,23 @@ def ingest_chunks(conn: sqlite3.Connection, rows: Iterable[Tuple[str, str, str, 
 
 
 def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20) -> List[Tuple[str, float]]:
-    cursor = conn.execute(
-        "SELECT chunk_id, bm25(chunks_fts) as score FROM chunks_fts WHERE chunks_fts MATCH ? ORDER BY score LIMIT ?",
-        (query, limit),
-    )
-    return cursor.fetchall()
+    try:
+        cursor = conn.execute(
+            "SELECT chunk_id, bm25(chunks_fts) as score FROM chunks_fts WHERE chunks_fts MATCH ? ORDER BY score LIMIT ?",
+            (query, limit),
+        )
+        return cursor.fetchall()
+    except sqlite3.OperationalError:
+        safe_query = _sanitize_fts_query(query)
+        if not safe_query:
+            return []
+        cursor = conn.execute(
+            "SELECT chunk_id, bm25(chunks_fts) as score FROM chunks_fts WHERE chunks_fts MATCH ? ORDER BY score LIMIT ?",
+            (safe_query, limit),
+        )
+        return cursor.fetchall()
+
+
+def _sanitize_fts_query(query: str) -> str:
+    tokens = re.findall(r"[A-Za-z0-9_]+", query)
+    return " ".join(tokens)

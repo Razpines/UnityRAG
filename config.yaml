@@ -34,3 +34,4 @@ mcp:
   max_results_default: 6
   snippet_chars: 900
   min_score: 0.15
+  open_max_chars: 12000
