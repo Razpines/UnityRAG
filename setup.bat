@@ -83,7 +83,28 @@ if not exist "%VENV%\Scripts\activate.bat" (
 )
 
 set "CUDA_TAG="
-for /f "delims=" %%T in ('python -c "import subprocess,re,sys;\\ntry:\\n    out=subprocess.check_output([''nvidia-smi'',''--query-gpu=cuda_version'',''--format=csv,noheader''], stderr=subprocess.DEVNULL, text=True).splitlines()\\nexcept Exception:\\n    print(''); sys.exit(0)\\nv=out[0].strip() if out else ''\\nm=re.match(r'^(\\\\d+)\\\\.(\\\\d+)', v)\\ntag=''\\nif m:\\n    major=int(m.group(1)); minor=int(m.group(2))\\n    if major>12 or (major==12 and minor>=1): tag='cu121'\\n    elif major==11 and minor>=8: tag='cu118'\\nprint(tag)"') do set "CUDA_TAG=%%T"
+set "TEMP_CUDA_PY=%TEMP%\\unitydocs_cuda_detect.py"
+> "%TEMP_CUDA_PY%" echo import subprocess
+>> "%TEMP_CUDA_PY%" echo import re
+>> "%TEMP_CUDA_PY%" echo import sys
+>> "%TEMP_CUDA_PY%" echo try:
+>> "%TEMP_CUDA_PY%" echo ^    out = subprocess.check_output(["nvidia-smi","--query-gpu=cuda_version","--format=csv,noheader"], stderr=subprocess.DEVNULL, text=True).splitlines()
+>> "%TEMP_CUDA_PY%" echo except Exception:
+>> "%TEMP_CUDA_PY%" echo ^    print("")
+>> "%TEMP_CUDA_PY%" echo ^    sys.exit(0)
+>> "%TEMP_CUDA_PY%" echo v = out[0].strip() if out else ""
+>> "%TEMP_CUDA_PY%" echo m = re.match(r"^(\\d+)\\.(\\d+)", v)
+>> "%TEMP_CUDA_PY%" echo tag = ""
+>> "%TEMP_CUDA_PY%" echo if m:
+>> "%TEMP_CUDA_PY%" echo ^    major = int(m.group(1))
+>> "%TEMP_CUDA_PY%" echo ^    minor = int(m.group(2))
+>> "%TEMP_CUDA_PY%" echo ^    if major ^> 12 or (major == 12 and minor ^>= 1):
+>> "%TEMP_CUDA_PY%" echo ^        tag = "cu121"
+>> "%TEMP_CUDA_PY%" echo ^    elif major == 11 and minor ^>= 8:
+>> "%TEMP_CUDA_PY%" echo ^        tag = "cu118"
+>> "%TEMP_CUDA_PY%" echo print(tag)
+for /f "delims=" %%T in (`"%VENV%\\Scripts\\python.exe" "%TEMP_CUDA_PY%"`) do set "CUDA_TAG=%%T"
+del "%TEMP_CUDA_PY%" >nul 2>&1
 if defined CUDA_TAG (
   call :print_color Cyan "[setup] Detected CUDA. Installing torch %CUDA_TAG%..."
   if "%CUDA_TAG%"=="cu121" python -m pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121
