@@ -110,6 +110,7 @@ if errorlevel 1 (
 
 set "DEFAULT_VER=6000.3"
 set "HINT_VER="
+set "DETECTED_VER="
 if defined UNITY_VERSION set "HINT_VER=%UNITY_VERSION%"
 if defined UNITY_EDITOR_VERSION set "HINT_VER=%UNITY_EDITOR_VERSION%"
 if not defined HINT_VER call :detect_hint
@@ -119,7 +120,10 @@ if defined HINT_VER (
     set "HINT_SHORT=%%A.%%B"
   )
   for %%V in (6000.5 6000.4 6000.3 6000.0) do (
-    if /i "!HINT_SHORT!"=="%%V" set "DEFAULT_VER=%%V"
+    if /i "!HINT_SHORT!"=="%%V" (
+      set "DEFAULT_VER=%%V"
+      set "DETECTED_VER=%%V"
+    )
   )
 )
 
@@ -156,8 +160,8 @@ exit /b 0
 
 :after_hint
 
-if defined HINT_VER (
-  set "SELECTED=%DEFAULT_VER%"
+if defined DETECTED_VER (
+  set "SELECTED=%DETECTED_VER%"
   goto :write_config
 )
 
