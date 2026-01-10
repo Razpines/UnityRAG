@@ -4,11 +4,6 @@ UnityRAG is a local Unity docs assistant for Codex/Claude that provides accurate
 
 MCP tools: `search` / `open` / `related` / `list_files` / `status`
 
-## About
-I'm working on an indie solo-dev in my free time and heavily use coding agents. I really felt like easy doc referencing was a missing capability (especially for the newest features in Unity 6.3), so I created this tool to make my life easier.
-
-For other stuff I'm working on: [razpines.github.io]
-
 ## Quick Start (recommended)
 
 1) Run setup
@@ -54,3 +49,7 @@ Do not commit `data/` artifacts to public repos.
 - `docs/internal/requirements.md`
 - `docs/internal/improvements.md`
 - `docs/internal/codex_notes.md`
+
+## About
+I’m a solo indie developer and I use coding agents every day. I built UnityRAG because quick, reliable doc lookups (especially for the newest Unity 6.3 features) were missing, and I wanted a frictionless way to cite the official docs.  
+More projects: [razpines.github.io]
