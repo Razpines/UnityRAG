@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from typing import List, Optional
 
 from mcp.server.fastmcp import FastMCP
@@ -122,6 +123,15 @@ def status() -> dict:
 
 def main() -> None:
     app.run()
+
+
+def main_http() -> None:
+    host = os.environ.get("UNITY_DOCS_MCP_HOST", "127.0.0.1")
+    port = int(os.environ.get("UNITY_DOCS_MCP_PORT", "8765"))
+    app.settings.host = host
+    app.settings.port = port
+    print(f"[unitydocs-mcp] starting streamable HTTP server on {host}:{port}/mcp")
+    app.run(transport="streamable-http")
 
 
 if __name__ == "__main__":

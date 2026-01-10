@@ -29,6 +29,7 @@ unitydocs-setup = "unity_docs_mcp.setup.ensure_artifacts:main"
 unitydocs-bake = "unity_docs_mcp.bake.bake_cli:main"
 unitydocs-index = "unity_docs_mcp.index.index_cli:main"
 unitydocs-mcp = "unity_docs_mcp.mcp_server:main"
+unitydocs-mcp-http = "unity_docs_mcp.mcp_server:main_http"
 
 [tool.setuptools.packages.find]
 where = ["src"]
