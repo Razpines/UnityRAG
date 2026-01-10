@@ -1,1 +1,145 @@
-﻿‣湕瑩剹䝁ਊ⅛䍛嵉栨瑴獰⼺椯杭献楨汥獤椮⽯楧桴扵愯瑣潩獮眯牯晫潬⽷瑳瑡獵刯穡楰敮⽳湕瑩剹䝁振⹩浹㽬慬敢㵬䥃崩栨瑴獰⼺术瑩畨⹢潣⽭慒灺湩獥唯楮祴䅒⽇捡楴湯⥳嬊嬡楌散獮嵥栨瑴獰⼺椯杭献楨汥獤椮⽯楧桴扵氯捩湥敳刯穡楰敮⽳湕瑩剹䝁崩䰨䍉久䕓਩⅛偛偹嵉栨瑴獰⼺椯杭献楨汥獤椮⽯祰楰瘯甯楮祴搭捯⵳捭㽰慬敢㵬祐䥐崩栨瑴獰⼺瀯灹⹩牯⽧牰橯捥⽴湵瑩⵹潤獣洭灣⤯ਊ潌慣ⱬ漠晦楬敮爭慥祤唠楮祴㘠㌮搠捯浵湥慴楴湯戠歡⽥湩敤⁸楰数楬敮眠瑩⁨湡䴠偃猠牥敶⁲硥潰楳杮猠慥捲⽨灯湥氯獩⽴敲慬整⁤潴汯⹳ਊ䍍⁐潴汯㩳怠敳牡档⁠ 潠数恮⼠怠敲慬整恤⼠怠楬瑳晟汩獥⁠ 獠慴畴恳ਊ⌣圠票琠楨⁳硥獩獴ⴊ倠潲汢浥›湕瑩⁹䍍獐愠摮洠摯汥欠潮汷摥敧挠湡戠⁥瑳污㭥琠楨⁳獵獥琠敨漠晦捩慩⁬湕瑩⁹景汦湩⁥潤獣映牯礠畯⁲档獯湥瘠牥楳湯ਮ‭桗瑡椠⁴潤獥›潄湷潬摡⁳湕瑩鉹⁳景汦湩⁥潤獣稠灩‬慢敫⁳呈䱍ⴠ‾汣慥⁮整瑸挠畨歮ⱳ戠極摬⁳⁡票牢摩椠摮硥⠠呆⁓‫敶瑣牯⥳‬湡⁤敳癲獥䴠偃琠潯獬ਮ‭桗瑡椠⁴潤獥鉮⁴潤›潎眠扥挠慲汷湩㭧渠⁯潤獣猠楨灰摥椠⁮桴獩爠灥⹯ਊ⌣传敮挭浯慭摮瀠瑡⁨爨捥浯敭摮摥਩恠੠湵瑩摹捯⁳湩瑳污⁬ⴭ敶獲潩⁮〶〰㌮甊楮祴潤獣洠灣怊恠唊摮牥琠敨栠潯⁤桴獩爠湵⁳潤湷潬摡‬慢敫‬湡⁤湩敤⁸摩浥潰整瑮祬‬桴湥猠慴瑲⁳桴⁥呈偔䴠偃猠牥敶⹲ਊ⌣儠極正瑳牡⁴洨湡慵⁬瑳灥⥳ਊ⤱䌠敲瑡⁥湥⁶…湩瑳污⁬敤獰怊恠瀊瑹潨⁮洭瘠湥⁶瘮湥੶恠੠㈊ 捁楴慶整瘠湥੶恠੠楗摮睯㩳⸠⹜敶癮卜牣灩獴慜瑣癩瑡੥慭佣⽓楌畮㩸猠畯捲⁥瘮湥⽶楢⽮捡楴慶整怊恠ਊ⤳䤠獮慴汬搠灥ੳ恠੠楰⁰湩瑳污⁬攭⸠摛癥੝恠੠㐊 湅畳敲唠楮祴搠捯⁳牡楴慦瑣⁳硥獩⁴搨睯汮慯⭤湵楺⁰牡⁥摩浥潰整瑮਩恠੠湵瑩摹捯⵳敳畴ੰ恠੠㔊 慂敫䠠䵔⁌潴䰠䵌昭楲湥汤⁹潣灲獵振畨歮⽳楬歮朠慲桰怊恠甊楮祴潤獣戭歡੥恠੠㘊 畂汩⁤票牢摩椠摮硥獥⠠兓楌整䘠協‵‫䅆卉⁓敶瑣牯⥳怊恠甊楮祴潤獣椭摮硥怊恠ਊ⤷删湵䴠偃猠牥敶⁲䠨呔⥐怊恠甊楮祴潤獣洭灣栭瑴ੰ恠੠⌊‣〳猭捥湯⁤浳歯⁥整瑳䄊歳䌠摯硥䌯慬摵㩥錊潈⁷潤䤠猠档摥汵⁥湡䤠潊偢牡污敬䙬牯眠瑩⁨慢捴⁨楳敺鐿ਊ桔⁥潭敤⁬桳畯摬挠污⁬畠楮祴摟捯⹳敳牡档Ⱡ琠敨⁮楣整琠敨爠獥汵獴ਮ⌊‣慌潹瑵ⴊ怠慤慴甯楮祴㘯〰⸰⼳慲恷›湕瑩䑹捯浵湥慴楴湯種灩⬠甠穮灩数⁤呈䱍⠠潮⁴潣浭瑩整⥤ⴊ怠慤慴甯楮祴㘯〰⸰⼳慢敫恤›潣灲獵樮潳汮‬档湵獫樮潳汮‬楬歮束慲桰樮潳汮‬慭楮敦瑳樮潳੮‭摠瑡⽡湵瑩⽹〶〰㌮椯摮硥㩠映獴献汱瑩ⱥ瘠捥潴獲昮楡獳‬敶瑣牯彳敭慴樮潳汮ⴊ怠牳⽣湵瑩役潤獣浟灣㩠瀠灩汥湩⁥‫䍍⁐敳癲牥ⴊ怠捳楲瑰⽳㩠挠湯敶楮湥散眠慲灰牥⁳猨浡⁥獡挠湯潳敬猠牣灩獴਩⌊‣桗牥⁥楦敬⁳牡⁥瑳牯摥⼠搠獩⁫獵条੥‭楚⁰楦敬›摠瑡⽡湵瑩⽹瘼牥楳湯⼾慲⽷湕瑩䑹捯浵湥慴楴湯種灩੠‭湕楺灰摥䠠䵔㩌怠慤慴甯楮祴㰯敶獲潩㹮爯睡唯楮祴潄畣敭瑮瑡潩⽮੠‭慂敫⁤牡楴慦瑣㩳怠慤慴甯楮祴㰯敶獲潩㹮戯歡摥怯ⴊ䤠摮硥愠瑲晩捡獴›摠瑡⽡湵瑩⽹瘼牥楳湯⼾湩敤⽸੠吊灹捩污猠穩獥瘠牡⁹祢瘠牥楳湯愠摮洠摯汥਺‭楚㩰縠ⴱ′䉇ⴊ唠穮灩数⁤呈䱍›㑾㘭䜠ੂ‭慂敫⁤半乏㩌縠〳ⴰ〷‰䉍ⴊ䤠摮硥獥⠠呆⁓‫敶瑣牯⥳›ㅾ㐭䜠ੂ刊獥瑥愠瘠牥楳湯਺‭楗摮睯㩳怠浲楤⁲猯⼠ⁱ慤慴畜楮祴㙜〰⸰怳ⴊ洠捡协䰯湩硵›牠⁭爭⁦慤慴甯楮祴㘯〰⸰怳ਊ⌣䴠偃琠潯獬⠠畳浭牡⥹ⴊ怠湵瑩役潤獣献慥捲⡨畱牥ⱹ欠ⰿ猠畯捲彥祴数㽳‬慰桴灟敲楦㽸‬湩汣摵彥湳灩数獴ⰿ搠扥杵⤿੠‭畠楮祴摟捯⹳灯湥搨捯楟㽤‬慰桴ⰿ椠据畬敤瑟捯ⰿ洠硡损慨獲⤿੠‭畠楮祴摟捯⹳楬瑳晟汩獥瀨瑡整湲‬楬業㽴怩ⴊ怠湵瑩役潤獣爮汥瑡摥搨捯楟㽤‬慰桴ⰿ洠摯㽥‬楬業㽴怩ⴊ怠湵瑩役潤獣献慴畴⡳怩ਊ⌣䌠湯楦畧慲楴湯䔊楤⁴捠湯楦⹧慹汭⁠漨瑰潩慮⥬‮敄慦汵獴›湕瑩⁹⸶″剕ⱌ瀠瑡獨甠摮牥怠慤慴甯楮祴㘯〰⸰怳‬敨摡湩ⵧ慢敳⁤档湵楫杮‬杢ⵥ浳污⵬湥瘭⸱‵潬慣⁬浥敢摤湩獧‬䅆卉⁓敶瑣牯ⱳ䘠協‵敬楸慣⹬ਊ⌣䔠慸灭敬ੳ‭敠慸灭敬⽳潣敤彸捭彰潣普杩樮潳恮ⴊ怠硥浡汰獥振慬摵彥敤歳潴彰潣普杩樮潳恮ਊ⌣䌠湯整瑮☠氠捩湥楳杮吊楨⁳牰橯捥⁴潤獥渠瑯椠据畬敤唠楮祴搠捯浵湥慴楴湯‮湏猠瑥灵‬瑩搠睯汮慯獤唠楮祴玒漠晦捩慩⁬景汦湩⁥潤畣敭瑮瑡潩⁮楺⁰湡⁤畢汩獤氠捯污愠瑲晩捡獴漠⁮潹牵洠捡楨敮ਮ唊楮祴猠慴整⁳桴瑡挠摯⁥湳灩数獴愠敲甠摮牥琠敨唠楮祴䌠浯慰楮湯䰠捩湥敳‬湡⁤瑯敨⁲慍畮污匯牣灩楴杮删晥牥湥散挠湯整瑮椠⁳湵敤⁲䍃䈠ⵙ䍎中⁄⸴⸰䐊⁯潮⁴潣浭瑩怠慤慴怯愠瑲晩捡獴琠⁯異汢捩爠灥獯ਮ⌊‣牔畯汢獥潨瑯湩੧‭晠楡獳挭異⁠湩瑳污⁬慦汩㩳攠獮牵⁥潹⁵牡⁥湯倠瑹潨⁮⸳㈱愠摮椠獮慴汬眠瑩⁨灠灩椠獮慴汬映楡獳挭異⹠传⁮潳敭瀠慬晴牯獭‬獵⁥潣摮⁡牯戠極摬映潲⁭潳牵散ਮ‭偃ⵕ湯祬琠牯档›湩瑳污⁬⁡啃䅄攭慮汢摥眠敨汥⠠⹥⹧‬灠灩椠獮慴汬ⴠ昭牯散爭楥獮慴汬琠牯档㴽⸲⸲⬲畣㈱‱ⴭ湩敤⵸牵⁬瑨灴㩳⼯潤湷潬摡瀮瑹牯档漮杲眯汨振ㅵㄲ⥠ਮ‭敓牡档爠瑥牵獮朠牡慢敧›敤敬整怠慤慴甯楮祴㰯敶獲潩㹮戯歡摥⁠湡⁤敲爭湵怠湵瑩摹捯⵳慢敫⁠潴瘠污摩瑡⁥硥牴捡楴湯焠慵楬祴ਮ‭潐瑲愠牬慥祤甠敳㩤猠瑥怠乕呉彙佄千䵟偃偟剏恔⠠湡⁤啠䥎奔䑟䍏当䍍彐佈呓⁠晩渠敥敤⥤ਮ‭潄湷潬摡戠潬正摥漠⁲汳睯›潤湷潬摡唠楮祴潄畣敭瑮瑡潩⹮楺⁰慭畮污祬‬汰捡⁥瑩甠摮牥怠慤慴甯楮祴㰯敶獲潩㹮爯睡怯‬桴湥爠ⵥ畲⁮敳畴⹰ⴊ怠祰桴湯⁠潮⁴潦湵㩤椠獮慴汬倠瑹潨⁮⸳㈱‫牯爠湵怠敳畴⹰慢恴琠⁯獵⁥桴⁥敲潰氭捯污瀠牯慴汢⁥祐桴湯ਮ‭慄慴愠瑲晩捡獴愠捣摩湥慴汬⁹牴捡敫㩤爠湵怠祰桴湯猠牣灩獴振敨正湟彯慤慴瑟慲正摥瀮恹愠摮爠浥癯⁥楬瑳摥映汩獥映潲⁭楧⹴ਊ⌣吠獥楴杮怊恠瀊瑹獥ੴ恠੠⌊‣潎整ੳ‭慂敫椯摮硥猠整獰愠敲椠敤灭瑯湥㩴攠楸瑳湩⁧牡楴慦瑣⁳楷桴洠瑡档湩⁧潣普杩瘯牥楳湯猠楫⁰潷歲ਮ‭楌歮攠瑸慲瑣潩⁮杩潮敲⁳硥整湲污愠摮愠据潨⵲湯祬氠湩獫※湩整湲污氠湩獫愠敲渠牯慭楬敺⁤潴搠捯楟獤映牯爠汥瑡摥氠潯畫獰ਮ⌊‣潃敤⽸汃畡敤䴠偃眠物湩⁧䠨呔⁐敳癲牥‬畡潴猭慴瑲摥਩‭摁⁤⁡敳癲牥攠瑮祲瀠楯瑮湩⁧潴琠敨䠠呔⁐慬湵档牥椠獮摩⁥桴⁥敶癮‮硅浡汰⁥在湩潤獷㨩 怠恠獪湯 笠 †∠敳癲牥≳›੻†††產楮祴搭捯≳›੻††††挢浯慭摮㨢∠尮⹜敶癮屜捓楲瑰屳畜楮祴潤獣洭灣栭瑴⹰硥≥ਬ††††愢杲≳›嵛ਬ††††攢癮㨢笠 ††††∠乕呉彙佄千䵟偃剟住≔›䌢尺灜潲敪瑣屳啜楮祴䅒≇ਬ†††††唢䥎奔䑟䍏当䍍彐佈呓㨢∠㈱⸷⸰⸰∱ਬ†††††唢䥎奔䑟䍏当䍍彐佐呒㨢∠㜸㔶ਢ††††੽†††੽††੽†੽†恠੠†汁整湲瑡癩汥ⱹ礠畯挠湡瀠楯瑮琠⁯獠慴瑲獟牥敶⹲慢恴椠⁦潹⁵慷瑮愠瘠獩扩敬挠湯潳敬眠湩潤⹷䄠橤獵⁴桴⁥啠䥎奔䑟䍏当䍍彐佒呏⁠慰桴琠⁯潹牵挠潬敮※楷桴琠楨⁳湥⁶桴⁥敳癲牥映湩獤怠潣普杩礮浡恬愠摮搠瑡⁡楷桴畯⁴档湡楧杮琠敨眠牯楫杮搠物捥潴祲‮潃敤⽸汃畡敤眠汩⁬畡潴猭慴瑲琠敨䴠偃猠牥敶⁲湡⁤潣湮捥⁴癯牥䠠呔⁐瑡怠瑨灴⼺ㄯ㜲〮〮ㄮ㠺㘷⼵捭恰മ
+﻿# UnityRAG
+
+[![CI](https://img.shields.io/github/actions/workflow/status/Razpines/UnityRAG/ci.yml?label=CI)](https://github.com/Razpines/UnityRAG/actions)
+[![License](https://img.shields.io/github/license/Razpines/UnityRAG)](LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/unityrag?label=PyPI)](https://pypi.org/project/unityrag/)
+
+Local, offline-ready Unity 6.3 documentation bake/index pipeline with an MCP server exposing search/open/list/related tools.
+
+MCP tools: `search` / `open` / `related` / `list_files` / `status`
+
+## Why this exists
+- Problem: Unity MCPs and model knowledge can be stale; this uses the official Unity offline docs for your chosen version.
+- What it does: Downloads Unity's offline docs zip, bakes HTML -> clean text chunks, builds a hybrid index (FTS + vectors), and serves MCP tools.
+- What it doesn't do: No web crawling; no docs shipped in this repo.
+
+## One-command path (recommended)
+```
+unitydocs install --version 6000.3
+unitydocs mcp
+```
+Under the hood this runs download, bake, and index idempotently, then starts the HTTP MCP server.
+
+## Quickstart (manual steps)
+
+1) Create env & install deps
+```
+python -m venv .venv
+```
+
+2) Activate venv
+```
+Windows: .\.venv\Scripts\activate
+macOS/Linux: source .venv/bin/activate
+```
+
+3) Install deps
+```
+pip install -e .[dev]
+```
+
+4) Ensure Unity docs artifacts exist (download+unzip are idempotent)
+```
+unitydocs-setup
+```
+
+5) Bake HTML to LLM-friendly corpus/chunks/link graph
+```
+unitydocs-bake
+```
+
+6) Build hybrid indexes (SQLite FTS5 + FAISS vectors)
+```
+unitydocs-index
+```
+
+7) Run MCP server (HTTP)
+```
+unitydocs-mcp-http
+```
+
+## 30-second smoke test
+Ask Codex/Claude:
+"How do I schedule an IJobParallelFor with batch size?"
+
+The model should call `unity_docs.search`, then cite the results.
+
+## Layout
+- `data/unity/6000.3/raw`: UnityDocumentation.zip + unzipped HTML (not committed)
+- `data/unity/6000.3/baked`: corpus.jsonl, chunks.jsonl, link_graph.jsonl, manifest.json
+- `data/unity/6000.3/index`: fts.sqlite, vectors.faiss, vectors_meta.jsonl
+- `src/unity_docs_mcp`: pipeline + MCP server
+- `scripts/`: convenience wrappers (same as console scripts)
+
+## Where files are stored / disk usage
+- Zip file: `data/unity/<version>/raw/UnityDocumentation.zip`
+- Unzipped HTML: `data/unity/<version>/raw/UnityDocumentation/`
+- Baked artifacts: `data/unity/<version>/baked/`
+- Index artifacts: `data/unity/<version>/index/`
+
+Typical sizes vary by version and model:
+- Zip: ~1-2 GB
+- Unzipped HTML: ~4-6 GB
+- Baked JSONL: ~300-700 MB
+- Indexes (FTS + vectors): ~1-4 GB
+
+Reset a version:
+- Windows: `rmdir /s /q data\unity\6000.3`
+- macOS/Linux: `rm -rf data/unity/6000.3`
+
+## MCP tools (summary)
+- `unity_docs.search(query, k?, source_types?, path_prefix?, include_snippets?, debug?)`
+- `unity_docs.open(doc_id?, path?, include_toc?, max_chars?)`
+- `unity_docs.list_files(pattern, limit?)`
+- `unity_docs.related(doc_id?, path?, mode?, limit?)`
+- `unity_docs.status()`
+
+## Configuration
+Edit `config.yaml` (optional). Defaults: Unity 6.3 URL, paths under `data/unity/6000.3`, heading-based chunking, bge-small-en-v1.5 local embeddings, FAISS vectors, FTS5 lexical.
+
+## Examples
+- `examples/codex_mcp_config.json`
+- `examples/claude_desktop_config.json`
+
+## Content & licensing
+This project does not include Unity documentation. On setup, it downloads Unity's official offline documentation zip and builds local artifacts on your machine.
+
+Unity states that code snippets are under the Unity Companion License, and other Manual/Scripting Reference content is under CC BY-NC-ND 4.0.
+Do not commit `data/` artifacts to public repos.
+
+## Troubleshooting
+- `faiss-cpu` install fails: ensure you are on Python 3.12 and install with `pip install faiss-cpu`. On some platforms, use conda or build from source.
+- CPU-only torch: install a CUDA-enabled wheel (e.g., `pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121`).
+- Search returns garbage: delete `data/unity/<version>/baked` and re-run `unitydocs-bake` to validate extraction quality.
+- Port already used: set `UNITY_DOCS_MCP_PORT` (and `UNITY_DOCS_MCP_HOST` if needed).
+- Download blocked or slow: download UnityDocumentation.zip manually, place it under `data/unity/<version>/raw/`, then re-run setup.
+- `python` not found: install Python 3.12+ or run `setup.bat` to use the repo-local portable Python.
+- Data artifacts accidentally tracked: run `python scripts/check_no_data_tracked.py` and remove listed files from git.
+
+## Testing
+```
+pytest
+```
+
+## Notes
+- Bake/index steps are idempotent: existing artifacts with matching config/version skip work.
+- Link extraction ignores external and anchor-only links; internal links are normalized to doc_ids for related lookups.
+
+## Codex/Claude MCP wiring (HTTP server, auto-started)
+- Add a server entry pointing to the HTTP launcher inside the venv. Example (Windows):
+  ```json
+  {
+    "servers": {
+      "unity-docs": {
+        "command": ".\\.venv\\Scripts\\unitydocs-mcp-http.exe",
+        "args": [],
+        "env": {
+          "UNITY_DOCS_MCP_ROOT": "C:\\projects\\UnityRAG",
+          "UNITY_DOCS_MCP_HOST": "127.0.0.1",
+          "UNITY_DOCS_MCP_PORT": "8765"
+        }
+      }
+    }
+  }
+  ```
+  Alternatively, you can point to `start_server.bat` if you want a visible console window. Adjust the `UNITY_DOCS_MCP_ROOT` path to your clone; with this env the server finds `config.yaml` and data without changing the working directory. Codex/Claude will auto-start the MCP server and connect over HTTP at `http://127.0.0.1:8765/mcp`.
