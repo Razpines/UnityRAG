@@ -63,3 +63,5 @@
 [2026-02-20 16:10] Decision update: support CPU-only environments via explicit FTS-only mode (index.vector=none) while keeping CUDA hybrid as default for full semantic retrieval.
 [2026-02-20 16:10] setup.bat/setup.sh now prompt for CUDA vs CPU-only and install dependency sets accordingly (. [dev,vector] vs . [dev]); FTS-only path skips torch/sentence-transformers/faiss runtime logic.
 [2026-02-20 16:15] Setup mode/version selection now persists into repo config.yaml (not temp-only) so MCP startup uses the same retrieval mode after setup.
+[2026-02-20 15:35] Reduced onboarding friction: setup now prompts for Codex/Claude MCP auto-config and writes client config entries automatically via unity_docs_mcp.setup.mcp_config.
+[2026-02-20 17:50] MCP auto-config now writes absolute repo venv stdio command (`unitydocs-mcp`) plus UNITY_DOCS_MCP_ROOT/UNITY_DOCS_MCP_CONFIG env to avoid CWD-dependent startup failures across projects.

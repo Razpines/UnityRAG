@@ -85,16 +85,21 @@ These require local Unity raw docs under `data/unity/<version>/raw/UnityDocument
 - Bake/index steps are idempotent: existing artifacts with matching config/version skip work.
 - Link extraction ignores external and anchor-only links; internal links are normalized to doc_ids for related lookups.
 
-## Codex/Claude MCP wiring (HTTP server, auto-started)
-- Use `start_server` as the command and set it to an absolute path. Example (Windows):
+## Codex/Claude MCP wiring (stdio MCP, auto-started)
+- Setup can auto-configure Codex/Claude MCP files now (recommended).
+- If you need manual wiring, use the repo venv `unitydocs-mcp` entrypoint with absolute paths plus env overrides. Example (Windows):
   ```json
   {
     "servers": {
       "unity-docs": {
-        "command": "C:\\projects\\UnityRAG\\start_server.bat",
-        "args": []
+        "command": "C:\\projects\\UnityRAG\\.venv\\Scripts\\unitydocs-mcp.exe",
+        "args": [],
+        "env": {
+          "UNITY_DOCS_MCP_ROOT": "C:\\projects\\UnityRAG",
+          "UNITY_DOCS_MCP_CONFIG": "C:\\projects\\UnityRAG\\config.yaml"
+        }
       }
     }
   }
   ```
-  macOS/Linux equivalent command: `/path/to/UnityRAG/start_server.sh`. This default flow does not require manually setting `UNITY_DOCS_MCP_ROOT`, `UNITY_DOCS_MCP_HOST`, or `UNITY_DOCS_MCP_PORT`. Use those env vars only if you need custom overrides.
+  macOS/Linux equivalent command: `/path/to/UnityRAG/.venv/bin/unitydocs-mcp`.

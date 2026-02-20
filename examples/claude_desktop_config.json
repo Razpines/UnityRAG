@@ -1,8 +1,12 @@
 {
   "mcpServers": {
     "unity-docs": {
-      "command": "C:\\path\\to\\UnityRAG\\start_server.bat",
-      "args": []
+      "command": "C:\\path\\to\\UnityRAG\\.venv\\Scripts\\unitydocs-mcp.exe",
+      "args": [],
+      "env": {
+        "UNITY_DOCS_MCP_ROOT": "C:\\path\\to\\UnityRAG",
+        "UNITY_DOCS_MCP_CONFIG": "C:\\path\\to\\UnityRAG\\config.yaml"
+      }
     }
   }
 }
