@@ -32,6 +32,19 @@ Reset a version:
 - `unity_docs.related(doc_id?, path?, mode?, limit?)`
 - `unity_docs.status()`
 
+Example response metadata (present in all tools):
+```json
+{
+  "meta": {
+    "unity_version": "6000.3",
+    "index_mode": { "lexical": "sqlite_fts5", "vector": "faiss" },
+    "retrieval_mode": "hybrid",
+    "build_from": "local-zip",
+    "built_on": "2026-02-20"
+  }
+}
+```
+
 ## Configuration
 Edit `config.yaml` (optional). Defaults: Unity 6.3 URL, paths under `data/unity/6000.3`, heading-based chunking, bge-small-en-v1.5 local embeddings, FAISS vectors, FTS5 lexical.
 
