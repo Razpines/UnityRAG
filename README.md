@@ -34,11 +34,10 @@ bash setup.sh
 - Codex: `examples/codex_mcp_config.json`
 - Claude Desktop: `examples/claude_desktop_config.json`
 - macOS/Linux: `*_unix.json` variants
-
-Set:
-- `UNITY_DOCS_MCP_ROOT` to your local clone path
-- `UNITY_DOCS_MCP_HOST=127.0.0.1`
-- `UNITY_DOCS_MCP_PORT=8765`
+- Replace the `command` value with the absolute path to your local `start_server` script.
+  - Windows example: `C:\\projects\\UnityRAG\\start_server.bat`
+  - macOS/Linux example: `/home/you/UnityRAG/start_server.sh`
+- No env vars are required for the default onboarding flow.
 
 3. Restart your agent and run a prompt:
 - "How do I schedule an `IJobParallelFor` with batch size?"
@@ -76,6 +75,11 @@ unitydocs mcp
 Notes:
 - In `CUDA` mode, setup scripts enforce CUDA torch and fail if no working CUDA runtime is detected.
 - In `CPU-only` mode, setup configures `index.vector: none` and skips vector dependencies.
+
+Optional advanced overrides:
+- `UNITY_DOCS_MCP_ROOT`
+- `UNITY_DOCS_MCP_HOST`
+- `UNITY_DOCS_MCP_PORT`
 
 ## Commands
 

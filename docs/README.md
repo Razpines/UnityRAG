@@ -86,20 +86,15 @@ These require local Unity raw docs under `data/unity/<version>/raw/UnityDocument
 - Link extraction ignores external and anchor-only links; internal links are normalized to doc_ids for related lookups.
 
 ## Codex/Claude MCP wiring (HTTP server, auto-started)
-- Add a server entry pointing to the HTTP launcher inside the venv. Example (Windows):
+- Use `start_server` as the command and set it to an absolute path. Example (Windows):
   ```json
   {
     "servers": {
       "unity-docs": {
-        "command": ".\\.venv\\Scripts\\unitydocs-mcp-http.exe",
-        "args": [],
-        "env": {
-          "UNITY_DOCS_MCP_ROOT": "C:\\projects\\UnityRAG",
-          "UNITY_DOCS_MCP_HOST": "127.0.0.1",
-          "UNITY_DOCS_MCP_PORT": "8765"
-        }
+        "command": "C:\\projects\\UnityRAG\\start_server.bat",
+        "args": []
       }
     }
   }
   ```
-  Alternatively, you can point to `start_server.bat` or `start_server.sh` if you want a visible console window. Adjust the `UNITY_DOCS_MCP_ROOT` path to your clone; with this env the server finds `config.yaml` and data without changing the working directory. Codex/Claude will auto-start the MCP server and connect over HTTP at `http://127.0.0.1:8765/mcp`.
+  macOS/Linux equivalent command: `/path/to/UnityRAG/start_server.sh`. This default flow does not require manually setting `UNITY_DOCS_MCP_ROOT`, `UNITY_DOCS_MCP_HOST`, or `UNITY_DOCS_MCP_PORT`. Use those env vars only if you need custom overrides.

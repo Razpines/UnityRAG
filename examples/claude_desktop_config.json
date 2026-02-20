@@ -1,13 +1,8 @@
 {
   "mcpServers": {
     "unity-docs": {
-      "command": "start_server.bat",
-      "args": [],
-      "env": {
-        "UNITY_DOCS_MCP_ROOT": "C:\\projects\\UnityRAG",
-        "UNITY_DOCS_MCP_HOST": "127.0.0.1",
-        "UNITY_DOCS_MCP_PORT": "8765"
-      }
+      "command": "C:\\path\\to\\UnityRAG\\start_server.bat",
+      "args": []
     }
   }
 }
