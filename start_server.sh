@@ -13,7 +13,7 @@ if [ -f "$REPO_DIR/banner.txt" ]; then
   cat "$REPO_DIR/banner.txt"
 fi
 
-export UNITY_DOCS_MCP_ROOT="$REPO_DIR"
+cd "$REPO_DIR"
 
 if [ -n "${1:-}" ]; then
   export UNITY_DOCS_MCP_PORT="$1"

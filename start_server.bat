@@ -12,7 +12,7 @@ if exist "%REPO%\\banner.txt" (
   type "%REPO%\\banner.txt"
 )
 
-set "UNITY_DOCS_MCP_ROOT=%REPO%"
+cd /d "%REPO%"
 if "%~1" neq "" (
   set "UNITY_DOCS_MCP_PORT=%~1"
 )
