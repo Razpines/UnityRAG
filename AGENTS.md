@@ -5,7 +5,7 @@
 - Data: `data/unity/6000.3/raw` (Unity docs zip + unzip), `data/unity/6000.3/baked`, `data/unity/6000.3/index` (artifact outputs; git-ignored).
 - Scripts/entrypoints: console scripts (`unitydocs-setup`, `unitydocs-bake`, `unitydocs-index`, `unitydocs-mcp`) and wrappers in `scripts/`.
 - Tests: `tests/` (pytest).
-- Config: `config.yaml` optional overrides; defaults baked into code. Paths resolve via `UNITY_DOCS_MCP_ROOT` if set.
+- Config: tracked `config.yaml` base defaults + optional untracked `config.local.yaml` overrides. Paths resolve relative to repo by default, with `UNITY_DOCS_MCP_ROOT` as an advanced override.
 
 ## Build, Test, Run
 - Create env:
@@ -14,14 +14,14 @@
 - Ensure artifacts: `unitydocs-setup` (downloads if missing, bakes, indexes).
 - Bake only: `unitydocs-bake`.
 - Index only: `unitydocs-index` (use `--dry-run` to verify device/model without embedding).
-- MCP server: `unitydocs-mcp` (stdio; Codex config should set `UNITY_DOCS_MCP_ROOT=C:\projects\UnityRAG`).
+- MCP server: `unitydocs-mcp` (stdio; setup can auto-configure Codex/Claude with absolute command paths, no env vars required for default flow).
 - Tests: `pytest`.
 
 ## Coding Style & Naming
 - Python 3.12+, 4-space indentation, type hints throughout.
 - Keep functions small; prefer explicit names (`bake_*`, `index_*`, `ensure_*`).
 - Inline comments only for non-obvious logic (e.g., path resolution, CUDA selection).
-- Avoid machine-specific absolute paths in committed files; rely on env for roots.
+- Avoid machine-specific absolute paths in committed files; rely on repo-relative defaults unless advanced env overrides are needed.
 
 ## Testing Guidelines
 - Framework: pytest.
@@ -35,5 +35,5 @@
 
 ## Security & Config Tips
 - Keep secrets out of repo; no tokens in config.
-- Use `UNITY_DOCS_MCP_ROOT`/`UNITY_DOCS_MCP_CONFIG` to locate data/config without changing working dir.
+- Use `UNITY_DOCS_MCP_ROOT`/`UNITY_DOCS_MCP_CONFIG` only when you need advanced root/config overrides.
 - For GPU: install CUDA-enabled torch in the venv (setup probes `cu128`, then `cu121`, then `cu118`) and verifies `torch.cuda.is_available()` at runtime.

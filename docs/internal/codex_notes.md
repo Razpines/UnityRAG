@@ -52,7 +52,7 @@
 [2026-01-10 04:20] setup.bat now creates .venv if missing, installs deps, checks free disk space, and supports optional repo-local portable Python 3.12 download (only if no 3.12 found).
 [2026-01-10 04:25] Added banner.txt and setup.bat displays banner; added colored output helpers and success/failure pauses for user-visible setup flow.
 [2026-01-10 04:30] Fixed setup.bat path normalization and removed where-python probing to avoid Windows path/volume label errors.
-[2026-02-20 15:25] Carry-forward rules: setup scripts are CUDA-only and must never silently fall back to CPU torch.
+[2026-02-20 15:25] SUPERSEDED by 2026-02-20 16:10 CPU-only mode support. Historical rule: setup scripts are CUDA-only and must never silently fall back to CPU torch.
 [2026-02-20 15:25] CUDA channel fallback must be runtime-verified (torch.cuda.is_available + torch.version.cuda), not install-success only.
 [2026-02-20 15:25] MCP stdio stability: keep setup/embed diagnostics off stdout (stderr only) to avoid transport/protocol breakage.
 [2026-02-20 15:25] Ensure flow: avoid forcing raw zip/unzip when baked/index artifacts are already valid for current config signature.
@@ -62,7 +62,8 @@
 [2026-02-20 15:45] Started issue #2 implementation plan: add unitydocs doctor with human/json output, preflight diagnostics, and non-zero exit on blocking failures.
 [2026-02-20 16:10] Decision update: support CPU-only environments via explicit FTS-only mode (index.vector=none) while keeping CUDA hybrid as default for full semantic retrieval.
 [2026-02-20 16:10] setup.bat/setup.sh now prompt for CUDA vs CPU-only and install dependency sets accordingly (. [dev,vector] vs . [dev]); FTS-only path skips torch/sentence-transformers/faiss runtime logic.
-[2026-02-20 16:15] Setup mode/version selection now persists into repo config.yaml (not temp-only) so MCP startup uses the same retrieval mode after setup.
+[2026-02-20 16:15] SUPERSEDED by 2026-02-20 18:20 layered config model. Historical note: setup mode/version selection persisted into repo config.yaml.
 [2026-02-20 15:35] Reduced onboarding friction: setup now prompts for Codex/Claude MCP auto-config and writes client config entries automatically via unity_docs_mcp.setup.mcp_config.
-[2026-02-20 17:50] MCP auto-config now writes absolute repo venv stdio command (`unitydocs-mcp`) plus UNITY_DOCS_MCP_ROOT/UNITY_DOCS_MCP_CONFIG env to avoid CWD-dependent startup failures across projects.
+[2026-02-20 17:50] SUPERSEDED by 2026-02-20 19:00 no-env default MCP config. Historical note: MCP auto-config wrote absolute `unitydocs-mcp` command plus UNITY_DOCS_MCP_ROOT/UNITY_DOCS_MCP_CONFIG env.
 [2026-02-20 18:20] Config model switched to layered load: tracked `config.yaml` base + untracked `config.local.yaml` setup overrides, with env/explicit paths as higher-precedence overlays.
+[2026-02-20 19:00] No-env onboarding default aligned across README/docs/examples/setup generator: Codex/Claude MCP configs now default to absolute `unitydocs-mcp` command with no env block; env vars remain advanced-only overrides.

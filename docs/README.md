@@ -89,19 +89,16 @@ These require local Unity raw docs under `data/unity/<version>/raw/UnityDocument
 
 ## Codex/Claude MCP wiring (stdio MCP, auto-started)
 - Setup can auto-configure Codex/Claude MCP files now (recommended).
-- If you need manual wiring, use the repo venv `unitydocs-mcp` entrypoint with absolute paths plus env overrides. Example (Windows):
+- If you need manual wiring, use the repo venv `unitydocs-mcp` entrypoint with an absolute path. Example (Windows):
   ```json
   {
     "servers": {
       "unity-docs": {
         "command": "C:\\projects\\UnityRAG\\.venv\\Scripts\\unitydocs-mcp.exe",
-        "args": [],
-        "env": {
-          "UNITY_DOCS_MCP_ROOT": "C:\\projects\\UnityRAG",
-          "UNITY_DOCS_MCP_CONFIG": "C:\\projects\\UnityRAG\\config.local.yaml"
-        }
+        "args": []
       }
     }
   }
   ```
   macOS/Linux equivalent command: `/path/to/UnityRAG/.venv/bin/unitydocs-mcp`.
+- Optional advanced overrides remain available via `UNITY_DOCS_MCP_ROOT` / `UNITY_DOCS_MCP_CONFIG`.
