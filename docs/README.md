@@ -55,6 +55,9 @@ Edit `config.yaml` (optional). Defaults: Unity 6.3 URL, paths under `data/unity/
 - `examples/claude_desktop_config_unix.json` (macOS/Linux)
 
 ## Troubleshooting
+- Run preflight diagnostics first:
+  - `unitydocs doctor`
+  - `unitydocs doctor --json` (for structured bug reports/automation)
 - `faiss-cpu` install fails: ensure you are on Python 3.12 and install with `pip install faiss-cpu`. On some platforms, use conda or build from source.
 - Setup scripts are CUDA-only now: `setup.bat` and `setup.sh` try torch channels in order (`cu128`, `cu121`, `cu118`) and accept a channel only if `torch.cuda.is_available()` is true at runtime.
 - If one channel installs but CUDA runtime is unavailable, setup automatically falls back to the next channel.
