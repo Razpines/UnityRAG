@@ -1,61 +1,102 @@
-﻿# UnityRAG
+# UnityRAG
 
-UnityRAG is a local Unity docs assistant for Codex/Claude that provides accurate, versioned citations from Unity's official offline documentation.
+[![CI](https://github.com/Razpines/UnityRAG/actions/workflows/ci.yml/badge.svg)](https://github.com/Razpines/UnityRAG/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/Razpines/UnityRAG)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.12%2B-blue)](pyproject.toml)
+[![GitHub Stars](https://img.shields.io/github/stars/Razpines/UnityRAG?style=social)](https://github.com/Razpines/UnityRAG/stargazers)
+
+Local Unity documentation RAG + MCP server for coding agents.
+
+UnityRAG grounds Codex and Claude answers in official Unity offline docs for your selected version, with citations from local artifacts.
 
 MCP tools: `search` / `open` / `related` / `list_files` / `status`
 
-## Quick Start (recommended)
+## Quick Start
 
-1) Run setup
-- Windows: double-click `setup.bat` (or run it in a terminal).
-- macOS/Linux: `bash setup.sh`
-- This downloads the Unity offline docs, builds the local index, and cleans up raw files to save space.
-- Setup now enforces CUDA-enabled torch only. It tries PyTorch CUDA channels in order (`cu128`, `cu121`, `cu118`) and exits if none produce `torch.cuda.is_available()==True`.
+1. Install dependencies and build artifacts.
 
-2) Add the MCP server to your agent
-- Codex: copy `examples/codex_mcp_config.json` into your Codex MCP config.
-- Codex CLI: use `codex mcp ...` to add a server (see Codex CLI docs for exact syntax).
-- Claude Desktop: copy `examples/claude_desktop_config.json` into your Claude config.
-- Update the `UNITY_DOCS_MCP_ROOT` path to your clone.
-- macOS/Linux: use `start_server.sh` and the `*_unix.json` examples.
-
-3) Restart your agent
-- It will auto-start the HTTP MCP server and connect at `http://127.0.0.1:8765/mcp`.
-
-4) Try it
-Ask: "How do I schedule an IJobParallelFor with batch size?"
-
-The model should call `unity_docs.search`, then cite the results.
-
-Troubleshooting tip:
+```bash
+python -m venv .venv
+# Windows: .\.venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
+pip install -e .[dev]
+unitydocs install --version 6000.3 --cleanup
 ```
+
+2. Start the MCP HTTP server.
+
+```bash
+unitydocs mcp
+```
+
+3. Configure your agent with files in `examples/`.
+- Codex: `examples/codex_mcp_config.json`
+- Claude Desktop: `examples/claude_desktop_config.json`
+- macOS/Linux: `*_unix.json` variants
+
+Set:
+- `UNITY_DOCS_MCP_ROOT` to your local clone path
+- `UNITY_DOCS_MCP_HOST=127.0.0.1`
+- `UNITY_DOCS_MCP_PORT=8765`
+
+4. Restart your agent and run a prompt:
+- "How do I schedule an `IJobParallelFor` with batch size?"
+- "Open `Mesh.SetVertices` and show related docs."
+
+If setup fails, run:
+
+```bash
 unitydocs doctor
 unitydocs doctor --json
 ```
 
-## Why this exists
-- Problem: Unity MCPs and model knowledge can be stale; this uses the official Unity offline docs for your chosen version.
-- What it does: Downloads Unity's offline docs zip, bakes HTML -> clean text chunks, builds a hybrid index (FTS + vectors), and serves MCP tools.
-- What it doesn't do: No web crawling; no docs shipped in this repo.
+## Why UnityRAG
 
-## One-command path
-```
+- Uses official Unity offline docs for versioned retrieval.
+- Hybrid retrieval with SQLite FTS and FAISS vectors.
+- Local-first artifacts and server operation.
+- Idempotent download, bake, and index steps.
+
+## One-Command Setup Scripts
+
+- Windows: `setup.bat`
+- macOS/Linux: `bash setup.sh`
+
+These scripts install dependencies, download docs, bake chunks, index, and clean raw files.
+
+Note: `setup.bat` and `setup.sh` enforce CUDA runtime validation and fail if no working CUDA torch build is available.
+
+## Commands
+
+```bash
 unitydocs install --version 6000.3
 unitydocs mcp
+unitydocs doctor
+unitydocs-bake
+unitydocs-index --dry-run
+pytest
 ```
-Under the hood this runs download, bake, and index idempotently. Then start the HTTP MCP server.
 
-Note: The convenience setup scripts (`setup.bat` / `setup.sh`) enforce CUDA-only embeddings and will fail if they cannot install a working CUDA torch build.
+## Contributing
 
-## Content & licensing
-This project does not include Unity documentation. On setup, it downloads Unity's official offline documentation zip and builds local artifacts on your machine.
+- Read `CONTRIBUTING.md`.
+- Week 1 execution tracker: `docs/WEEK1_EXECUTION.md`.
+- Roadmap: `ROADMAP.md`.
 
-Unity states that code snippets are under the Unity Companion License, and other Manual/Scripting Reference content is under CC BY-NC-ND 4.0.
-Do not commit `data/` artifacts to public repos.
+## Docs
 
-## Advanced docs
-- [docs/README.md](docs/README.md)
+- Developer details: `docs/README.md`
+
+## Content and Licensing
+
+This project does not include Unity documentation. During setup, it downloads Unity's official offline docs and builds local artifacts on your machine.
+
+Unity states code snippets are under the Unity Companion License, while other Manual and Scripting Reference content is under CC BY-NC-ND 4.0.
+
+Do not commit `data/` artifacts.
 
 ## About
-I’m working on an indie game in my spare time and I use coding agents every day. I built UnityRAG because quick, reliable doc lookups (especially for the newest Unity 6.3 features) were missing, and I wanted a frictionless way to cite the official docs.  
-[More projects here](https://razpines.github.io)
+
+Built by an indie developer using coding agents daily, focused on reliable Unity citations over stale model memory.
+
+More projects: https://razpines.github.io
