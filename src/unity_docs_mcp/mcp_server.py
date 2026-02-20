@@ -5,6 +5,7 @@ import json
 import asyncio
 import os
 import sys
+from pathlib import Path
 from typing import List, Optional
 
 from mcp.server.fastmcp import FastMCP
@@ -46,6 +47,42 @@ def _ensure_startup() -> None:
     _ensured = True
 
 
+def _read_manifest(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text())
+    except Exception:
+        return {}
+
+
+def _retrieval_mode(vector_mode: str) -> str:
+    mode = (vector_mode or "").strip().lower()
+    if mode in {"", "none", "off", "disabled", "false"}:
+        return "fts_only"
+    return "hybrid"
+
+
+def _response_meta(docstore: DocStore, baked_manifest: Optional[dict] = None) -> dict:
+    cfg = docstore.config
+    meta = {
+        "unity_version": cfg.unity_version,
+        "index_mode": {
+            "lexical": cfg.index.lexical,
+            "vector": cfg.index.vector,
+        },
+        "retrieval_mode": _retrieval_mode(cfg.index.vector),
+    }
+    baked = baked_manifest or {}
+    build_from = baked.get("build_from")
+    built_on = baked.get("built_on")
+    if build_from is not None:
+        meta["build_from"] = build_from
+    if built_on is not None:
+        meta["built_on"] = built_on
+    return meta
+
+
 @app.tool()
 def search(
     query: str,
@@ -53,6 +90,7 @@ def search(
     source_types: Optional[List[str] | str] = None,
 ) -> List[dict]:
     docstore = _get_docstore()
+    meta = _response_meta(docstore)
     if isinstance(source_types, str):
         source_types = [s.strip() for s in source_types.split(",") if s.strip()]
     results = docstore.search(query=query, k=k, source_types=source_types)
@@ -67,6 +105,7 @@ def search(
             "source_type": r.source_type,
             "score": r.score,
             "canonical_url": r.canonical_url,
+            "meta": meta,
         }
         for r in results
     ]
@@ -80,9 +119,10 @@ def open(
     full: bool = False,
 ) -> dict:
     docstore = _get_docstore()
+    meta = _response_meta(docstore)
     record = docstore.open_doc(doc_id=doc_id, path=path)
     if not record:
-        return {}
+        return {"meta": meta}
     text = record.text_md
     if not full:
         cap = max_chars if max_chars is not None else docstore.config.mcp.open_max_chars
@@ -95,12 +135,14 @@ def open(
         "origin_path": record.origin_path,
         "canonical_url": record.canonical_url,
         "text": text,
+        "meta": meta,
     }
 
 
 @app.tool()
 def list_files(pattern: str, limit: int = 20) -> List[dict]:
     docstore = _get_docstore()
+    meta = _response_meta(docstore)
     matches = docstore.list_files(pattern=pattern, limit=limit)
     return [
         {
@@ -109,6 +151,7 @@ def list_files(pattern: str, limit: int = 20) -> List[dict]:
             "source_type": m.source_type,
             "origin_path": m.origin_path,
             "canonical_url": m.canonical_url,
+            "meta": meta,
         }
         for m in matches
     ]
@@ -117,6 +160,7 @@ def list_files(pattern: str, limit: int = 20) -> List[dict]:
 @app.tool()
 def related(doc_id: str, limit: int = 10) -> List[dict]:
     docstore = _get_docstore()
+    meta = _response_meta(docstore)
     neighbors = docstore.related(doc_id=doc_id, limit=limit)
     return [
         {
@@ -125,6 +169,7 @@ def related(doc_id: str, limit: int = 10) -> List[dict]:
             "source_type": n.source_type,
             "origin_path": n.origin_path,
             "canonical_url": n.canonical_url,
+            "meta": meta,
         }
         for n in neighbors
     ]
@@ -137,13 +182,10 @@ def status() -> dict:
     from unity_docs_mcp.paths import make_paths
 
     paths = make_paths(config)
-    baked_manifest = {}
-    index_manifest = {}
-    if (paths.baked_dir / "manifest.json").exists():
-        baked_manifest = json.loads((paths.baked_dir / "manifest.json").read_text())
-    if (paths.index_dir / "manifest.json").exists():
-        index_manifest = json.loads((paths.index_dir / "manifest.json").read_text())
+    baked_manifest = _read_manifest(paths.baked_dir / "manifest.json")
+    index_manifest = _read_manifest(paths.index_dir / "manifest.json")
     return {
+        "meta": _response_meta(docstore, baked_manifest=baked_manifest),
         "paths": vars(config.paths),
         "unity_version": config.unity_version,
         "embedder": vars(config.index.embedder),
