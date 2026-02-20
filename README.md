@@ -82,7 +82,6 @@ pytest
 ## Contributing
 
 - Read `CONTRIBUTING.md`.
-- Week 1 execution tracker: `docs/WEEK1_EXECUTION.md`.
 - Roadmap: `ROADMAP.md`.
 
 ## Docs
