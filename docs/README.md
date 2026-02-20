@@ -43,7 +43,9 @@ Edit `config.yaml` (optional). Defaults: Unity 6.3 URL, paths under `data/unity/
 
 ## Troubleshooting
 - `faiss-cpu` install fails: ensure you are on Python 3.12 and install with `pip install faiss-cpu`. On some platforms, use conda or build from source.
-- CPU-only torch: install a CUDA-enabled wheel (e.g., `pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121`).
+- Setup scripts are CUDA-only now: `setup.bat` and `setup.sh` try torch channels in order (`cu128`, `cu121`, `cu118`) and accept a channel only if `torch.cuda.is_available()` is true at runtime.
+- If one channel installs but CUDA runtime is unavailable, setup automatically falls back to the next channel.
+- If all channels fail runtime validation, setup exits (no CPU fallback in setup scripts).
 - Search returns garbage: delete `data/unity/<version>/baked` and re-run `unitydocs-bake` to validate extraction quality.
 - Port already used: set `UNITY_DOCS_MCP_PORT` (and `UNITY_DOCS_MCP_HOST` if needed).
 - Download blocked or slow: download UnityDocumentation.zip manually, place it under `data/unity/<version>/raw/`, then re-run setup.

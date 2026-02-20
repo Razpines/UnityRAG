@@ -10,6 +10,7 @@ MCP tools: `search` / `open` / `related` / `list_files` / `status`
 - Windows: double-click `setup.bat` (or run it in a terminal).
 - macOS/Linux: `bash setup.sh`
 - This downloads the Unity offline docs, builds the local index, and cleans up raw files to save space.
+- Setup now enforces CUDA-enabled torch only. It tries PyTorch CUDA channels in order (`cu128`, `cu121`, `cu118`) and exits if none produce `torch.cuda.is_available()==True`.
 
 2) Add the MCP server to your agent
 - Codex: copy `examples/codex_mcp_config.json` into your Codex MCP config.
@@ -37,6 +38,8 @@ unitydocs install --version 6000.3
 unitydocs mcp
 ```
 Under the hood this runs download, bake, and index idempotently. Then start the HTTP MCP server.
+
+Note: The convenience setup scripts (`setup.bat` / `setup.sh`) enforce CUDA-only embeddings and will fail if they cannot install a working CUDA torch build.
 
 ## Content & licensing
 This project does not include Unity documentation. On setup, it downloads Unity's official offline documentation zip and builds local artifacts on your machine.

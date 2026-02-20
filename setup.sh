@@ -69,30 +69,46 @@ fi
 
 source "$VENV_DIR/bin/activate"
 
-CUDA_SELECTED=0
-if command -v nvidia-smi >/dev/null 2>&1; then
-  CUDA_VER="$(nvidia-smi | grep \"CUDA Version\" | awk '{ print $9 }' | head -n1 | tr -d ' ')"
-  if [[ "$CUDA_VER" =~ ^[0-9]+\.[0-9]+$ ]]; then
-    CUDA_MAJOR="${CUDA_VER%%.*}"
-    CUDA_MINOR="${CUDA_VER#*.}"
-    if [ "$CUDA_MAJOR" -ge 12 ] && [ "$CUDA_MINOR" -ge 1 ]; then
-      echo "[setup] Detected CUDA $CUDA_VER. Installing torch cu121..."
-      python -m pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121
-      CUDA_SELECTED=1
-    elif [ "$CUDA_MAJOR" -eq 11 ] && [ "$CUDA_MINOR" -ge 8 ]; then
-      echo "[setup] Detected CUDA $CUDA_VER. Installing torch cu118..."
-      python -m pip install --force-reinstall torch==2.2.2+cu118 --index-url https://download.pytorch.org/whl/cu118
-      CUDA_SELECTED=1
+echo "[setup] Installing project dependencies..."
+python -m pip install -U pip
+python -m pip install -e ".[dev]"
+
+verify_cuda_torch() {
+  python - <<'PY'
+import sys
+import torch
+
+print(f"[setup] torch={torch.__version__} cuda={torch.version.cuda} available={torch.cuda.is_available()}")
+sys.exit(0 if (torch.cuda.is_available() and torch.version.cuda is not None) else 1)
+PY
+}
+
+try_cuda_channel() {
+  local channel="$1"
+  echo "[setup] Trying torch from ${channel}..."
+  if ! python -m pip install --force-reinstall torch --index-url "https://download.pytorch.org/whl/${channel}"; then
+    echo "[setup] ${channel} install failed."
+    return 1
+  fi
+  if ! verify_cuda_torch; then
+    echo "[setup] ${channel} installed but CUDA runtime verification failed."
+    return 1
+  fi
+  TORCH_CHANNEL="$channel"
+  return 0
+}
+
+TORCH_CHANNEL=""
+echo "[setup] Installing CUDA torch build (cu128 -> cu121 -> cu118)..."
+if ! try_cuda_channel "cu128"; then
+  if ! try_cuda_channel "cu121"; then
+    if ! try_cuda_channel "cu118"; then
+      echo "[setup] Failed to install a CUDA-capable torch build."
+      exit 1
     fi
   fi
 fi
-
-if [ "$CUDA_SELECTED" -eq 0 ]; then
-  printf "\033[33m[setup] WARNING: No compatible CUDA version detected. Using CPU embeddings; initial indexing may be slow.\033[0m\n"
-fi
-
-python -m pip install -U pip
-python -m pip install -e ".[dev]"
+echo "[setup] Installed torch from ${TORCH_CHANNEL} index."
 
 export UNITY_DOCS_MCP_ROOT="$REPO_DIR"
 export UNITY_DOCS_MCP_CLEANUP=1

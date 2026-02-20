@@ -75,35 +75,38 @@ if not exist "%VENV%\Scripts\activate.bat" (
   call "%VENV%\Scripts\activate.bat"
 )
 
-set "CUDA_TAG="
-set "CUDA_VER="
-set "TEMP_CUDA_PS=%TEMP%\unitydocs_cuda_detect.ps1"
-> "%TEMP_CUDA_PS%" echo $out = ^& nvidia-smi 2^>$null
->> "%TEMP_CUDA_PS%" echo $line = $out ^| Select-String 'CUDA Version' ^| Select-Object -First 1
->> "%TEMP_CUDA_PS%" echo if ($line -and $line -match 'CUDA Version:\s*(\d+)\.(\d+)') {
->> "%TEMP_CUDA_PS%" echo ^  $major = [int]$matches[1]
->> "%TEMP_CUDA_PS%" echo ^  $minor = [int]$matches[2]
->> "%TEMP_CUDA_PS%" echo ^  $ver = \"$($major).$($minor)\"
->> "%TEMP_CUDA_PS%" echo ^  if ($major -gt 12 -or ($major -eq 12 -and $minor -ge 1)) { \"cu121|$ver\"; exit 0 }
->> "%TEMP_CUDA_PS%" echo ^  if ($major -eq 11 -and $minor -ge 8) { \"cu118|$ver\"; exit 0 }
->> "%TEMP_CUDA_PS%" echo }
-for /f "tokens=1,2 delims=|" %%A in ('powershell -NoProfile -ExecutionPolicy Bypass -File "%TEMP_CUDA_PS%"') do (
-  set "CUDA_TAG=%%A"
-  set "CUDA_VER=%%B"
-)
-del "%TEMP_CUDA_PS%" >nul 2>&1
-if defined CUDA_TAG (
-  call :print_color Cyan "[setup] Detected CUDA %CUDA_VER%. Installing torch %CUDA_TAG%..."
-  if "%CUDA_TAG%"=="cu121" python -m pip install --force-reinstall torch==2.2.2+cu121 --index-url https://download.pytorch.org/whl/cu121
-  if "%CUDA_TAG%"=="cu118" python -m pip install --force-reinstall torch==2.2.2+cu118 --index-url https://download.pytorch.org/whl/cu118
-) else (
-  call :print_color DarkYellow "[setup] WARNING: No compatible CUDA version detected. Using CPU embeddings; initial indexing may be slow."
-)
+call :print_color Cyan "[setup] Installing project dependencies..."
 
 python -m pip install -U pip
 python -m pip install -e .[dev]
 if errorlevel 1 (
   call :print_color Red "[setup] Failed to install dependencies."
+  pause
+  exit /b 1
+)
+
+set "TORCH_OK="
+set "TORCH_CHANNEL="
+call :print_color Cyan "[setup] Installing CUDA torch build (cu128 -> cu121 -> cu118)..."
+call :try_torch_channel cu128
+if errorlevel 1 (
+  call :try_torch_channel cu121
+)
+if errorlevel 1 (
+  call :try_torch_channel cu118
+)
+
+if not defined TORCH_OK (
+  call :print_color Red "[setup] Failed to install CUDA torch."
+  pause
+  exit /b 1
+)
+
+call :print_color Cyan "[setup] Installed torch from %TORCH_CHANNEL% index."
+
+python -c "import torch,sys; print('[setup] torch=' + str(torch.__version__) + ' cuda=' + str(torch.version.cuda) + ' available=' + str(torch.cuda.is_available())); raise SystemExit(0 if (torch.cuda.is_available() and torch.version.cuda is not None) else 1)"
+if errorlevel 1 (
+  call :print_color Red "[setup] CUDA verification failed. Refusing to continue with CPU torch."
   pause
   exit /b 1
 )
@@ -204,6 +207,25 @@ call :print_color Green "[setup] Success."
 pause
 
 goto :eof
+
+:try_torch_channel
+set "CHANNEL=%~1"
+call :print_color Cyan "[setup] Trying torch from %CHANNEL%..."
+python -m pip install --force-reinstall torch --index-url https://download.pytorch.org/whl/%CHANNEL%
+if errorlevel 1 (
+  call :print_color DarkYellow "[setup] %CHANNEL% install failed."
+  exit /b 1
+)
+
+python -c "import torch,sys; print('[setup] torch=' + str(torch.__version__) + ' cuda=' + str(torch.version.cuda) + ' available=' + str(torch.cuda.is_available())); raise SystemExit(0 if (torch.cuda.is_available() and torch.version.cuda is not None) else 1)"
+if errorlevel 1 (
+  call :print_color DarkYellow "[setup] %CHANNEL% installed but CUDA runtime verification failed."
+  exit /b 1
+)
+
+set "TORCH_OK=1"
+set "TORCH_CHANNEL=%CHANNEL%"
+exit /b 0
 
 :install_portable_python
 set "TEMP_ZIP=%TEMP%\%PY_PORTABLE_ZIP%"
