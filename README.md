@@ -3,9 +3,9 @@
 ![UnityRAG demo comparison](demo/assets/ad_demo_readme_dark.png)
 
 [![CI](https://github.com/Razpines/UnityRAG/actions/workflows/ci.yml/badge.svg)](https://github.com/Razpines/UnityRAG/actions/workflows/ci.yml)
-[![License](https://img.shields.io/github/license/Razpines/UnityRAG)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue)](pyproject.toml)
-[![GitHub Stars](https://img.shields.io/github/stars/Razpines/UnityRAG?style=social)](https://github.com/Razpines/UnityRAG/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/Razpines/UnityRAG)](https://github.com/Razpines/UnityRAG/stargazers)
 
 Local Unity documentation RAG + MCP server for coding agents.
 
