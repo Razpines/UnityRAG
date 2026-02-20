@@ -23,13 +23,7 @@ pip install -e .[dev]
 unitydocs install --version 6000.3 --cleanup
 ```
 
-2. Start the MCP HTTP server.
-
-```bash
-unitydocs mcp
-```
-
-3. Configure your agent with files in `examples/`.
+2. Configure your agent with files in `examples/`.
 - Codex: `examples/codex_mcp_config.json`
 - Claude Desktop: `examples/claude_desktop_config.json`
 - macOS/Linux: `*_unix.json` variants
@@ -39,9 +33,17 @@ Set:
 - `UNITY_DOCS_MCP_HOST=127.0.0.1`
 - `UNITY_DOCS_MCP_PORT=8765`
 
-4. Restart your agent and run a prompt:
+3. Restart your agent and run a prompt:
 - "How do I schedule an `IJobParallelFor` with batch size?"
 - "Open `Mesh.SetVertices` and show related docs."
+
+Development/debug option:
+
+```bash
+unitydocs mcp
+```
+
+Use this when you want direct server logs/prints in your terminal instead of agent-managed auto-start.
 
 If setup fails, run:
 

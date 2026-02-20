@@ -60,4 +60,3 @@
 [2026-02-20 15:45] Extraction coverage moved to committed HTML fixtures; real-doc extraction tests remain optional behind UNITYDOCS_E2E=1.
 [2026-02-20 15:45] PR #7 merged to main with fixture-based extraction tests and green Windows/Ubuntu CI.
 [2026-02-20 15:45] Started issue #2 implementation plan: add unitydocs doctor with human/json output, preflight diagnostics, and non-zero exit on blocking failures.
-[2026-02-20 16:05] Week 1 growth foundation branch: tightened README conversion path, improved contributor onboarding doc, and added explicit week-by-week execution tracker/roadmap docs for measurable adoption work.
