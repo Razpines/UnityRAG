@@ -9,7 +9,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
-from unity_docs_mcp.config import Config, config_signature, load_config, vector_enabled
+from unity_docs_mcp.config import (
+    Config,
+    config_signature,
+    existing_config_layer_paths,
+    load_config,
+    vector_enabled,
+)
 from unity_docs_mcp.paths import make_paths
 
 
@@ -21,35 +27,25 @@ class CheckResult:
     details: dict[str, Any]
 
 
-def _resolve_config_path(config_path: Optional[Path | str] = None) -> Optional[Path]:
-    env_override = os.environ.get("UNITY_DOCS_MCP_CONFIG")
-    candidates: list[Path] = []
-    if config_path is not None:
-        candidates.append(Path(config_path))
-    if env_override:
-        candidates.append(Path(env_override))
-    candidates.append(Path("config.yaml"))
-    repo_root = Path(__file__).resolve().parents[2]
-    candidates.append(repo_root / "config.yaml")
-    for candidate in candidates:
-        if candidate.exists():
-            return candidate.resolve()
-    return None
+def _resolve_config_paths(config_path: Optional[Path | str] = None) -> list[Path]:
+    return existing_config_layer_paths(config_path)
 
 
-def _check_config_source(config_path: Optional[Path]) -> CheckResult:
-    if config_path is None:
+def _check_config_source(config_paths: list[Path]) -> CheckResult:
+    if not config_paths:
         return CheckResult(
             id="config_source",
             status="warn",
-            message="No config file found; using built-in defaults.",
-            details={"config_path": None},
+            message="No config files found; using built-in defaults.",
+            details={"config_paths": []},
         )
+    path_strings = [str(p) for p in config_paths]
+    path_list = ", ".join(path_strings)
     return CheckResult(
         id="config_source",
         status="pass",
-        message=f"Using config file: {config_path}",
-        details={"config_path": str(config_path)},
+        message=f"Using config layers: {path_list}",
+        details={"config_paths": path_strings},
     )
 
 
@@ -274,10 +270,10 @@ def _check_artifacts(cfg: Config) -> CheckResult:
 
 
 def run_doctor(config_path: Optional[Path | str] = None) -> dict[str, Any]:
-    cfg_path = _resolve_config_path(config_path)
+    cfg_paths = _resolve_config_paths(config_path)
     cfg = load_config(config_path)
     checks = [
-        _check_config_source(cfg_path),
+        _check_config_source(cfg_paths),
         _check_paths(cfg),
         _check_dependencies(cfg),
         _check_embedder_device(cfg),

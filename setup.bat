@@ -217,7 +217,7 @@ if not defined SELECTED (
 )
 
 :write_config
-set "TEMP_CFG=%REPO%\config.yaml"
+set "TEMP_CFG=%REPO%\config.local.yaml"
 (
   echo unity_version: "%SELECTED%"
   echo download_url: "https://cloudmedia-docs.unity3d.com/docscloudstorage/en/%SELECTED%/UnityDocumentation.zip"
@@ -247,11 +247,78 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
+
+call :configure_mcp
+
 echo.
 call :print_color Green "[setup] Success."
 pause
 
 goto :eof
+
+:configure_mcp
+set "MCP_CLIENT="
+if /i "%UNITYDOCS_MCP_CLIENT%"=="codex" set "MCP_CLIENT=codex"
+if /i "%UNITYDOCS_MCP_CLIENT%"=="claude" set "MCP_CLIENT=claude"
+if /i "%UNITYDOCS_MCP_CLIENT%"=="both" set "MCP_CLIENT=both"
+if /i "%UNITYDOCS_MCP_CLIENT%"=="skip" set "MCP_CLIENT=skip"
+if /i "%UNITYDOCS_MCP_CLIENT%"=="none" set "MCP_CLIENT=skip"
+if /i "%UNITYDOCS_MCP_CLIENT%"=="0" set "MCP_CLIENT=skip"
+
+if defined MCP_CLIENT goto apply_mcp
+
+:choose_mcp
+echo.
+call :print_color Green "Auto-configure MCP client now?"
+echo   1^) Codex ^(recommended^)
+echo   2^) Claude Desktop
+echo   3^) Both
+echo   4^) Skip
+echo.
+set "MCP_CLIENT="
+set /p MCP_CHOICE=Choice [1]:
+if "%MCP_CHOICE%"=="" set "MCP_CHOICE=1"
+if /i "%MCP_CHOICE%"=="1" set "MCP_CLIENT=codex"
+if /i "%MCP_CHOICE%"=="codex" set "MCP_CLIENT=codex"
+if /i "%MCP_CHOICE%"=="2" set "MCP_CLIENT=claude"
+if /i "%MCP_CHOICE%"=="claude" set "MCP_CLIENT=claude"
+if /i "%MCP_CHOICE%"=="3" set "MCP_CLIENT=both"
+if /i "%MCP_CHOICE%"=="both" set "MCP_CLIENT=both"
+if /i "%MCP_CHOICE%"=="4" set "MCP_CLIENT=skip"
+if /i "%MCP_CHOICE%"=="skip" set "MCP_CLIENT=skip"
+if /i "%MCP_CHOICE%"=="none" set "MCP_CLIENT=skip"
+if not defined MCP_CLIENT (
+  call :print_color Red "Invalid selection."
+  goto choose_mcp
+)
+
+:apply_mcp
+if /i "%MCP_CLIENT%"=="skip" (
+  call :print_color Cyan "[setup] Skipping MCP client auto-config."
+  exit /b 0
+)
+
+if /i "%MCP_CLIENT%"=="codex" goto install_codex
+if /i "%MCP_CLIENT%"=="claude" goto install_claude
+if /i "%MCP_CLIENT%"=="both" (
+  goto install_codex
+)
+exit /b 0
+
+:install_codex
+python -m unity_docs_mcp.setup.mcp_config --client codex --repo-root "%REPO%"
+if errorlevel 1 (
+  call :print_color Yellow "[setup] Warning: failed to auto-configure Codex MCP."
+)
+if /i "%MCP_CLIENT%"=="both" goto install_claude
+exit /b 0
+
+:install_claude
+python -m unity_docs_mcp.setup.mcp_config --client claude --repo-root "%REPO%"
+if errorlevel 1 (
+  call :print_color Yellow "[setup] Warning: failed to auto-configure Claude MCP."
+)
+exit /b 0
 
 :try_torch_channel
 set "CHANNEL=%~1"

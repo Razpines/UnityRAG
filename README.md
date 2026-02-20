@@ -13,14 +13,7 @@ MCP tools: `search` / `open` / `related` / `list_files` / `status`
 
 ## Quick Start
 
-1. Run setup (recommended).
-- Windows: double-click `setup.bat` (or run it in a terminal).
-- macOS/Linux: `bash setup.sh`
-- Setup prompts for mode:
-  - `CUDA` (hybrid retrieval: FTS + vectors)
-  - `CPU-only` (FTS-only retrieval, no transformers/faiss)
-- Setup writes the selected version/mode into local `config.yaml` so MCP startup uses the same retrieval mode.
-- This downloads the Unity offline docs, builds the selected local index, and cleans up raw files to save space.
+1. Run setup.
 
 ```bash
 # Windows
@@ -30,18 +23,18 @@ setup.bat
 bash setup.sh
 ```
 
-2. Configure your agent with files in `examples/`.
-- Codex: `examples/codex_mcp_config.json`
-- Claude Desktop: `examples/claude_desktop_config.json`
-- macOS/Linux: `*_unix.json` variants
-- Replace the `command` value with the absolute path to your local `start_server` script.
-  - Windows example: `C:\\projects\\UnityRAG\\start_server.bat`
-  - macOS/Linux example: `/home/you/UnityRAG/start_server.sh`
-- No env vars are required for the default onboarding flow.
+Setup will prompt you for:
+- Retrieval mode: `CUDA` (hybrid) or `CPU-only` (FTS-only)
+- MCP client auto-config: `Codex`, `Claude Desktop`, `Both`, or `Skip`
+- Setup writes machine-local overrides to `config.local.yaml` (untracked), while `config.yaml` remains tracked defaults.
 
-3. Restart your agent and run a prompt:
+2. Restart your agent.
+
+3. Test:
 - "How do I schedule an `IJobParallelFor` with batch size?"
 - "Open `Mesh.SetVertices` and show related docs."
+
+If you chose `Skip`, configure manually using files in `examples/` with an absolute `unitydocs-mcp` path plus `UNITY_DOCS_MCP_ROOT` and `UNITY_DOCS_MCP_CONFIG`.
 
 If setup fails, run:
 
@@ -78,6 +71,7 @@ Notes:
 
 Optional advanced overrides:
 - `UNITY_DOCS_MCP_ROOT`
+- `UNITY_DOCS_MCP_CONFIG`
 - `UNITY_DOCS_MCP_HOST`
 - `UNITY_DOCS_MCP_PORT`
 

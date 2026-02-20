@@ -46,8 +46,10 @@ Example response metadata (present in all tools):
 ```
 
 ## Configuration
-Edit `config.yaml` (optional). Defaults: Unity 6.3 URL, paths under `data/unity/6000.3`, heading-based chunking, bge-small-en-v1.5 local embeddings, FAISS vectors, FTS5 lexical.
-Set `index.vector: "none"` for explicit FTS-only mode (CPU-only path).
+- `config.yaml`: tracked base defaults.
+- `config.local.yaml`: optional untracked local overrides written by setup.
+- Effective config is layered in this order: `config.yaml` -> `config.local.yaml` -> `UNITY_DOCS_MCP_CONFIG` -> explicit `--config`.
+- Set `index.vector: "none"` in local overrides for explicit FTS-only mode.
 
 ## Examples
 - `examples/codex_mcp_config.json` (Windows)
@@ -62,7 +64,7 @@ Set `index.vector: "none"` for explicit FTS-only mode (CPU-only path).
 - Setup scripts now prompt for mode:
   - `CUDA`: installs `.[dev,vector]`, then validates CUDA torch (`cu128 -> cu121 -> cu118` fallback).
   - `CPU-only`: installs `.[dev]` and configures `index.vector: none` (FTS-only, no vector deps).
-- Setup writes the chosen version/mode into repo-local `config.yaml` for MCP startup consistency.
+- Setup writes the chosen version/mode into repo-local `config.local.yaml` for MCP startup consistency without dirtying git state.
 - If all CUDA channels fail runtime validation, CUDA mode exits; rerun setup and choose CPU-only if desired.
 - Search returns garbage: delete `data/unity/<version>/baked` and re-run `unitydocs-bake` to validate extraction quality.
 - Port already used: set `UNITY_DOCS_MCP_PORT` (and `UNITY_DOCS_MCP_HOST` if needed).
@@ -85,16 +87,21 @@ These require local Unity raw docs under `data/unity/<version>/raw/UnityDocument
 - Bake/index steps are idempotent: existing artifacts with matching config/version skip work.
 - Link extraction ignores external and anchor-only links; internal links are normalized to doc_ids for related lookups.
 
-## Codex/Claude MCP wiring (HTTP server, auto-started)
-- Use `start_server` as the command and set it to an absolute path. Example (Windows):
+## Codex/Claude MCP wiring (stdio MCP, auto-started)
+- Setup can auto-configure Codex/Claude MCP files now (recommended).
+- If you need manual wiring, use the repo venv `unitydocs-mcp` entrypoint with absolute paths plus env overrides. Example (Windows):
   ```json
   {
     "servers": {
       "unity-docs": {
-        "command": "C:\\projects\\UnityRAG\\start_server.bat",
-        "args": []
+        "command": "C:\\projects\\UnityRAG\\.venv\\Scripts\\unitydocs-mcp.exe",
+        "args": [],
+        "env": {
+          "UNITY_DOCS_MCP_ROOT": "C:\\projects\\UnityRAG",
+          "UNITY_DOCS_MCP_CONFIG": "C:\\projects\\UnityRAG\\config.local.yaml"
+        }
       }
     }
   }
   ```
-  macOS/Linux equivalent command: `/path/to/UnityRAG/start_server.sh`. This default flow does not require manually setting `UNITY_DOCS_MCP_ROOT`, `UNITY_DOCS_MCP_HOST`, or `UNITY_DOCS_MCP_PORT`. Use those env vars only if you need custom overrides.
+  macOS/Linux equivalent command: `/path/to/UnityRAG/.venv/bin/unitydocs-mcp`.

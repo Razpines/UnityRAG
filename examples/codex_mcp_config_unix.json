@@ -1,8 +1,12 @@
 {
   "servers": {
     "unity-docs": {
-      "command": "/path/to/UnityRAG/start_server.sh",
-      "args": []
+      "command": "/path/to/UnityRAG/.venv/bin/unitydocs-mcp",
+      "args": [],
+      "env": {
+        "UNITY_DOCS_MCP_ROOT": "/path/to/UnityRAG",
+        "UNITY_DOCS_MCP_CONFIG": "/path/to/UnityRAG/config.local.yaml"
+      }
     }
   }
 }

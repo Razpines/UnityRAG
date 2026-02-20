@@ -149,7 +149,7 @@ fi
 
 export UNITY_DOCS_MCP_ROOT="$REPO_DIR"
 export UNITY_DOCS_MCP_CLEANUP=1
-CFG_PATH="$REPO_DIR/config.yaml"
+CFG_PATH="$REPO_DIR/config.local.yaml"
 VECTOR_MODE="faiss"
 if [ "$SETUP_MODE" = "cpu" ]; then
   VECTOR_MODE="none"
@@ -170,4 +170,51 @@ EOF
 export UNITY_DOCS_MCP_CONFIG="$CFG_PATH"
 
 python -c "from unity_docs_mcp.setup.ensure_artifacts import main; main()"
+
+MCP_CLIENT="${UNITYDOCS_MCP_CLIENT:-}"
+if [ -z "$MCP_CLIENT" ]; then
+  echo
+  echo "Auto-configure MCP client now?"
+  echo "  1) Codex (recommended)"
+  echo "  2) Claude Desktop"
+  echo "  3) Both"
+  echo "  4) Skip"
+  read -r -p "Choice [1]: " MCP_CHOICE
+  MCP_CHOICE="${MCP_CHOICE:-1}"
+  MCP_CHOICE_LOWER="$(printf '%s' "$MCP_CHOICE" | tr '[:upper:]' '[:lower:]')"
+  case "$MCP_CHOICE_LOWER" in
+    1|codex) MCP_CLIENT="codex" ;;
+    2|claude) MCP_CLIENT="claude" ;;
+    3|both) MCP_CLIENT="both" ;;
+    4|skip|none) MCP_CLIENT="skip" ;;
+    *)
+      echo "[setup] Invalid MCP client selection, skipping auto-config."
+      MCP_CLIENT="skip"
+      ;;
+  esac
+else
+  MCP_CLIENT_LOWER="$(printf '%s' "$MCP_CLIENT" | tr '[:upper:]' '[:lower:]')"
+  case "$MCP_CLIENT_LOWER" in
+    codex|claude|both|skip|none) MCP_CLIENT="$MCP_CLIENT_LOWER" ;;
+    *)
+      echo "[setup] UNITYDOCS_MCP_CLIENT must be codex|claude|both|skip. Skipping auto-config."
+      MCP_CLIENT="skip"
+      ;;
+  esac
+fi
+
+if [ "$MCP_CLIENT" = "none" ]; then
+  MCP_CLIENT="skip"
+fi
+if [ "$MCP_CLIENT" = "codex" ] || [ "$MCP_CLIENT" = "both" ]; then
+  if ! python -m unity_docs_mcp.setup.mcp_config --client codex --repo-root "$REPO_DIR"; then
+    echo "[setup] Warning: failed to auto-configure Codex MCP."
+  fi
+fi
+if [ "$MCP_CLIENT" = "claude" ] || [ "$MCP_CLIENT" = "both" ]; then
+  if ! python -m unity_docs_mcp.setup.mcp_config --client claude --repo-root "$REPO_DIR"; then
+    echo "[setup] Warning: failed to auto-configure Claude MCP."
+  fi
+fi
+
 echo "[setup] Done."
