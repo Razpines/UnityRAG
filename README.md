@@ -34,7 +34,7 @@ Setup will prompt you for:
 - "How do I schedule an `IJobParallelFor` with batch size?"
 - "Open `Mesh.SetVertices` and show related docs."
 
-If you chose `Skip`, configure manually using files in `examples/` with an absolute `unitydocs-mcp` path and `UNITY_DOCS_MCP_ROOT` env.
+If you chose `Skip`, configure manually using files in `examples/` with an absolute `unitydocs-mcp` path plus `UNITY_DOCS_MCP_ROOT` and `UNITY_DOCS_MCP_CONFIG`.
 
 If setup fails, run:
 
@@ -71,6 +71,7 @@ Notes:
 
 Optional advanced overrides:
 - `UNITY_DOCS_MCP_ROOT`
+- `UNITY_DOCS_MCP_CONFIG`
 - `UNITY_DOCS_MCP_HOST`
 - `UNITY_DOCS_MCP_PORT`
 
