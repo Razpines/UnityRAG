@@ -34,6 +34,7 @@ unitydocs-index = "unity_docs_mcp.index.index_cli:main"
 unitydocs-mcp = "unity_docs_mcp.mcp_server:main"
 unitydocs-mcp-http = "unity_docs_mcp.mcp_server:main_http"
 unitydocs = "unity_docs_mcp.cli:main"
+unitydocs-mcp-config = "unity_docs_mcp.setup.mcp_config:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
