@@ -10,7 +10,7 @@ from typing import List, Optional
 
 from mcp.server.fastmcp import FastMCP
 
-from unity_docs_mcp.config import load_config
+from unity_docs_mcp.config import load_config, retrieval_mode
 from unity_docs_mcp.setup.ensure_artifacts import ensure
 from unity_docs_mcp.tools.ops import DocStore
 
@@ -56,13 +56,6 @@ def _read_manifest(path: Path) -> dict:
         return {}
 
 
-def _retrieval_mode(vector_mode: str) -> str:
-    mode = (vector_mode or "").strip().lower()
-    if mode in {"", "none", "off", "disabled", "false"}:
-        return "fts_only"
-    return "hybrid"
-
-
 def _response_meta(docstore: DocStore, baked_manifest: Optional[dict] = None) -> dict:
     cfg = docstore.config
     meta = {
@@ -71,7 +64,7 @@ def _response_meta(docstore: DocStore, baked_manifest: Optional[dict] = None) ->
             "lexical": cfg.index.lexical,
             "vector": cfg.index.vector,
         },
-        "retrieval_mode": _retrieval_mode(cfg.index.vector),
+        "retrieval_mode": retrieval_mode(cfg.index.vector),
     }
     baked = baked_manifest or {}
     build_from = baked.get("build_from")

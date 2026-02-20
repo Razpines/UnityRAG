@@ -1,6 +1,7 @@
 import json
 
 import unity_docs_mcp.doctor as doctor
+from unity_docs_mcp.config import Config
 
 
 def test_doctor_report_has_stable_shape(monkeypatch):
@@ -27,7 +28,7 @@ def test_doctor_exit_nonzero_on_blocking_failure(monkeypatch):
     monkeypatch.setattr(
         doctor,
         "_check_dependencies",
-        lambda: doctor.CheckResult(
+        lambda _cfg: doctor.CheckResult(
             id="dependencies",
             status="fail",
             message="forced failure",
@@ -48,3 +49,11 @@ def test_doctor_main_json_output(monkeypatch, capsys):
     assert isinstance(parsed, dict)
     assert "checks" in parsed
     assert code in {0, 1}
+
+
+def test_doctor_skips_vector_dependencies_in_fts_only_mode(monkeypatch):
+    cfg = Config()
+    cfg.index.vector = "none"
+    result = doctor._check_dependencies(cfg)
+    assert result.status == "pass"
+    assert "FTS-only mode" in result.message

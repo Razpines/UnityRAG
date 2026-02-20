@@ -60,3 +60,6 @@
 [2026-02-20 15:45] Extraction coverage moved to committed HTML fixtures; real-doc extraction tests remain optional behind UNITYDOCS_E2E=1.
 [2026-02-20 15:45] PR #7 merged to main with fixture-based extraction tests and green Windows/Ubuntu CI.
 [2026-02-20 15:45] Started issue #2 implementation plan: add unitydocs doctor with human/json output, preflight diagnostics, and non-zero exit on blocking failures.
+[2026-02-20 16:10] Decision update: support CPU-only environments via explicit FTS-only mode (index.vector=none) while keeping CUDA hybrid as default for full semantic retrieval.
+[2026-02-20 16:10] setup.bat/setup.sh now prompt for CUDA vs CPU-only and install dependency sets accordingly (. [dev,vector] vs . [dev]); FTS-only path skips torch/sentence-transformers/faiss runtime logic.
+[2026-02-20 16:15] Setup mode/version selection now persists into repo config.yaml (not temp-only) so MCP startup uses the same retrieval mode after setup.

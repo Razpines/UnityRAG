@@ -74,6 +74,13 @@ def test_search_includes_meta(monkeypatch):
     assert result[0]["meta"]["retrieval_mode"] == "hybrid"
 
 
+def test_search_meta_reports_fts_only_when_vector_disabled(monkeypatch):
+    fake = _install_fake_docstore(monkeypatch)
+    fake.config.index.vector = "none"
+    result = mcp_server.search("IJobParallelFor batch size", k=3)
+    assert result[0]["meta"]["retrieval_mode"] == "fts_only"
+
+
 def test_open_includes_meta_even_when_missing(monkeypatch):
     _install_fake_docstore(monkeypatch)
     found = mcp_server.open(doc_id="manual/job-system-parallel-for-jobs")

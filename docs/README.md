@@ -5,7 +5,7 @@ This file contains the advanced, developer-oriented details that were removed fr
 ## Layout
 - `data/unity/6000.3/raw`: UnityDocumentation.zip + unzipped HTML (not committed)
 - `data/unity/6000.3/baked`: corpus.jsonl, chunks.jsonl, link_graph.jsonl, manifest.json
-- `data/unity/6000.3/index`: fts.sqlite, vectors.faiss, vectors_meta.jsonl
+- `data/unity/6000.3/index`: always `fts.sqlite`; plus `vectors.faiss` and `vectors_meta.jsonl` in hybrid mode
 - `src/unity_docs_mcp`: pipeline + MCP server
 - `scripts/`: convenience wrappers (same as console scripts)
 
@@ -47,6 +47,7 @@ Example response metadata (present in all tools):
 
 ## Configuration
 Edit `config.yaml` (optional). Defaults: Unity 6.3 URL, paths under `data/unity/6000.3`, heading-based chunking, bge-small-en-v1.5 local embeddings, FAISS vectors, FTS5 lexical.
+Set `index.vector: "none"` for explicit FTS-only mode (CPU-only path).
 
 ## Examples
 - `examples/codex_mcp_config.json` (Windows)
@@ -58,10 +59,11 @@ Edit `config.yaml` (optional). Defaults: Unity 6.3 URL, paths under `data/unity/
 - Run preflight diagnostics first:
   - `unitydocs doctor`
   - `unitydocs doctor --json` (for structured bug reports/automation)
-- `faiss-cpu` install fails: ensure you are on Python 3.12 and install with `pip install faiss-cpu`. On some platforms, use conda or build from source.
-- Setup scripts are CUDA-only now: `setup.bat` and `setup.sh` try torch channels in order (`cu128`, `cu121`, `cu118`) and accept a channel only if `torch.cuda.is_available()` is true at runtime.
-- If one channel installs but CUDA runtime is unavailable, setup automatically falls back to the next channel.
-- If all channels fail runtime validation, setup exits (no CPU fallback in setup scripts).
+- Setup scripts now prompt for mode:
+  - `CUDA`: installs `.[dev,vector]`, then validates CUDA torch (`cu128 -> cu121 -> cu118` fallback).
+  - `CPU-only`: installs `.[dev]` and configures `index.vector: none` (FTS-only, no vector deps).
+- Setup writes the chosen version/mode into repo-local `config.yaml` for MCP startup consistency.
+- If all CUDA channels fail runtime validation, CUDA mode exits; rerun setup and choose CPU-only if desired.
 - Search returns garbage: delete `data/unity/<version>/baked` and re-run `unitydocs-bake` to validate extraction quality.
 - Port already used: set `UNITY_DOCS_MCP_PORT` (and `UNITY_DOCS_MCP_HOST` if needed).
 - Download blocked or slow: download UnityDocumentation.zip manually, place it under `data/unity/<version>/raw/`, then re-run setup.
