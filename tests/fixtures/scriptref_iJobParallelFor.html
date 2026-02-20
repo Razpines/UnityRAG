@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>IJobParallelFor</title>
+    <link rel="canonical" href="https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Unity.Jobs.IJobParallelFor.html" />
+  </head>
+  <body>
+    <div id="content-wrap">
+      <div class="section">
+        <h1>IJobParallelFor</h1>
+        <p>
+          IJobParallelFor defines an Execute method that runs once per index in a NativeArray-style data source.
+          Unity partitions work into batches and schedules these across worker threads to improve throughput on
+          multicore CPUs. This fixture is representative rather than canonical documentation content.
+        </p>
+        <h2>Description</h2>
+        <p>
+          Implement Execute(int index) to process one element at a time. Use Schedule(length, batchSize) to control
+          how many elements are processed and how work stealing can rebalance uneven workloads.
+        </p>
+        <pre><code class="lang-cs">public struct MyParallelJob : IJobParallelFor
+{
+    public NativeArray<float> values;
+    public float deltaTime;
+
+    public void Execute(int index)
+    {
+        values[index] += deltaTime;
+    }
+}</code></pre>
+      </div>
+    </div>
+  </body>
+</html>
