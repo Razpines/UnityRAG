@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import json
 import asyncio
 import os
@@ -28,7 +29,8 @@ def _get_docstore() -> DocStore:
     if _docstore is None:
         config = load_config()
         if not _ensured:
-            ensure(config)
+            with contextlib.redirect_stdout(sys.stderr):
+                ensure(config)
             _ensured = True
         _docstore = DocStore(config)
     return _docstore
@@ -39,7 +41,8 @@ def _ensure_startup() -> None:
     if _ensured:
         return
     config = load_config()
-    ensure(config)
+    with contextlib.redirect_stdout(sys.stderr):
+        ensure(config)
     _ensured = True
 
 

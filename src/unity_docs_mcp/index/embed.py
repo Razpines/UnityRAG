@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+import sys
 from typing import Iterable
 
 import numpy as np
@@ -27,7 +28,7 @@ def embed_texts(texts: Iterable[str], model_name: str, device: str = "auto") -> 
         "torch_version": torch.__version__,
         "torch_cuda_version": torch.version.cuda,
     }
-    print(f"[embed] using device={resolved_device} model={model_name} info={cuda_info}")
+    print(f"[embed] using device={resolved_device} model={model_name} info={cuda_info}", file=sys.stderr)
     model = _load_model(model_name, resolved_device)
     return np.array(
         model.encode(

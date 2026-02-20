@@ -30,16 +30,18 @@ def ensure(config: Config) -> None:
     sig = config_signature(config)
     ran_index = False
 
-    if not paths.raw_zip.exists():
-        download_zip(config.download_url, paths.raw_zip)
-
-    if not paths.raw_unzipped.exists() or not any(paths.raw_unzipped.iterdir()):
-        safe_unzip(paths.raw_zip, paths.raw_unzipped)
-
     baked_manifest = paths.baked_dir / "manifest.json"
-    if not _manifest_matches(baked_manifest, sig):
+    baked_matches = _manifest_matches(baked_manifest, sig)
+    if not baked_matches:
+        if not paths.raw_zip.exists():
+            download_zip(config.download_url, paths.raw_zip)
+
+        if not paths.raw_unzipped.exists() or not any(paths.raw_unzipped.iterdir()):
+            safe_unzip(paths.raw_zip, paths.raw_unzipped)
+
         print("==> Baking docs (HTML -> cleaned text + chunks)...")
         bake(config)
+        baked_matches = True
 
     index_manifest = paths.index_dir / "manifest.json"
     if not _manifest_matches(index_manifest, sig):
