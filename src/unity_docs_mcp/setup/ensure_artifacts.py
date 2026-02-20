@@ -23,6 +23,20 @@ def _manifest_matches(path: Path, signature: str) -> bool:
         return False
 
 
+def _raw_docs_ready(raw_unzipped: Path) -> bool:
+    return (raw_unzipped / "Documentation" / "en").is_dir()
+
+
+def _recover_unzip(download_url: str, raw_zip: Path, raw_unzipped: Path, error: Exception) -> None:
+    print(f"[setup] Unzip failed ({error}). Re-downloading zip and retrying once...")
+    if raw_unzipped.exists():
+        shutil.rmtree(raw_unzipped, ignore_errors=True)
+    if raw_zip.exists():
+        raw_zip.unlink()
+    download_zip(download_url, raw_zip, overwrite=True)
+    safe_unzip(raw_zip, raw_unzipped)
+
+
 def ensure(config: Config) -> None:
     paths = make_paths(config)
     paths.ensure_dirs()
@@ -36,8 +50,13 @@ def ensure(config: Config) -> None:
         if not paths.raw_zip.exists():
             download_zip(config.download_url, paths.raw_zip)
 
-        if not paths.raw_unzipped.exists() or not any(paths.raw_unzipped.iterdir()):
-            safe_unzip(paths.raw_zip, paths.raw_unzipped)
+        if not _raw_docs_ready(paths.raw_unzipped):
+            if paths.raw_unzipped.exists():
+                shutil.rmtree(paths.raw_unzipped, ignore_errors=True)
+            try:
+                safe_unzip(paths.raw_zip, paths.raw_unzipped)
+            except Exception as unzip_error:
+                _recover_unzip(config.download_url, paths.raw_zip, paths.raw_unzipped, unzip_error)
 
         print("==> Baking docs (HTML -> cleaned text + chunks)...")
         bake(config)
