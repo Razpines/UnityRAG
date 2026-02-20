@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UnityRAG README Demo Card</title>
+  <style>
+    :root {
+      --gh-bg: #0d1117;
+      --gh-paper: #161b22;
+      --gh-ink: #c9d1d9;
+      --gh-muted: #8b949e;
+      --gh-line: #30363d;
+      --gh-code-bg: #0d1117;
+      --ok-bg: #0f2419;
+      --ok-ink: #7ee787;
+      --bad-bg: #2d1318;
+      --bad-ink: #ff7b72;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--gh-bg);
+      color: var(--gh-ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      min-width: 1020px;
+    }
+
+    .canvas {
+      width: 980px;
+      margin: 24px auto;
+      background: var(--gh-paper);
+      border: 1px solid var(--gh-line);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.25;
+    }
+
+    .sub {
+      margin: 0 0 16px;
+      color: var(--gh-muted);
+      font-size: 14px;
+    }
+
+    .question {
+      border: 1px solid var(--gh-line);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      background: var(--gh-paper);
+    }
+
+    .prompt {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: var(--gh-ink);
+      font-weight: 600;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .panel {
+      border: 1px solid var(--gh-line);
+      border-radius: 6px;
+      padding: 10px;
+    }
+
+    .panel.ok {
+      background: var(--ok-bg);
+      border-color: #2e6b4b;
+    }
+
+    .panel.bad {
+      background: var(--bad-bg);
+      border-color: #8d2d33;
+    }
+
+    .label {
+      margin: 0 0 6px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      color: var(--gh-muted);
+    }
+
+    .thought {
+      margin: 0 0 6px;
+      font-size: 12px;
+      color: var(--gh-muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .answer {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.45;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      white-space: pre-wrap;
+    }
+
+    .ok .answer {
+      color: var(--ok-ink);
+    }
+
+    .bad .answer {
+      color: var(--bad-ink);
+    }
+
+    .links {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--gh-muted);
+    }
+
+    .links a {
+      color: #58a6ff;
+      text-decoration: none;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+    .footer {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--gh-muted);
+    }
+
+    code {
+      background: var(--gh-code-bg);
+      border: 1px solid var(--gh-line);
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+  </style>
+</head>
+<body>
+  <main class="canvas">
+    <h1>Unity 6.3 says yes. Generic AI says no.</h1>
+    <p class="sub">Same model flow. With UnityRAG: correct + cited + faster. Without retrieval: confidently wrong.</p>
+
+    <section class="question">
+      <p class="prompt">Q1: In unity, how can I apply CSS-style blur/grayscale/invert filters to a UI Toolkit subtree?</p>
+      <div class="columns">
+        <article class="panel ok">
+          <p class="label">With UnityRAG MCP</p>
+          <p class="thought">[thought for 70 seconds...]</p>
+          <p class="answer">Use UI Toolkit's `filter` style on the parent element.
+
+.fx-root {
+  filter: blur(6px) grayscale(100%) invert(100%);
+}</p>
+        </article>
+        <article class="panel bad">
+          <p class="label">Without UnityRAG (MCP-less)</p>
+          <p class="thought">[thought for 96 seconds...]</p>
+          <p class="answer">Short answer: you can't do this directly in UI Toolkit USS today.</p>
+        </article>
+      </div>
+      <div class="links">
+        Source:
+        <a href="https://docs.unity3d.com/6000.3/Documentation/Manual/ui-systems/uss-filter.html">ui-systems/uss-filter</a>
+      </div>
+    </section>
+
+    <section class="question">
+      <p class="prompt">Q2: In Unity, how can I make MeshRenderer objects receive 2D Lights in URP's 2D Renderer?</p>
+      <div class="columns">
+        <article class="panel ok">
+          <p class="label">With UnityRAG MCP</p>
+          <p class="thought">[thought for 48 seconds...]</p>
+          <p class="answer">Use URP 2D Renderer + Mesh2D-Lit-Default (or compatible Sprite Lit graph).</p>
+        </article>
+        <article class="panel bad">
+          <p class="label">Without UnityRAG (MCP-less)</p>
+          <p class="thought">[thought for 52 seconds...]</p>
+          <p class="answer">You generally can't, at least not as a supported workflow.</p>
+        </article>
+      </div>
+      <div class="links">
+        Source:
+        <a href="https://docs.unity3d.com/6000.3/Documentation/Manual/urp/2d-renderer-urp-shader-compatibility.html">urp/2d-renderer-urp-shader-compatibility</a>
+      </div>
+    </section>
+
+    <p class="footer">Built from captured outputs from MCP-less and UnityRAG-backed runs.</p>
+  </main>
+</body>
+</html>

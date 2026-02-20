@@ -1,5 +1,7 @@
 # UnityRAG
 
+![UnityRAG demo comparison](demo/assets/ad_demo_readme_dark.png)
+
 [![CI](https://github.com/Razpines/UnityRAG/actions/workflows/ci.yml/badge.svg)](https://github.com/Razpines/UnityRAG/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/Razpines/UnityRAG)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue)](pyproject.toml)

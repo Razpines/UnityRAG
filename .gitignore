@@ -23,3 +23,6 @@ data/
 UnityDocumentation.zip
 *.egg-info/
 "data/" 
+
+# Local/private demo artifacts
+internal/

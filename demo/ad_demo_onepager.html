@@ -1,0 +1,412 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UnityRAG Demo - AI Chat Comparison</title>
+  <meta name="description" content="MCP-less Codex vs UnityRAG on Unity 6.3 questions." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --app-bg: #0b1018;
+      --ink: #e7eef6;
+      --muted: #9aa7b6;
+      --line: #2a3645;
+      --panel: #111826;
+      --header: #0f1522;
+      --user: #1b2b4a;
+      --bad: #3a1f29;
+      --good: #153228;
+      --bad-ink: #ffb8aa;
+      --good-ink: #9ce8ba;
+      --cta: #79a7ff;
+      --shadow: 0 20px 42px rgba(3, 7, 13, 0.45);
+      --radius-xl: 20px;
+      --radius-lg: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(1200px 680px at 88% -16%, #213153 0%, transparent 58%),
+        radial-gradient(980px 600px at -18% 4%, #1a3b31 0%, transparent 54%),
+        var(--app-bg);
+      color: var(--ink);
+      font-family: "IBM Plex Sans", "Noto Sans", sans-serif;
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--header);
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 7px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #3b4657;
+    }
+
+    .dot:nth-child(1) { background: #ff8e7e; }
+    .dot:nth-child(2) { background: #ffd26a; }
+    .dot:nth-child(3) { background: #7fd8a4; }
+
+    .mode {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .hero-body {
+      padding: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.9rem, 4.8vw, 3.3rem);
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+    }
+
+    .sub {
+      margin: 10px 0 0;
+      color: var(--muted);
+      max-width: 840px;
+      font-size: 1rem;
+    }
+
+    .chip-row {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: #141d2d;
+    }
+
+    .cta-row {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px 13px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.88rem;
+      transition: transform 160ms ease;
+    }
+
+    .btn-main {
+      background: var(--cta);
+      color: #08101e;
+      border-color: var(--cta);
+    }
+
+    .btn-alt {
+      background: #121b2c;
+      color: var(--ink);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .question {
+      margin-top: 22px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .question-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--header);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .question-title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .speed {
+      margin: 0;
+      font-size: 0.83rem;
+      color: var(--good-ink);
+      font-weight: 700;
+      background: #11261f;
+      border: 1px solid #2c624c;
+      border-radius: 999px;
+      padding: 5px 9px;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+
+    .col {
+      padding: 16px;
+    }
+
+    .col + .col {
+      border-left: 1px solid var(--line);
+    }
+
+    .col-title {
+      margin: 0 0 10px;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .chat {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .bubble {
+      border-radius: var(--radius-lg);
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      font-size: 0.9rem;
+      max-width: 95%;
+    }
+
+    .bubble.user {
+      background: var(--user);
+      margin-left: 28px;
+      margin-right: 0;
+      align-self: flex-end;
+    }
+
+    .bubble.assistant-bad {
+      background: var(--bad);
+      color: var(--bad-ink);
+      margin-left: 0;
+      margin-right: 18px;
+      align-self: flex-start;
+    }
+
+    .bubble.assistant-good {
+      background: var(--good);
+      color: var(--good-ink);
+      margin-left: 0;
+      margin-right: 18px;
+      align-self: flex-start;
+    }
+
+    .thought {
+      margin: 0;
+      font-family: "IBM Plex Mono", "Fira Code", monospace;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .code {
+      margin: 0;
+      font-family: "IBM Plex Mono", "Fira Code", monospace;
+      white-space: pre-wrap;
+      line-height: 1.42;
+    }
+
+    .sources {
+      margin-top: 11px;
+      display: grid;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+
+    .sources a {
+      color: #86b7ff;
+      text-decoration-thickness: 1.5px;
+      word-break: break-all;
+    }
+
+    .foot {
+      margin-top: 14px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      .columns {
+        grid-template-columns: 1fr;
+      }
+
+      .col + .col {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-top">
+        <div class="window-dots" aria-hidden="true">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+        <span class="mode">AI Chat Comparison</span>
+      </div>
+      <div class="hero-body">
+        <h1>Unity 6.3 says yes. Generic AI says no.</h1>
+        <p class="sub">
+          Same prompt set. Same model family. MCP-less run returned incorrect "not supported" answers.
+          UnityRAG-backed run returned correct, version-specific guidance with Unity 6000.3 citations.
+        </p>
+        <div class="chip-row">
+          <span class="chip">Unity 6.3 (6000.3)</span>
+          <span class="chip">Codex MCP-less vs Codex + UnityRAG MCP</span>
+          <span class="chip">Q1 + Q2 real captures</span>
+        </div>
+        <div class="cta-row">
+          <a class="btn btn-main" href="https://github.com/Razpines/UnityRAG" target="_blank" rel="noreferrer">Star UnityRAG</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="question">
+      <header class="question-head">
+        <h2 class="question-title">Q1 - UI Toolkit subtree filters (`blur`, `grayscale`, `invert`)</h2>
+        <p class="speed">UnityRAG: faster + correct</p>
+      </header>
+      <div class="columns">
+        <article class="col">
+          <p class="col-title">With UnityRAG MCP</p>
+          <div class="chat">
+            <div class="bubble user">In unity, how can I apply CSS-style blur/grayscale/invert filters to a UI Toolkit subtree?</div>
+            <div class="bubble assistant-good">
+              <p class="thought">[thought for 70 seconds...]</p>
+              <p class="code">Use UI Toolkit's `filter` style on the parent element of the subtree.
+
+.fx-root {
+  filter: blur(6px) grayscale(100%) invert(100%);
+}</p>
+            </div>
+          </div>
+          <div class="sources">
+            <a href="https://docs.unity3d.com/6000.3/Documentation/Manual/ui-systems/uss-filter.html" target="_blank" rel="noreferrer">ui-systems/uss-filter</a>
+            <a href="https://docs.unity3d.com/6000.3/Documentation/Manual/ui-systems/built-in-filters.html" target="_blank" rel="noreferrer">ui-systems/built-in-filters</a>
+            <a href="https://docs.unity3d.com/6000.3/Documentation/Manual/ui-systems/uss-filter-transitions.html" target="_blank" rel="noreferrer">ui-systems/uss-filter-transitions</a>
+          </div>
+        </article>
+
+        <article class="col">
+          <p class="col-title">Without UnityRAG (MCP-less)</p>
+          <div class="chat">
+            <div class="bubble user">In unity, how can I apply CSS-style blur/grayscale/invert filters to a UI Toolkit subtree?</div>
+            <div class="bubble assistant-bad">
+              <p class="thought">[thought for 96 seconds...]</p>
+              <p class="code">Short answer: you can't do this directly in UI Toolkit USS today.
+
+`filter`, `backdrop-filter`, `blur`, etc. are not in the supported USS property list...</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="question">
+      <header class="question-head">
+        <h2 class="question-title">Q2 - MeshRenderer receiving 2D Lights in URP 2D Renderer</h2>
+        <p class="speed">UnityRAG: faster + correct</p>
+      </header>
+      <div class="columns">
+        <article class="col">
+          <p class="col-title">With UnityRAG MCP</p>
+          <div class="chat">
+            <div class="bubble user">In Unity, how can I make MeshRenderer objects receive 2D Lights in URP's 2D Renderer?</div>
+            <div class="bubble assistant-good">
+              <p class="thought">[thought for 48 seconds...]</p>
+              <p class="code">As of Unity 6.3 (6000.3), `MeshRenderer` objects can receive URP 2D Lights
+if you use a 2D-compatible material/shader.
+
+Use URP 2D Renderer + Mesh2D-Lit-Default,
+or a Sprite Lit/Custom Lit Shader Graph with Sort 3D As 2D Compatible.</p>
+            </div>
+          </div>
+          <div class="sources">
+            <a href="https://docs.unity3d.com/6000.3/Documentation/Manual/urp/2d-renderer-urp-shader-compatibility.html" target="_blank" rel="noreferrer">urp/2d-renderer-urp-shader-compatibility</a>
+            <a href="https://docs.unity3d.com/6000.3/Documentation/Manual/urp/2d-renderer-urp-features-landing.html" target="_blank" rel="noreferrer">urp/2d-renderer-urp-features-landing</a>
+          </div>
+        </article>
+
+        <article class="col">
+          <p class="col-title">Without UnityRAG (MCP-less)</p>
+          <div class="chat">
+            <div class="bubble user">In Unity, how can I make MeshRenderer objects receive 2D Lights in URP's 2D Renderer?</div>
+            <div class="bubble assistant-bad">
+              <p class="thought">[thought for 52 seconds...]</p>
+              <p class="code">You generally can't, at least not as a supported workflow.</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <p class="foot">Built from captured outputs from MCP-less and UnityRAG-backed runs.</p>
+  </main>
+</body>
+</html>
+
