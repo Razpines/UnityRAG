@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
-from unity_docs_mcp.config import Config, config_signature, load_config
+from unity_docs_mcp.config import Config, config_signature, load_config, vector_enabled
 from unity_docs_mcp.paths import make_paths
 
 
@@ -92,7 +92,15 @@ def _import_optional(module_name: str) -> tuple[bool, Optional[str], Optional[st
         return False, None, str(exc)
 
 
-def _check_dependencies() -> CheckResult:
+def _check_dependencies(cfg: Config) -> CheckResult:
+    if not vector_enabled(cfg.index.vector):
+        return CheckResult(
+            id="dependencies",
+            status="pass",
+            message="FTS-only mode enabled; skipping vector dependency checks.",
+            details={"vector_enabled": False},
+        )
+
     checks = {
         "sentence_transformers": _import_optional("sentence_transformers"),
         "faiss": _import_optional("faiss"),
@@ -100,25 +108,37 @@ def _check_dependencies() -> CheckResult:
     }
     missing = [name for name, (ok, _, _) in checks.items() if not ok]
     details = {
-        name: {"ok": ok, "version": version, "error": error}
-        for name, (ok, version, error) in checks.items()
+        "vector_enabled": True,
+        "vector_mode": cfg.index.vector,
+        "imports": {
+            name: {"ok": ok, "version": version, "error": error}
+            for name, (ok, version, error) in checks.items()
+        },
     }
     if missing:
         return CheckResult(
             id="dependencies",
             status="fail",
-            message=f"Missing/invalid dependencies: {', '.join(missing)}",
+            message=f"Missing/invalid vector dependencies: {', '.join(missing)}",
             details=details,
         )
     return CheckResult(
         id="dependencies",
         status="pass",
-        message="Required dependencies import successfully.",
+        message="Vector dependencies import successfully.",
         details=details,
     )
 
 
 def _check_embedder_device(cfg: Config) -> CheckResult:
+    if not vector_enabled(cfg.index.vector):
+        return CheckResult(
+            id="embedder_device",
+            status="pass",
+            message="FTS-only mode enabled; skipping embedder/CUDA checks.",
+            details={"vector_enabled": False, "vector_mode": cfg.index.vector},
+        )
+
     ok, _, err = _import_optional("torch")
     if not ok:
         return CheckResult(
@@ -259,7 +279,7 @@ def run_doctor(config_path: Optional[Path | str] = None) -> dict[str, Any]:
     checks = [
         _check_config_source(cfg_path),
         _check_paths(cfg),
-        _check_dependencies(),
+        _check_dependencies(cfg),
         _check_embedder_device(cfg),
         _check_mcp_port(),
         _check_artifacts(cfg),

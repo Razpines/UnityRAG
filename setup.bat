@@ -75,40 +75,78 @@ if not exist "%VENV%\Scripts\activate.bat" (
   call "%VENV%\Scripts\activate.bat"
 )
 
+set "SETUP_MODE="
+if /i "%UNITYDOCS_SETUP_MODE%"=="cuda" set "SETUP_MODE=cuda"
+if /i "%UNITYDOCS_SETUP_MODE%"=="1" set "SETUP_MODE=cuda"
+if /i "%UNITYDOCS_SETUP_MODE%"=="cpu" set "SETUP_MODE=cpu"
+if /i "%UNITYDOCS_SETUP_MODE%"=="2" set "SETUP_MODE=cpu"
+
+if not defined SETUP_MODE goto choose_mode
+goto after_choose_mode
+
+:choose_mode
+echo.
+call :print_color Green "Select setup mode:"
+echo   1^) CUDA ^(hybrid retrieval: FTS + vectors^)
+echo   2^) CPU-only ^(FTS-only retrieval; no transformers/faiss^)
+echo.
+set "SETUP_MODE="
+set /p MODE_CHOICE=Mode [1]:
+if "%MODE_CHOICE%"=="" set "MODE_CHOICE=1"
+if /i "%MODE_CHOICE%"=="1" set "SETUP_MODE=cuda"
+if /i "%MODE_CHOICE%"=="cuda" set "SETUP_MODE=cuda"
+if /i "%MODE_CHOICE%"=="2" set "SETUP_MODE=cpu"
+if /i "%MODE_CHOICE%"=="cpu" set "SETUP_MODE=cpu"
+if not defined SETUP_MODE (
+  call :print_color Red "Invalid mode selection."
+  goto choose_mode
+)
+
+:after_choose_mode
+
 call :print_color Cyan "[setup] Installing project dependencies..."
 
 python -m pip install -U pip
-python -m pip install -e .[dev]
+if /i "%SETUP_MODE%"=="cuda" (
+  python -m pip install -e ".[dev,vector]"
+) else (
+  python -m pip install -e ".[dev]"
+)
 if errorlevel 1 (
   call :print_color Red "[setup] Failed to install dependencies."
   pause
   exit /b 1
 )
 
-set "TORCH_OK="
-set "TORCH_CHANNEL="
-call :print_color Cyan "[setup] Installing CUDA torch build (cu128 -> cu121 -> cu118)..."
-call :try_torch_channel cu128
-if errorlevel 1 (
-  call :try_torch_channel cu121
-)
-if errorlevel 1 (
-  call :try_torch_channel cu118
-)
+if /i "%SETUP_MODE%"=="cuda" (
+  set "TORCH_OK="
+  set "TORCH_CHANNEL="
+  call :print_color Cyan "[setup] Installing CUDA torch build (cu128 -> cu121 -> cu118)..."
+  call :try_torch_channel cu128
+  if errorlevel 1 (
+    call :try_torch_channel cu121
+  )
+  if errorlevel 1 (
+    call :try_torch_channel cu118
+  )
 
-if not defined TORCH_OK (
-  call :print_color Red "[setup] Failed to install CUDA torch."
-  pause
-  exit /b 1
+  if not defined TORCH_OK (
+    call :print_color Red "[setup] Failed to install CUDA torch."
+    pause
+    exit /b 1
+  )
+
+  call :print_color Cyan "[setup] Installed torch from %TORCH_CHANNEL% index."
+
+  python -c "import torch,sys; print('[setup] torch=' + str(torch.__version__) + ' cuda=' + str(torch.version.cuda) + ' available=' + str(torch.cuda.is_available())); raise SystemExit(0 if (torch.cuda.is_available() and torch.version.cuda is not None) else 1)"
+  if errorlevel 1 (
+    call :print_color Red "[setup] CUDA verification failed. Refusing to continue with CPU torch."
+    pause
+    exit /b 1
+  )
 )
-
-call :print_color Cyan "[setup] Installed torch from %TORCH_CHANNEL% index."
-
-python -c "import torch,sys; print('[setup] torch=' + str(torch.__version__) + ' cuda=' + str(torch.version.cuda) + ' available=' + str(torch.cuda.is_available())); raise SystemExit(0 if (torch.cuda.is_available() and torch.version.cuda is not None) else 1)"
-if errorlevel 1 (
-  call :print_color Red "[setup] CUDA verification failed. Refusing to continue with CPU torch."
-  pause
-  exit /b 1
+if /i "%SETUP_MODE%"=="cpu" (
+  call :print_color Yellow "[setup] CPU-only mode selected. Index will run in FTS-only mode."
 )
 
 set "DEFAULT_VER=6000.3"
@@ -179,7 +217,7 @@ if not defined SELECTED (
 )
 
 :write_config
-set "TEMP_CFG=%TEMP%\unitydocs_config.yaml"
+set "TEMP_CFG=%REPO%\config.yaml"
 (
   echo unity_version: "%SELECTED%"
   echo download_url: "https://cloudmedia-docs.unity3d.com/docscloudstorage/en/%SELECTED%/UnityDocumentation.zip"
@@ -189,6 +227,13 @@ set "TEMP_CFG=%TEMP%\unitydocs_config.yaml"
   echo   raw_unzipped: "data/unity/%SELECTED%/raw/UnityDocumentation"
   echo   baked_dir: "data/unity/%SELECTED%/baked"
   echo   index_dir: "data/unity/%SELECTED%/index"
+  echo index:
+  echo   lexical: "sqlite_fts5"
+  if /i "%SETUP_MODE%"=="cuda" (
+    echo   vector: "faiss"
+  ) else (
+    echo   vector: "none"
+  )
 ) > "%TEMP_CFG%"
 
 set "UNITY_DOCS_MCP_ROOT=%REPO%"

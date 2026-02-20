@@ -6,7 +6,7 @@ import shutil
 from pathlib import Path
 
 from unity_docs_mcp.bake.bake_cli import bake
-from unity_docs_mcp.config import Config, config_signature, load_config
+from unity_docs_mcp.config import Config, config_signature, load_config, vector_enabled
 from unity_docs_mcp.index.index_cli import index
 from unity_docs_mcp.paths import make_paths
 from unity_docs_mcp.setup.download import download_zip
@@ -45,7 +45,10 @@ def ensure(config: Config) -> None:
 
     index_manifest = paths.index_dir / "manifest.json"
     if not _manifest_matches(index_manifest, sig):
-        print("==> Indexing docs (FTS + vectors)...")
+        if vector_enabled(config.index.vector):
+            print("==> Indexing docs (FTS + vectors)...")
+        else:
+            print("==> Indexing docs (FTS only)...")
         index(config)
         ran_index = True
 

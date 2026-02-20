@@ -8,7 +8,9 @@
 - Config: `config.yaml` optional overrides; defaults baked into code. Paths resolve via `UNITY_DOCS_MCP_ROOT` if set.
 
 ## Build, Test, Run
-- Create env: `python -m venv .venv && .venv\Scripts\activate && pip install -e .[dev]`.
+- Create env:
+  - CPU/FTS-only: `python -m venv .venv && .venv\Scripts\activate && pip install -e .[dev]`
+  - CUDA/hybrid: `python -m venv .venv && .venv\Scripts\activate && pip install -e .[dev,vector]`
 - Ensure artifacts: `unitydocs-setup` (downloads if missing, bakes, indexes).
 - Bake only: `unitydocs-bake`.
 - Index only: `unitydocs-index` (use `--dry-run` to verify device/model without embedding).
@@ -34,4 +36,4 @@
 ## Security & Config Tips
 - Keep secrets out of repo; no tokens in config.
 - Use `UNITY_DOCS_MCP_ROOT`/`UNITY_DOCS_MCP_CONFIG` to locate data/config without changing working dir.
-- For GPU: install CUDA-enabled torch in the venv (e.g., 2.2.2+cu121); scripts auto-detect and log device selection.
+- For GPU: install CUDA-enabled torch in the venv (setup probes `cu128`, then `cu121`, then `cu118`) and verifies `torch.cuda.is_available()` at runtime.

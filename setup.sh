@@ -3,6 +3,7 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_DIR="$REPO_DIR/.venv"
+SETUP_MODE="${UNITYDOCS_SETUP_MODE:-}"
 
 detect_version() {
   if [ -n "${UNITY_VERSION:-}" ]; then
@@ -48,6 +49,34 @@ else
   fi
 fi
 
+if [ -z "$SETUP_MODE" ]; then
+  echo
+  echo "Select setup mode:"
+  echo "  1) CUDA (hybrid retrieval: FTS + vectors)"
+  echo "  2) CPU-only (FTS-only retrieval; no transformers/faiss)"
+  read -r -p "Mode [1]: " MODE_CHOICE
+  MODE_CHOICE="${MODE_CHOICE:-1}"
+  MODE_CHOICE_LOWER="$(printf '%s' "$MODE_CHOICE" | tr '[:upper:]' '[:lower:]')"
+  case "$MODE_CHOICE_LOWER" in
+    1|cuda) SETUP_MODE="cuda" ;;
+    2|cpu) SETUP_MODE="cpu" ;;
+    *)
+      echo "[setup] Invalid mode selection."
+      exit 1
+      ;;
+  esac
+else
+  SETUP_MODE_LOWER="$(printf '%s' "$SETUP_MODE" | tr '[:upper:]' '[:lower:]')"
+  case "$SETUP_MODE_LOWER" in
+    1|cuda) SETUP_MODE="cuda" ;;
+    2|cpu) SETUP_MODE="cpu" ;;
+    *)
+      echo "[setup] UNITYDOCS_SETUP_MODE must be cuda or cpu."
+      exit 1
+      ;;
+  esac
+fi
+
 if command -v python3.12 >/dev/null 2>&1; then
   PYTHON=python3.12
 elif command -v python3 >/dev/null 2>&1; then
@@ -71,7 +100,11 @@ source "$VENV_DIR/bin/activate"
 
 echo "[setup] Installing project dependencies..."
 python -m pip install -U pip
-python -m pip install -e ".[dev]"
+if [ "$SETUP_MODE" = "cuda" ]; then
+  python -m pip install -e ".[dev,vector]"
+else
+  python -m pip install -e ".[dev]"
+fi
 
 verify_cuda_torch() {
   python - <<'PY'
@@ -99,19 +132,42 @@ try_cuda_channel() {
 }
 
 TORCH_CHANNEL=""
-echo "[setup] Installing CUDA torch build (cu128 -> cu121 -> cu118)..."
-if ! try_cuda_channel "cu128"; then
-  if ! try_cuda_channel "cu121"; then
-    if ! try_cuda_channel "cu118"; then
-      echo "[setup] Failed to install a CUDA-capable torch build."
-      exit 1
+if [ "$SETUP_MODE" = "cuda" ]; then
+  echo "[setup] Installing CUDA torch build (cu128 -> cu121 -> cu118)..."
+  if ! try_cuda_channel "cu128"; then
+    if ! try_cuda_channel "cu121"; then
+      if ! try_cuda_channel "cu118"; then
+        echo "[setup] Failed to install a CUDA-capable torch build."
+        exit 1
+      fi
     fi
   fi
+  echo "[setup] Installed torch from ${TORCH_CHANNEL} index."
+else
+  echo "[setup] CPU-only mode selected. Index will run in FTS-only mode."
 fi
-echo "[setup] Installed torch from ${TORCH_CHANNEL} index."
 
 export UNITY_DOCS_MCP_ROOT="$REPO_DIR"
 export UNITY_DOCS_MCP_CLEANUP=1
+CFG_PATH="$REPO_DIR/config.yaml"
+VECTOR_MODE="faiss"
+if [ "$SETUP_MODE" = "cpu" ]; then
+  VECTOR_MODE="none"
+fi
+cat >"$CFG_PATH" <<EOF
+unity_version: "$VERSION"
+download_url: "https://cloudmedia-docs.unity3d.com/docscloudstorage/en/$VERSION/UnityDocumentation.zip"
+paths:
+  root: "data/unity/$VERSION"
+  raw_zip: "data/unity/$VERSION/raw/UnityDocumentation.zip"
+  raw_unzipped: "data/unity/$VERSION/raw/UnityDocumentation"
+  baked_dir: "data/unity/$VERSION/baked"
+  index_dir: "data/unity/$VERSION/index"
+index:
+  lexical: "sqlite_fts5"
+  vector: "$VECTOR_MODE"
+EOF
+export UNITY_DOCS_MCP_CONFIG="$CFG_PATH"
 
-unitydocs install --version "$VERSION"
+python -c "from unity_docs_mcp.setup.ensure_artifacts import main; main()"
 echo "[setup] Done."

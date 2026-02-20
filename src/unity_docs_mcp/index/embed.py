@@ -5,22 +5,36 @@ import sys
 from typing import Iterable
 
 import numpy as np
-import torch
-from sentence_transformers import SentenceTransformer
 
 
 @lru_cache(maxsize=2)
-def _load_model(model_name: str, device: str) -> SentenceTransformer:
+def _load_model(model_name: str, device: str):
+    try:
+        from sentence_transformers import SentenceTransformer
+    except Exception as exc:
+        raise RuntimeError(
+            "sentence-transformers is required for vector indexing/search. Install with the 'vector' extra."
+        ) from exc
     return SentenceTransformer(model_name, device=device)
+
+
+def _torch_module():
+    try:
+        import torch
+    except Exception as exc:
+        raise RuntimeError("torch is required for vector indexing/search. Install with the 'vector' extra.") from exc
+    return torch
 
 
 def _select_device(preference: str) -> str:
     if preference and preference.lower() in {"cpu", "cuda"}:
         return preference.lower()
+    torch = _torch_module()
     return "cuda" if torch.cuda.is_available() else "cpu"
 
 
 def embed_texts(texts: Iterable[str], model_name: str, device: str = "auto") -> np.ndarray:
+    torch = _torch_module()
     resolved_device = _select_device(device)
     cuda_info = {
         "torch_cuda_available": torch.cuda.is_available(),

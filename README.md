@@ -14,6 +14,13 @@ MCP tools: `search` / `open` / `related` / `list_files` / `status`
 ## Quick Start
 
 1. Run setup (recommended).
+- Windows: double-click `setup.bat` (or run it in a terminal).
+- macOS/Linux: `bash setup.sh`
+- Setup prompts for mode:
+  - `CUDA` (hybrid retrieval: FTS + vectors)
+  - `CPU-only` (FTS-only retrieval, no transformers/faiss)
+- Setup writes the selected version/mode into local `config.yaml` so MCP startup uses the same retrieval mode.
+- This downloads the Unity offline docs, builds the selected local index, and cleans up raw files to save space.
 
 ```bash
 # Windows
@@ -47,7 +54,7 @@ unitydocs doctor --json
 ## Why UnityRAG
 
 - Uses official Unity offline docs for versioned retrieval.
-- Hybrid retrieval with SQLite FTS and FAISS vectors.
+- Hybrid retrieval with SQLite FTS and FAISS vectors, or explicit FTS-only mode for CPU-only setups.
 - Local-first artifacts and server operation.
 - Idempotent download, bake, and index steps.
 
@@ -60,11 +67,15 @@ python -m venv .venv
 # Windows: .\.venv\Scripts\activate
 # macOS/Linux: source .venv/bin/activate
 pip install -e .[dev]
+# For CUDA/hybrid installs, use:
+# pip install -e .[dev,vector]
 unitydocs install --version 6000.3 --cleanup
 unitydocs mcp
 ```
 
-Note: `setup.bat` and `setup.sh` enforce CUDA runtime validation and fail if no working CUDA torch build is available.
+Notes:
+- In `CUDA` mode, setup scripts enforce CUDA torch and fail if no working CUDA runtime is detected.
+- In `CPU-only` mode, setup configures `index.vector: none` and skips vector dependencies.
 
 ## Commands
 

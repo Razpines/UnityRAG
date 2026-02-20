@@ -145,6 +145,15 @@ def load_config(config_path: Optional[Path | str] = None) -> Config:
     return Config()
 
 
+def vector_enabled(vector_mode: str) -> bool:
+    mode = (vector_mode or "").strip().lower()
+    return mode not in {"", "none", "off", "disabled", "false"}
+
+
+def retrieval_mode(vector_mode: str) -> str:
+    return "hybrid" if vector_enabled(vector_mode) else "fts_only"
+
+
 def config_signature(cfg: Config) -> str:
     """
     Stable hash representing the effective configuration to detect staleness.
