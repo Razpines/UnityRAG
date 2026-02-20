@@ -82,7 +82,6 @@ pytest
 ## Contributing
 
 - Read `CONTRIBUTING.md`.
-- Roadmap: `ROADMAP.md`.
 
 ## Docs
 
