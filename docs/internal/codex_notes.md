@@ -52,3 +52,11 @@
 [2026-01-10 04:20] setup.bat now creates .venv if missing, installs deps, checks free disk space, and supports optional repo-local portable Python 3.12 download (only if no 3.12 found).
 [2026-01-10 04:25] Added banner.txt and setup.bat displays banner; added colored output helpers and success/failure pauses for user-visible setup flow.
 [2026-01-10 04:30] Fixed setup.bat path normalization and removed where-python probing to avoid Windows path/volume label errors.
+[2026-02-20 15:25] Carry-forward rules: setup scripts are CUDA-only and must never silently fall back to CPU torch.
+[2026-02-20 15:25] CUDA channel fallback must be runtime-verified (torch.cuda.is_available + torch.version.cuda), not install-success only.
+[2026-02-20 15:25] MCP stdio stability: keep setup/embed diagnostics off stdout (stderr only) to avoid transport/protocol breakage.
+[2026-02-20 15:25] Ensure flow: avoid forcing raw zip/unzip when baked/index artifacts are already valid for current config signature.
+[2026-02-20 15:45] CI policy decision: default tests must be deterministic and not depend on untracked Unity raw docs under data/.
+[2026-02-20 15:45] Extraction coverage moved to committed HTML fixtures; real-doc extraction tests remain optional behind UNITYDOCS_E2E=1.
+[2026-02-20 15:45] PR #7 merged to main with fixture-based extraction tests and green Windows/Ubuntu CI.
+[2026-02-20 15:45] Started issue #2 implementation plan: add unitydocs doctor with human/json output, preflight diagnostics, and non-zero exit on blocking failures.

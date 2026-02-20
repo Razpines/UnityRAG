@@ -27,6 +27,12 @@ Ask: "How do I schedule an IJobParallelFor with batch size?"
 
 The model should call `unity_docs.search`, then cite the results.
 
+Troubleshooting tip:
+```
+unitydocs doctor
+unitydocs doctor --json
+```
+
 ## Why this exists
 - Problem: Unity MCPs and model knowledge can be stale; this uses the official Unity offline docs for your chosen version.
 - What it does: Downloads Unity's offline docs zip, bakes HTML -> clean text chunks, builds a hybrid index (FTS + vectors), and serves MCP tools.
