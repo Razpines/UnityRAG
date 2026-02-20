@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Create and run a job</title>
+    <link rel="canonical" href="https://docs.unity3d.com/6000.3/Documentation/Manual/job-system-creating-jobs.html" />
+  </head>
+  <body>
+    <div id="content-wrap">
+      <div class="section">
+        <h1>Create and run a job</h1>
+        <p>
+          Unity jobs let you schedule small units of work so the main thread can keep rendering and gameplay responsive.
+          A job typically operates on NativeArray data, is scheduled from the main thread, and completed when the results
+          are needed. This fixture intentionally contains enough text to exercise markdown conversion and extraction logic.
+        </p>
+        <h2>Schedule and Complete best practices</h2>
+        <p>
+          Use JobHandle dependencies to chain work, avoid forcing the main thread to wait too early, and call Complete as
+          late as possible when you need job results. This helps maximize parallel throughput and keeps frame time stable.
+        </p>
+        <p>
+          For data-parallel workloads, use IJobParallelFor with a tuned batch count and avoid oversynchronizing unrelated
+          jobs. Profiling helps determine whether you should split long jobs into smaller dependent jobs.
+        </p>
+        <a href="../ScriptReference/Unity.Jobs.IJobParallelFor.html">IJobParallelFor API</a>
+      </div>
+    </div>
+  </body>
+</html>

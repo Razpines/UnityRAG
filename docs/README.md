@@ -57,6 +57,12 @@ Edit `config.yaml` (optional). Defaults: Unity 6.3 URL, paths under `data/unity/
 pytest
 ```
 
+Optional real-doc extraction integration tests:
+```
+UNITYDOCS_E2E=1 pytest tests/test_extraction.py
+```
+These require local Unity raw docs under `data/unity/<version>/raw/UnityDocumentation`.
+
 ## Notes
 - Bake/index steps are idempotent: existing artifacts with matching config/version skip work.
 - Link extraction ignores external and anchor-only links; internal links are normalized to doc_ids for related lookups.
