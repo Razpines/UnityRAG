@@ -13,14 +13,14 @@ MCP tools: `search` / `open` / `related` / `list_files` / `status`
 
 ## Quick Start
 
-1. Install dependencies and build artifacts.
+1. Run setup (recommended).
 
 ```bash
-python -m venv .venv
-# Windows: .\.venv\Scripts\activate
-# macOS/Linux: source .venv/bin/activate
-pip install -e .[dev]
-unitydocs install --version 6000.3 --cleanup
+# Windows
+setup.bat
+
+# macOS/Linux
+bash setup.sh
 ```
 
 2. Configure your agent with files in `examples/`.
@@ -37,14 +37,6 @@ Set:
 - "How do I schedule an `IJobParallelFor` with batch size?"
 - "Open `Mesh.SetVertices` and show related docs."
 
-Development/debug option:
-
-```bash
-unitydocs mcp
-```
-
-Use this when you want direct server logs/prints in your terminal instead of agent-managed auto-start.
-
 If setup fails, run:
 
 ```bash
@@ -59,12 +51,18 @@ unitydocs doctor --json
 - Local-first artifacts and server operation.
 - Idempotent download, bake, and index steps.
 
-## One-Command Setup Scripts
+## Manual and Advanced Setup
 
-- Windows: `setup.bat`
-- macOS/Linux: `bash setup.sh`
+For development and debugging, use manual setup and server start:
 
-These scripts install dependencies, download docs, bake chunks, index, and clean raw files.
+```bash
+python -m venv .venv
+# Windows: .\.venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
+pip install -e .[dev]
+unitydocs install --version 6000.3 --cleanup
+unitydocs mcp
+```
 
 Note: `setup.bat` and `setup.sh` enforce CUDA runtime validation and fail if no working CUDA torch build is available.
 
