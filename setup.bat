@@ -217,7 +217,7 @@ if not defined SELECTED (
 )
 
 :write_config
-set "TEMP_CFG=%REPO%\config.yaml"
+set "TEMP_CFG=%REPO%\config.local.yaml"
 (
   echo unity_version: "%SELECTED%"
   echo download_url: "https://cloudmedia-docs.unity3d.com/docscloudstorage/en/%SELECTED%/UnityDocumentation.zip"

@@ -1,6 +1,7 @@
 .venv
 env/
 .env
+config.local.yaml
 __pycache__/
 .pytest_cache/
 *.pyc

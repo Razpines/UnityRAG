@@ -37,7 +37,7 @@ def test_install_mcp_config_creates_new_file(tmp_path: Path):
     assert data["servers"]["unity-docs"]["args"] == []
     assert data["servers"]["unity-docs"]["env"]["UNITY_DOCS_MCP_ROOT"] == str(repo_root.resolve())
     assert data["servers"]["unity-docs"]["env"]["UNITY_DOCS_MCP_CONFIG"] == str(
-        (repo_root / "config.yaml").resolve()
+        (repo_root / "config.local.yaml").resolve()
     )
 
 

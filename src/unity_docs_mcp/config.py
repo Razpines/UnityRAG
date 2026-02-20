@@ -127,22 +127,48 @@ def merge_config(base: Config, overrides: Dict[str, Any]) -> Config:
     )
 
 
-def load_config(config_path: Optional[Path | str] = None) -> Config:
-    env_override = os.environ.get("UNITY_DOCS_MCP_CONFIG")
-    search_paths = []
-    if config_path is not None:
-        search_paths.append(Path(config_path))
-    if env_override:
-        search_paths.append(Path(env_override))
-    search_paths.append(Path("config.yaml"))
-    # fallback to repo root (two parents up from this file's directory)
-    repo_root = Path(__file__).resolve().parents[2]
-    search_paths.append(repo_root / "config.yaml")
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parents[2]
 
-    for candidate in search_paths:
-        if candidate.exists():
-            return Config.from_file(candidate)
-    return Config()
+
+def config_layer_paths(config_path: Optional[Path | str] = None) -> list[Path]:
+    """
+    Return config layer candidates in merge order (lowest -> highest precedence).
+    """
+    repo_root = _repo_root()
+    env_override = os.environ.get("UNITY_DOCS_MCP_CONFIG")
+    layers: list[Path] = [repo_root / "config.yaml", repo_root / "config.local.yaml"]
+    if env_override:
+        layers.append(Path(env_override).expanduser())
+    if config_path is not None:
+        layers.append(Path(config_path).expanduser())
+
+    deduped: list[Path] = []
+    seen: set[str] = set()
+    for layer in layers:
+        key = str(layer.resolve()) if layer.exists() else str(layer)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(layer)
+    return deduped
+
+
+def existing_config_layer_paths(config_path: Optional[Path | str] = None) -> list[Path]:
+    return [p.resolve() for p in config_layer_paths(config_path) if p.exists()]
+
+
+def load_config(config_path: Optional[Path | str] = None) -> Config:
+    cfg = Config()
+    for layer in config_layer_paths(config_path):
+        if not layer.exists():
+            continue
+        with layer.open("r", encoding="utf-8") as f:
+            raw = yaml.safe_load(f) or {}
+        if not isinstance(raw, dict):
+            raise ValueError(f"Config file must contain a YAML mapping: {layer}")
+        cfg = merge_config(cfg, raw)
+    return cfg
 
 
 def vector_enabled(vector_mode: str) -> bool:

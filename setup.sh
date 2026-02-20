@@ -149,7 +149,7 @@ fi
 
 export UNITY_DOCS_MCP_ROOT="$REPO_DIR"
 export UNITY_DOCS_MCP_CLEANUP=1
-CFG_PATH="$REPO_DIR/config.yaml"
+CFG_PATH="$REPO_DIR/config.local.yaml"
 VECTOR_MODE="faiss"
 if [ "$SETUP_MODE" = "cpu" ]; then
   VECTOR_MODE="none"

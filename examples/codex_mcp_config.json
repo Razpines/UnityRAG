@@ -5,7 +5,7 @@
       "args": [],
       "env": {
         "UNITY_DOCS_MCP_ROOT": "C:\\path\\to\\UnityRAG",
-        "UNITY_DOCS_MCP_CONFIG": "C:\\path\\to\\UnityRAG\\config.yaml"
+        "UNITY_DOCS_MCP_CONFIG": "C:\\path\\to\\UnityRAG\\config.local.yaml"
       }
     }
   }

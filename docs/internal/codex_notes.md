@@ -65,3 +65,4 @@
 [2026-02-20 16:15] Setup mode/version selection now persists into repo config.yaml (not temp-only) so MCP startup uses the same retrieval mode after setup.
 [2026-02-20 15:35] Reduced onboarding friction: setup now prompts for Codex/Claude MCP auto-config and writes client config entries automatically via unity_docs_mcp.setup.mcp_config.
 [2026-02-20 17:50] MCP auto-config now writes absolute repo venv stdio command (`unitydocs-mcp`) plus UNITY_DOCS_MCP_ROOT/UNITY_DOCS_MCP_CONFIG env to avoid CWD-dependent startup failures across projects.
+[2026-02-20 18:20] Config model switched to layered load: tracked `config.yaml` base + untracked `config.local.yaml` setup overrides, with env/explicit paths as higher-precedence overlays.

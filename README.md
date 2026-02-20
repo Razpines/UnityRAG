@@ -26,6 +26,7 @@ bash setup.sh
 Setup will prompt you for:
 - Retrieval mode: `CUDA` (hybrid) or `CPU-only` (FTS-only)
 - MCP client auto-config: `Codex`, `Claude Desktop`, `Both`, or `Skip`
+- Setup writes machine-local overrides to `config.local.yaml` (untracked), while `config.yaml` remains tracked defaults.
 
 2. Restart your agent.
 
