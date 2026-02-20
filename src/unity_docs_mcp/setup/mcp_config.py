@@ -22,10 +22,6 @@ def _server_config(repo_root: Path) -> dict[str, Any]:
     return {
         "command": str(command),
         "args": [],
-        "env": {
-            "UNITY_DOCS_MCP_ROOT": str(root),
-            "UNITY_DOCS_MCP_CONFIG": str(root / "config.local.yaml"),
-        },
     }
 
 

@@ -35,10 +35,7 @@ def test_install_mcp_config_creates_new_file(tmp_path: Path):
     assert "unity-docs" in data["servers"]
     assert data["servers"]["unity-docs"]["command"] == str(launcher.resolve())
     assert data["servers"]["unity-docs"]["args"] == []
-    assert data["servers"]["unity-docs"]["env"]["UNITY_DOCS_MCP_ROOT"] == str(repo_root.resolve())
-    assert data["servers"]["unity-docs"]["env"]["UNITY_DOCS_MCP_CONFIG"] == str(
-        (repo_root / "config.local.yaml").resolve()
-    )
+    assert "env" not in data["servers"]["unity-docs"]
 
 
 def test_install_mcp_config_preserves_other_servers_and_creates_backup(tmp_path: Path):
