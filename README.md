@@ -135,7 +135,7 @@ pytest
 
 ## Contributing
 
-- Read `CONTRIBUTING.md`.
+- Read `.github/CONTRIBUTING.md`.
 
 ## Docs
 
