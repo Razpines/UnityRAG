@@ -128,6 +128,9 @@ def merge_config(base: Config, overrides: Dict[str, Any]) -> Config:
 
 
 def _repo_root() -> Path:
+    root_override = os.environ.get("UNITY_DOCS_MCP_ROOT")
+    if root_override:
+        return Path(root_override).expanduser()
     return Path(__file__).resolve().parents[2]
 
 

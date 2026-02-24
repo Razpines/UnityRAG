@@ -1,0 +1,3 @@
+# CPU-only container overrides layered on top of config.yaml.
+index:
+  vector: "none"

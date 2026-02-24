@@ -60,3 +60,22 @@ def test_load_config_explicit_path_has_highest_precedence(monkeypatch, tmp_path:
 
     cfg = config_mod.load_config(explicit_cfg)
     assert cfg.unity_version == "6000.0"
+
+
+def test_load_config_uses_unity_docs_mcp_root_for_base_layers(monkeypatch, tmp_path: Path):
+    _write(
+        tmp_path / "config.yaml",
+        """
+paths:
+  root: "data/unity/from-root-override"
+index:
+  vector: "none"
+""".strip()
+        + "\n",
+    )
+    monkeypatch.setenv("UNITY_DOCS_MCP_ROOT", str(tmp_path))
+    monkeypatch.delenv("UNITY_DOCS_MCP_CONFIG", raising=False)
+
+    cfg = config_mod.load_config()
+    assert cfg.paths.root == "data/unity/from-root-override"
+    assert cfg.index.vector == "none"

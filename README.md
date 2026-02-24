@@ -3,6 +3,7 @@
 ![UnityRAG demo comparison](demo/assets/ad_demo_readme_dark.png)
 
 [![CI](https://github.com/Razpines/UnityRAG/actions/workflows/ci.yml/badge.svg)](https://github.com/Razpines/UnityRAG/actions/workflows/ci.yml)
+[![Docker GHCR](https://img.shields.io/badge/Docker-GHCR-2496ED?logo=docker&logoColor=white)](https://github.com/Razpines/UnityRAG/pkgs/container/unityrag)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue)](pyproject.toml)
 [![GitHub Stars](https://img.shields.io/github/stars/Razpines/UnityRAG)](https://github.com/Razpines/UnityRAG/stargazers)
@@ -44,6 +45,50 @@ If setup fails, run:
 unitydocs doctor
 unitydocs doctor --json
 ```
+
+## Docker Quick Start (CPU-only)
+
+Use the official CPU-first container image to run the MCP HTTP server without local Python/venv setup.
+
+Run:
+
+```bash
+docker run -d --name unityrag \
+  -p 8765:8765 \
+  -v unityrag-data:/app/data \
+  ghcr.io/razpines/unityrag:latest
+```
+
+Wait / first startup:
+- First startup is slow: the container downloads Unity docs, bakes artifacts, and builds the FTS index.
+- Watch progress with `docker logs -f unityrag`.
+- Data persists across container recreation via the mounted volume (`/app/data`).
+
+Verify:
+- MCP HTTP endpoint is `http://localhost:8765/mcp`.
+- A plain `GET /mcp` may return `406 Not Acceptable`; this is expected for streamable HTTP when the client does not send `Accept: text/event-stream`.
+
+Connect (Codex CLI):
+
+```bash
+codex mcp add unity-docs-http --url http://localhost:8765/mcp
+```
+
+Common adjustments:
+- Port `8765` already in use: map a different host port, for example `-p 8876:8765`, then connect to `http://localhost:8876/mcp`.
+- Remote-hosted server: use `http://<host>:8765/mcp` (or your remapped host port).
+- The Docker container must stay running while your MCP client is connected.
+
+Container defaults (advanced):
+- `UNITY_DOCS_MCP_ROOT=/app`
+- `UNITY_DOCS_MCP_CONFIG=/app/config.docker.yaml` (FTS-only / CPU-safe)
+- `UNITY_DOCS_MCP_HOST=0.0.0.0`
+- `UNITY_DOCS_MCP_PORT=8765`
+
+Client config details (Docker-hosted MCP):
+- `docs/docker_http_clients.md`
+
+Initial Docker scope is CPU-only / FTS-only. GPU images and Docker Compose quick start are tracked separately.
 
 ## Why UnityRAG
 
@@ -95,6 +140,7 @@ pytest
 ## Docs
 
 - Developer details: `docs/README.md`
+- Docker-hosted MCP clients: `docs/docker_http_clients.md`
 
 ## Content and Licensing
 
