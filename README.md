@@ -3,6 +3,7 @@
 ![UnityRAG demo comparison](demo/assets/ad_demo_readme_dark.png)
 
 [![CI](https://github.com/Razpines/UnityRAG/actions/workflows/ci.yml/badge.svg)](https://github.com/Razpines/UnityRAG/actions/workflows/ci.yml)
+[![Docker GHCR](https://img.shields.io/badge/Docker-GHCR-2496ED?logo=docker&logoColor=white)](https://github.com/Razpines/UnityRAG/pkgs/container/unityrag)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue)](pyproject.toml)
 [![GitHub Stars](https://img.shields.io/github/stars/Razpines/UnityRAG)](https://github.com/Razpines/UnityRAG/stargazers)
