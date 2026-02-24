@@ -16,9 +16,12 @@ MCP tools: `search` / `open` / `related` / `list_files` / `status`
 
 ## Quick Start
 
-1. Run setup.
+1. Clone the repo and run setup.
 
 ```bash
+git clone https://github.com/Razpines/UnityRAG.git
+cd UnityRAG
+
 # Windows
 setup.bat
 
