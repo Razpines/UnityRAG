@@ -47,16 +47,38 @@ class _FakeDocStore:
             )
         ]
 
-    def related(self, doc_id: str, limit: int = 10):
-        return [
+    def related(
+        self,
+        doc_id: str,
+        limit: int = 10,
+        mode: str = "outgoing",
+        exclude_doc_ids=None,
+        exclude_source_types=None,
+    ):
+        docs = [
             SimpleNamespace(
                 doc_id="manual/job-system-creating-jobs",
                 title="Create and run a job",
                 source_type="manual",
                 origin_path="Documentation/en/Manual/job-system-creating-jobs.html",
                 canonical_url="https://docs.unity3d.com/6000.3/Documentation/Manual/job-system-creating-jobs.html",
-            )
+            ),
+            SimpleNamespace(
+                doc_id="manual/glossary",
+                title="Glossary",
+                source_type="manual",
+                origin_path="Documentation/en/Manual/Glossary.html",
+                canonical_url="https://docs.unity3d.com/6000.3/Documentation/Manual/Glossary.html",
+            ),
         ]
+        excluded_docs = set(exclude_doc_ids or [])
+        excluded_sources = {s.lower() for s in (exclude_source_types or [])}
+        filtered = [
+            d
+            for d in docs
+            if d.doc_id not in excluded_docs and d.source_type.lower() not in excluded_sources
+        ]
+        return filtered[:limit]
 
     def available_source_types(self):
         return list(self._available_source_types)
@@ -135,6 +157,24 @@ def test_list_files_and_related_include_meta(monkeypatch):
     assert files and rel
     assert files[0]["meta"]["unity_version"] == "6000.3"
     assert rel[0]["meta"]["unity_version"] == "6000.3"
+
+
+def test_related_supports_path_mode_and_glossary_exclusion(monkeypatch):
+    _install_fake_docstore(monkeypatch)
+    rel = mcp_server.related(
+        path="Documentation/en/Manual/job-system-parallel-for-jobs.html",
+        mode="bidirectional",
+        exclude_glossary=True,
+    )
+    assert rel
+    assert all(item["doc_id"] != "manual/glossary" for item in rel)
+
+
+def test_related_rejects_invalid_mode(monkeypatch):
+    _install_fake_docstore(monkeypatch)
+    rel = mcp_server.related(doc_id="manual/job-system-parallel-for-jobs", mode="sideways")
+    assert rel["error"] == "invalid_mode"
+    assert "outgoing" in rel["allowed_modes"]
 
 
 def test_status_includes_meta_and_manifest_fields(monkeypatch):
