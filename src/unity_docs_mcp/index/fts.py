@@ -5,7 +5,12 @@ from pathlib import Path
 import re
 from typing import Iterable, List, Tuple
 
-_FTS_QUERY = "SELECT chunk_id, bm25(chunks_fts) as score FROM chunks_fts WHERE chunks_fts MATCH ? ORDER BY score LIMIT ?"
+# FTS column weights (lower bm25 score is better):
+# text, doc_id, heading_path, title, chunk_id
+_FTS_QUERY = (
+    "SELECT chunk_id, bm25(chunks_fts, 1.0, 6.0, 3.0, 8.0, 0.0) as score "
+    "FROM chunks_fts WHERE chunks_fts MATCH ? ORDER BY score LIMIT ?"
+)
 
 
 def init_db(db_path: Path) -> sqlite3.Connection:
@@ -25,13 +30,15 @@ def init_db(db_path: Path) -> sqlite3.Connection:
         );
         """
     )
+    # Recreate FTS table to keep schema consistent with current indexed columns.
+    conn.execute("DROP TABLE IF EXISTS chunks_fts;")
     conn.execute(
         """
-        CREATE VIRTUAL TABLE IF NOT EXISTS chunks_fts USING fts5(
+        CREATE VIRTUAL TABLE chunks_fts USING fts5(
             text,
-            doc_id UNINDEXED,
-            heading_path UNINDEXED,
-            title UNINDEXED,
+            doc_id,
+            heading_path,
+            title,
             chunk_id UNINDEXED
         );
         """
