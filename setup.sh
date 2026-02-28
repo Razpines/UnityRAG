@@ -5,6 +5,15 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_DIR="$REPO_DIR/.venv"
 SETUP_MODE="${UNITYDOCS_SETUP_MODE:-}"
 
+report_failure_hint() {
+  local report_version="${UNITY_DOCS_MCP_UNITY_VERSION:-${VERSION:-6000.3}}"
+  echo
+  echo "[setup] Setup failed. Generate diagnostics with:"
+  echo "  UNITY_DOCS_MCP_UNITY_VERSION=${report_version} unitydocs report --summary setup.sh-failed --prefill-issue"
+}
+
+trap 'status=$?; if [ $status -ne 0 ]; then report_failure_hint; fi' EXIT
+
 detect_version() {
   if [ -n "${UNITY_VERSION:-}" ]; then
     echo "$UNITY_VERSION"
