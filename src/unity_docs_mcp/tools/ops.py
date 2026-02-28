@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import fnmatch
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -30,6 +31,7 @@ class DocStore:
         self.corpus = self._load_corpus(self.paths.baked_dir / "corpus.jsonl")
         self._origin_path_index = self._build_origin_path_index(self.corpus)
         self._canonical_url_index = self._build_canonical_url_index(self.corpus)
+        self._symbol_exact_index, self._symbol_norm_index = self._build_symbol_indexes(self.corpus)
         self._doc_source_type_counts = self._count_source_types(self.corpus.values())
         self.link_index = self._load_links(self.paths.baked_dir / "link_graph.jsonl")
         self.reverse_link_index = self._build_reverse_links(self.link_index)
@@ -86,6 +88,44 @@ class DocStore:
             if doc.canonical_url:
                 index[doc.canonical_url.strip()] = doc.doc_id
         return index
+
+    @staticmethod
+    def _normalize_symbol_key(value: str) -> str:
+        return re.sub(r"[^a-z0-9]+", "", (value or "").lower())
+
+    @staticmethod
+    def _append_unique(index: Dict[str, List[str]], key: str, doc_id: str) -> None:
+        if not key:
+            return
+        bucket = index.setdefault(key, [])
+        if doc_id not in bucket:
+            bucket.append(doc_id)
+
+    def _build_symbol_indexes(self, records: Dict[str, DocRecord]) -> tuple[Dict[str, List[str]], Dict[str, List[str]]]:
+        exact_index: Dict[str, List[str]] = {}
+        norm_index: Dict[str, List[str]] = {}
+        for doc in records.values():
+            candidates = set()
+            title = (doc.title or "").strip()
+            if title:
+                candidates.add(title.lower())
+
+            tail = (doc.doc_id.split("/")[-1] if "/" in doc.doc_id else doc.doc_id).strip().lower()
+            if tail:
+                candidates.add(tail)
+                candidates.add(tail.replace("-", "."))
+                candidates.add(tail.replace("-", ""))
+
+            if doc.origin_path:
+                stem = Path(doc.origin_path).stem.strip().lower()
+                if stem:
+                    candidates.add(stem)
+
+            for candidate in candidates:
+                self._append_unique(exact_index, candidate, doc.doc_id)
+                normalized = self._normalize_symbol_key(candidate)
+                self._append_unique(norm_index, normalized, doc.doc_id)
+        return exact_index, norm_index
 
     @staticmethod
     def _normalize_path_lookup_key(path: str) -> str:
@@ -198,6 +238,59 @@ class DocStore:
 
     def search(self, query: str, k: int = 6, source_types: Optional[List[str]] = None) -> List:
         return self.searcher.search(query=query, k=k, source_types=source_types)
+
+    def resolve_symbol(self, symbol: str, limit: int = 5) -> List[Dict]:
+        symbol_text = (symbol or "").strip()
+        if not symbol_text:
+            return []
+
+        symbol_lower = symbol_text.lower()
+        symbol_norm = self._normalize_symbol_key(symbol_text)
+        matches: Dict[str, float] = {}
+        match_kind: Dict[str, str] = {}
+
+        def _add(doc_id: str, score: float, kind: str) -> None:
+            if doc_id not in self.corpus:
+                return
+            if score > matches.get(doc_id, -1.0):
+                matches[doc_id] = score
+                match_kind[doc_id] = kind
+
+        # Direct and high-confidence symbol matches first.
+        if symbol_lower in self.corpus:
+            _add(symbol_lower, 1.0, "doc_id_exact")
+
+        for doc_id in self._symbol_exact_index.get(symbol_lower, []):
+            _add(doc_id, 0.95, "symbol_exact")
+
+        if symbol_norm:
+            for doc_id in self._symbol_norm_index.get(symbol_norm, []):
+                _add(doc_id, 0.90, "symbol_normalized")
+
+        # Backfill from retrieval results if exact symbol matching is sparse.
+        if len(matches) < limit:
+            fallback_hits = self.search(query=symbol_text, k=max(limit * 3, 10))
+            for rank, hit in enumerate(fallback_hits):
+                _add(hit.doc_id, 0.60 / (rank + 1), "search_fallback")
+                if len(matches) >= limit:
+                    break
+
+        sorted_doc_ids = sorted(matches.keys(), key=lambda d: (-matches[d], d))
+        results = []
+        for doc_id in sorted_doc_ids[:limit]:
+            doc = self.corpus[doc_id]
+            results.append(
+                {
+                    "doc_id": doc.doc_id,
+                    "title": doc.title,
+                    "source_type": doc.source_type,
+                    "origin_path": doc.origin_path,
+                    "canonical_url": doc.canonical_url,
+                    "score": matches[doc_id],
+                    "match_kind": match_kind[doc_id],
+                }
+            )
+        return results
 
     def available_source_types(self) -> List[str]:
         all_types = set(self._doc_source_type_counts) | set(self._chunk_source_type_counts)
