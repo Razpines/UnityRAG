@@ -8,12 +8,23 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
+from unity_docs_mcp.config import UNITY_VERSION_ENV
+
 
 def _config_root_key(client: str) -> str:
     return "servers" if client == "codex" else "mcpServers"
 
 
-def _server_config(repo_root: Path) -> dict[str, Any]:
+def _resolve_unity_version(unity_version: Optional[str]) -> str:
+    resolved = (unity_version or os.environ.get(UNITY_VERSION_ENV, "")).strip()
+    if resolved:
+        return resolved
+    raise ValueError(
+        f"Missing Unity docs version. Pass --unity-version or set {UNITY_VERSION_ENV}."
+    )
+
+
+def _server_config(repo_root: Path, unity_version: str) -> dict[str, Any]:
     root = repo_root.resolve()
     if os.name == "nt":
         command = root / ".venv" / "Scripts" / "unitydocs-mcp.exe"
@@ -22,6 +33,9 @@ def _server_config(repo_root: Path) -> dict[str, Any]:
     return {
         "command": str(command),
         "args": [],
+        "env": {
+            UNITY_VERSION_ENV: unity_version,
+        },
     }
 
 
@@ -76,6 +90,7 @@ def install_mcp_config(
     *,
     client: str,
     repo_root: Path,
+    unity_version: Optional[str] = None,
     config_path: Optional[str] = None,
     server_name: str = "unity-docs",
     dry_run: bool = False,
@@ -90,7 +105,10 @@ def install_mcp_config(
     if not isinstance(servers, dict):
         raise ValueError(f"Config field '{root_key}' must be an object.")
 
-    servers[server_name] = _server_config(repo_root)
+    servers[server_name] = _server_config(
+        repo_root=repo_root,
+        unity_version=_resolve_unity_version(unity_version),
+    )
     data[root_key] = servers
 
     if dry_run:
@@ -106,6 +124,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Install UnityRAG MCP server into Codex/Claude config.")
     parser.add_argument("--client", choices=["codex", "claude"], required=True)
     parser.add_argument("--repo-root", default=".", help="Path to UnityRAG repo root.")
+    parser.add_argument(
+        "--unity-version",
+        default=None,
+        help=f"Unity docs version to store in server env ({UNITY_VERSION_ENV}).",
+    )
     parser.add_argument("--config", default=None, help="Optional explicit config file path.")
     parser.add_argument("--server-name", default="unity-docs", help="Server name in client config.")
     parser.add_argument("--dry-run", action="store_true")
@@ -114,6 +137,7 @@ def main() -> None:
     target, backup = install_mcp_config(
         client=args.client,
         repo_root=Path(args.repo_root).resolve(),
+        unity_version=args.unity_version,
         config_path=args.config,
         server_name=args.server_name,
         dry_run=args.dry_run,

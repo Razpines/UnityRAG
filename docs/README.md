@@ -3,9 +3,9 @@
 This file contains the advanced, developer-oriented details that were removed from the top-level README.
 
 ## Layout
-- `data/unity/6000.3/raw`: UnityDocumentation.zip + unzipped HTML (not committed)
-- `data/unity/6000.3/baked`: corpus.jsonl, chunks.jsonl, link_graph.jsonl, manifest.json
-- `data/unity/6000.3/index`: always `fts.sqlite`; plus `vectors.faiss` and `vectors_meta.jsonl` in hybrid mode
+- `data/unity/<version>/raw`: UnityDocumentation.zip + unzipped HTML (not committed)
+- `data/unity/<version>/baked`: corpus.jsonl, chunks.jsonl, link_graph.jsonl, manifest.json
+- `data/unity/<version>/index`: always `fts.sqlite`; plus `vectors.faiss` and `vectors_meta.jsonl` in hybrid mode
 - `src/unity_docs_mcp`: pipeline + MCP server
 - `scripts/`: convenience wrappers (same as console scripts)
 
@@ -22,8 +22,8 @@ Typical sizes (approx):
 - Indexes (FTS + vectors): ~1-4 GB
 
 Reset a version:
-- Windows: `rmdir /s /q data\unity\6000.3`
-- macOS/Linux: `rm -rf data/unity/6000.3`
+- Windows: `rmdir /s /q data\unity\<version>`
+- macOS/Linux: `rm -rf data/unity/<version>`
 
 ## MCP tools (summary)
 - `unity_docs.search(query, k?, source_types?, group_by?, debug?)`
@@ -56,6 +56,7 @@ Example response metadata (present in all tools):
 - `config.yaml`: tracked base defaults.
 - `config.local.yaml`: optional untracked local overrides written by setup.
 - Effective config is layered in this order: `config.yaml` -> `config.local.yaml` -> `UNITY_DOCS_MCP_CONFIG` -> explicit `--config`.
+- Unity version is required at runtime via `UNITY_DOCS_MCP_UNITY_VERSION`; version/path/download values are derived from this env var.
 - Set `index.vector: "none"` in local overrides for explicit FTS-only mode.
 
 ## Examples
@@ -71,7 +72,7 @@ Example response metadata (present in all tools):
 - Setup scripts now prompt for mode:
   - `CUDA`: installs `.[dev,vector]`, then validates CUDA torch (`cu128 -> cu121 -> cu118` fallback).
   - `CPU-only`: installs `.[dev]` and configures `index.vector: none` (FTS-only, no vector deps).
-- Setup writes the chosen version/mode into repo-local `config.local.yaml` for MCP startup consistency without dirtying git state.
+- Setup writes mode into repo-local `config.local.yaml` and writes `UNITY_DOCS_MCP_UNITY_VERSION` into generated MCP client configs.
 - If all CUDA channels fail runtime validation, CUDA mode exits; rerun setup and choose CPU-only if desired.
 - Search returns garbage: delete `data/unity/<version>/baked` and re-run `unitydocs-bake` to validate extraction quality.
 - Port already used: set `UNITY_DOCS_MCP_PORT` (and `UNITY_DOCS_MCP_HOST` if needed).
@@ -102,10 +103,14 @@ These require local Unity raw docs under `data/unity/<version>/raw/UnityDocument
     "servers": {
       "unity-docs": {
         "command": "C:\\projects\\UnityRAG\\.venv\\Scripts\\unitydocs-mcp.exe",
-        "args": []
+        "args": [],
+        "env": {
+          "UNITY_DOCS_MCP_UNITY_VERSION": "6000.3"
+        }
       }
     }
   }
   ```
   macOS/Linux equivalent command: `/path/to/UnityRAG/.venv/bin/unitydocs-mcp`.
+- Include `UNITY_DOCS_MCP_UNITY_VERSION` in MCP server `env` for reliable startup.
 - Optional advanced overrides remain available via `UNITY_DOCS_MCP_ROOT` / `UNITY_DOCS_MCP_CONFIG`.

@@ -32,7 +32,8 @@ bash setup.sh
 Setup will prompt you for:
 - Retrieval mode: `CUDA` (hybrid) or `CPU-only` (FTS-only)
 - MCP client auto-config: `Codex`, `Claude Desktop`, `Both`, or `Skip`
-- Setup writes machine-local overrides to `config.local.yaml` (untracked), while `config.yaml` remains tracked defaults.
+- Setup writes machine-local mode overrides to `config.local.yaml` (untracked), while `config.yaml` remains tracked defaults.
+- MCP server configs include `UNITY_DOCS_MCP_UNITY_VERSION` so clients run against your selected docs version.
 
 2. Restart your agent.
 
@@ -58,6 +59,7 @@ Run:
 ```bash
 docker run -d --name unityrag \
   -p 8765:8765 \
+  -e UNITY_DOCS_MCP_UNITY_VERSION=6000.3 \
   -v unityrag-data:/app/data \
   ghcr.io/razpines/unityrag:latest
 ```
@@ -87,6 +89,7 @@ Container defaults (advanced):
 - `UNITY_DOCS_MCP_CONFIG=/app/config.docker.yaml` (FTS-only / CPU-safe)
 - `UNITY_DOCS_MCP_HOST=0.0.0.0`
 - `UNITY_DOCS_MCP_PORT=8765`
+- `UNITY_DOCS_MCP_UNITY_VERSION` is required (set it explicitly when starting the container).
 
 Client config details (Docker-hosted MCP):
 - `docs/docker_http_clients.md`
@@ -111,6 +114,7 @@ python -m venv .venv
 pip install -e .[dev]
 # For CUDA/hybrid installs, use:
 # pip install -e .[dev,vector]
+export UNITY_DOCS_MCP_UNITY_VERSION=6000.3  # Windows PowerShell: $env:UNITY_DOCS_MCP_UNITY_VERSION='6000.3'
 unitydocs install --version 6000.3 --cleanup
 unitydocs mcp
 ```
@@ -120,6 +124,7 @@ Notes:
 - In `CPU-only` mode, setup configures `index.vector: none` and skips vector dependencies.
 
 Optional advanced overrides:
+- `UNITY_DOCS_MCP_UNITY_VERSION` (required for runtime commands such as `unitydocs mcp`)
 - `UNITY_DOCS_MCP_ROOT`
 - `UNITY_DOCS_MCP_CONFIG`
 - `UNITY_DOCS_MCP_HOST`

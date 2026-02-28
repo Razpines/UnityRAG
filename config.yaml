@@ -1,13 +1,3 @@
-unity_version: "6000.3"
-download_url: "https://cloudmedia-docs.unity3d.com/docscloudstorage/en/6000.3/UnityDocumentation.zip"
-
-paths:
-  root: "data/unity/6000.3"
-  raw_zip: "data/unity/6000.3/raw/UnityDocumentation.zip"
-  raw_unzipped: "data/unity/6000.3/raw/UnityDocumentation"
-  baked_dir: "data/unity/6000.3/baked"
-  index_dir: "data/unity/6000.3/index"
-
 bake:
   keep_images: false
   include_figure_captions: true

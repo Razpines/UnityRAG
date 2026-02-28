@@ -3,32 +3,17 @@ from __future__ import annotations
 import argparse
 import os
 
-from unity_docs_mcp.config import Config, PathsConfig
+from unity_docs_mcp.config import UNITY_VERSION_ENV, load_config
 from unity_docs_mcp.doctor import main as doctor_main
 from unity_docs_mcp.mcp_server import main_http
 from unity_docs_mcp.setup.ensure_artifacts import ensure
 
 
-def _config_for_version(version: str) -> Config:
-    base = Config()
-    base.unity_version = version
-    base.download_url = (
-        f"https://cloudmedia-docs.unity3d.com/docscloudstorage/en/{version}/UnityDocumentation.zip"
-    )
-    base.paths = PathsConfig(
-        root=f"data/unity/{version}",
-        raw_zip=f"data/unity/{version}/raw/UnityDocumentation.zip",
-        raw_unzipped=f"data/unity/{version}/raw/UnityDocumentation",
-        baked_dir=f"data/unity/{version}/baked",
-        index_dir=f"data/unity/{version}/index",
-    )
-    return base
-
-
 def _cmd_install(args: argparse.Namespace) -> None:
     if args.cleanup:
         os.environ["UNITY_DOCS_MCP_CLEANUP"] = "1"
-    config = _config_for_version(args.version)
+    os.environ[UNITY_VERSION_ENV] = args.version.strip()
+    config = load_config()
     ensure(config)
 
 

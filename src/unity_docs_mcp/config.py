@@ -1,22 +1,25 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass, field
 import hashlib
 import json
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 import yaml
 
+UNITY_VERSION_ENV = "UNITY_DOCS_MCP_UNITY_VERSION"
+_LEGACY_VERSION_KEYS = ("unity_version", "download_url", "paths")
+
 
 @dataclass
 class PathsConfig:
-    root: str = "data/unity/6000.3"
-    raw_zip: str = "data/unity/6000.3/raw/UnityDocumentation.zip"
-    raw_unzipped: str = "data/unity/6000.3/raw/UnityDocumentation"
-    baked_dir: str = "data/unity/6000.3/baked"
-    index_dir: str = "data/unity/6000.3/index"
+    root: str
+    raw_zip: str
+    raw_unzipped: str
+    baked_dir: str
+    index_dir: str
 
 
 @dataclass
@@ -58,36 +61,84 @@ class MCPConfig:
     open_max_chars: int = 12000
 
 
+def _require_unity_version() -> str:
+    unity_version = os.environ.get(UNITY_VERSION_ENV, "").strip()
+    if unity_version:
+        return unity_version
+    raise ValueError(
+        f"Missing required environment variable {UNITY_VERSION_ENV}. "
+        "Set it to a Unity docs version (for example: 6000.3)."
+    )
+
+
+def _download_url_for_version(version: str) -> str:
+    return f"https://cloudmedia-docs.unity3d.com/docscloudstorage/en/{version}/UnityDocumentation.zip"
+
+
+def _paths_for_version(version: str) -> PathsConfig:
+    base = f"data/unity/{version}"
+    return PathsConfig(
+        root=base,
+        raw_zip=f"{base}/raw/UnityDocumentation.zip",
+        raw_unzipped=f"{base}/raw/UnityDocumentation",
+        baked_dir=f"{base}/baked",
+        index_dir=f"{base}/index",
+    )
+
+
 @dataclass
 class Config:
-    unity_version: str = "6000.3"
-    download_url: str = (
-        "https://cloudmedia-docs.unity3d.com/docscloudstorage/en/6000.3/UnityDocumentation.zip"
-    )
-    paths: PathsConfig = field(default_factory=PathsConfig)
+    unity_version: str = field(default_factory=_require_unity_version)
+    download_url: str = field(init=False)
+    paths: PathsConfig = field(init=False)
     bake: BakeConfig = field(default_factory=BakeConfig)
     chunking: ChunkConfig = field(default_factory=ChunkConfig)
     index: IndexConfig = field(default_factory=IndexConfig)
     mcp: MCPConfig = field(default_factory=MCPConfig)
 
+    def __post_init__(self) -> None:
+        unity_version = (self.unity_version or "").strip()
+        if not unity_version:
+            raise ValueError(
+                f"{UNITY_VERSION_ENV} must be a non-empty string "
+                "(for example: 6000.3)."
+            )
+        self.unity_version = unity_version
+        self.download_url = _download_url_for_version(unity_version)
+        self.paths = _paths_for_version(unity_version)
+
     @classmethod
     def from_file(cls, path: Path | str) -> "Config":
         cfg_path = Path(path)
+        base = cls(unity_version=_require_unity_version())
         if not cfg_path.exists():
-            return cls()
+            return base
         with cfg_path.open("r", encoding="utf-8") as f:
             raw = yaml.safe_load(f) or {}
-        return merge_config(cls(), raw)
+        if not isinstance(raw, dict):
+            raise ValueError(f"Config file must contain a YAML mapping: {cfg_path}")
+        _validate_override_keys(raw, source=cfg_path)
+        return merge_config(base, raw)
+
+
+def _validate_override_keys(overrides: Dict[str, Any], source: Optional[Path] = None) -> None:
+    forbidden = [key for key in _LEGACY_VERSION_KEYS if key in overrides]
+    if not forbidden:
+        return
+    where = f" in {source}" if source is not None else ""
+    forbidden_list = ", ".join(forbidden)
+    raise ValueError(
+        f"Unsupported config keys{where}: {forbidden_list}. "
+        f"Set {UNITY_VERSION_ENV} and let paths/download URL derive from that value."
+    )
 
 
 def merge_config(base: Config, overrides: Dict[str, Any]) -> Config:
     """
     Merge dictionary overrides into a Config instance, returning a new instance.
     """
+    _validate_override_keys(overrides)
     cfg_dict: Dict[str, Any] = {
-        "unity_version": base.unity_version,
-        "download_url": base.download_url,
-        "paths": vars(base.paths),
         "bake": vars(base.bake),
         "chunking": vars(base.chunking),
         "index": {
@@ -111,9 +162,7 @@ def merge_config(base: Config, overrides: Dict[str, Any]) -> Config:
     merged = deep_update(cfg_dict, overrides)
 
     return Config(
-        unity_version=merged["unity_version"],
-        download_url=merged["download_url"],
-        paths=PathsConfig(**merged["paths"]),
+        unity_version=base.unity_version,
         bake=BakeConfig(**merged["bake"]),
         chunking=ChunkConfig(**merged["chunking"]),
         index=IndexConfig(
@@ -162,7 +211,7 @@ def existing_config_layer_paths(config_path: Optional[Path | str] = None) -> lis
 
 
 def load_config(config_path: Optional[Path | str] = None) -> Config:
-    cfg = Config()
+    cfg = Config(unity_version=_require_unity_version())
     for layer in config_layer_paths(config_path):
         if not layer.exists():
             continue
@@ -170,6 +219,7 @@ def load_config(config_path: Optional[Path | str] = None) -> Config:
             raw = yaml.safe_load(f) or {}
         if not isinstance(raw, dict):
             raise ValueError(f"Config file must contain a YAML mapping: {layer}")
+        _validate_override_keys(raw, source=layer)
         cfg = merge_config(cfg, raw)
     return cfg
 
