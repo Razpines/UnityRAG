@@ -12,6 +12,11 @@ from unity_docs_mcp.paths import make_paths
 from unity_docs_mcp.setup.download import download_zip
 from unity_docs_mcp.setup.unzip import safe_unzip
 
+_BAKE_INPUT_GLOBS = [
+    "Documentation/en/Manual/*.html",
+    "Documentation/en/Manual/**/*.html",
+]
+
 
 def _manifest_matches(path: Path, signature: str) -> bool:
     if not path.exists():
@@ -24,17 +29,23 @@ def _manifest_matches(path: Path, signature: str) -> bool:
 
 
 def _raw_docs_ready(raw_unzipped: Path) -> bool:
-    return (raw_unzipped / "Documentation" / "en").is_dir()
+    return (raw_unzipped / "Documentation" / "en" / "Manual" / "index.html").is_file()
 
 
-def _recover_unzip(download_url: str, raw_zip: Path, raw_unzipped: Path, error: Exception) -> None:
+def _recover_unzip(
+    download_url: str,
+    raw_zip: Path,
+    raw_unzipped: Path,
+    include_globs: list[str],
+    error: Exception,
+) -> None:
     print(f"[setup] Unzip failed ({error}). Re-downloading zip and retrying once...")
     if raw_unzipped.exists():
         shutil.rmtree(raw_unzipped, ignore_errors=True)
     if raw_zip.exists():
         raw_zip.unlink()
     download_zip(download_url, raw_zip, overwrite=True)
-    safe_unzip(raw_zip, raw_unzipped)
+    safe_unzip(raw_zip, raw_unzipped, include_globs=include_globs)
 
 
 def ensure(config: Config) -> None:
@@ -54,9 +65,15 @@ def ensure(config: Config) -> None:
             if paths.raw_unzipped.exists():
                 shutil.rmtree(paths.raw_unzipped, ignore_errors=True)
             try:
-                safe_unzip(paths.raw_zip, paths.raw_unzipped)
+                safe_unzip(paths.raw_zip, paths.raw_unzipped, include_globs=_BAKE_INPUT_GLOBS)
             except Exception as unzip_error:
-                _recover_unzip(config.download_url, paths.raw_zip, paths.raw_unzipped, unzip_error)
+                _recover_unzip(
+                    config.download_url,
+                    paths.raw_zip,
+                    paths.raw_unzipped,
+                    include_globs=_BAKE_INPUT_GLOBS,
+                    error=unzip_error,
+                )
 
         print("==> Baking docs (HTML -> cleaned text + chunks)...")
         bake(config)
