@@ -3,7 +3,7 @@
 ## Project Structure & Modules
 - Source: `src/unity_docs_mcp/` (bake, index, MCP server, setup helpers).
 - Data: `data/unity/6000.3/raw` (Unity docs zip + unzip), `data/unity/6000.3/baked`, `data/unity/6000.3/index` (artifact outputs; git-ignored).
-- Scripts/entrypoints: console scripts (`unitydocs-setup`, `unitydocs-bake`, `unitydocs-index`, `unitydocs-mcp`) and wrappers in `scripts/`.
+- Scripts/entrypoints: console scripts (`unitydocs`, `unitydocs-setup`, `unitydocs-bake`, `unitydocs-index`, `unitydocs-mcp`, `unitydocs-benchmark`) and wrappers in `scripts/`.
 - Tests: `tests/` (pytest).
 - Config: tracked `config.yaml` base defaults + optional untracked `config.local.yaml` overrides. Paths resolve relative to repo by default, with `UNITY_DOCS_MCP_ROOT` as an advanced override.
 
@@ -14,7 +14,9 @@
 - Ensure artifacts: `unitydocs-setup` (downloads if missing, bakes, indexes).
 - Bake only: `unitydocs-bake`.
 - Index only: `unitydocs-index` (use `--dry-run` to verify device/model without embedding).
-- MCP server: `unitydocs-mcp` (stdio; setup can auto-configure Codex/Claude with absolute command paths, no env vars required for default flow).
+- MCP server: `unitydocs-mcp` (stdio; runtime requires `UNITY_DOCS_MCP_UNITY_VERSION`, and setup auto-config writes this into Codex/Claude MCP server `env`).
+- Diagnostics/reporting: `unitydocs doctor --json --with-setup-snapshot`, `unitydocs report --summary ... --prefill-issue`.
+- Benchmarking: `unitydocs-benchmark --dataset benchmarks/eval/unity_queries_v1.jsonl --output benchmarks/results/latest.json`.
 - Tests: `pytest`.
 
 ## Coding Style & Naming

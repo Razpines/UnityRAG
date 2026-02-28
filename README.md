@@ -12,7 +12,7 @@ Local Unity documentation RAG + MCP server for coding agents.
 
 UnityRAG grounds Codex and Claude answers in official Unity offline docs for your selected version, with citations from local artifacts.
 
-MCP tools: `search` / `open` / `related` / `list_files` / `status`
+MCP tools: `search` / `resolve_symbol` / `open` / `related` / `list_files` / `status`
 
 ## Quick Start
 
