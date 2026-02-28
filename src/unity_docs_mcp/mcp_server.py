@@ -86,6 +86,16 @@ def _parse_source_types(source_types: Optional[List[str] | str]) -> Optional[Lis
     return values or None
 
 
+def _parse_string_list(values: Optional[List[str] | str]) -> Optional[List[str]]:
+    if values is None:
+        return None
+    if isinstance(values, str):
+        parsed = [item.strip() for item in values.split(",") if item.strip()]
+    else:
+        parsed = [str(item).strip() for item in values if str(item).strip()]
+    return parsed or None
+
+
 def _serialize_search_results(results: list[Any], meta: dict) -> List[dict]:
     return [
         {
@@ -214,10 +224,52 @@ def list_files(pattern: str, limit: int = 20) -> List[dict]:
 
 
 @app.tool()
-def related(doc_id: str, limit: int = 10) -> List[dict]:
+def related(
+    doc_id: Optional[str] = None,
+    path: Optional[str] = None,
+    mode: str = "outgoing",
+    limit: int = 10,
+    exclude_doc_ids: Optional[List[str] | str] = None,
+    exclude_source_types: Optional[List[str] | str] = None,
+    exclude_glossary: bool = False,
+) -> List[dict] | dict:
     docstore = _get_docstore()
     meta = _response_meta(docstore)
-    neighbors = docstore.related(doc_id=doc_id, limit=limit)
+    resolved_doc_id = doc_id
+    if not resolved_doc_id and path:
+        record = docstore.open_doc(path=path)
+        if record:
+            resolved_doc_id = record.doc_id
+    if not resolved_doc_id:
+        return {
+            "error": "not_found",
+            "message": "Provide a valid doc_id or path.",
+            "attempted": {"doc_id": doc_id, "path": path},
+            "meta": meta,
+        }
+
+    mode_norm = (mode or "outgoing").strip().lower()
+    allowed_modes = {"outgoing", "incoming", "bidirectional"}
+    if mode_norm not in allowed_modes:
+        return {
+            "error": "invalid_mode",
+            "message": f"Unsupported mode: {mode}",
+            "allowed_modes": sorted(allowed_modes),
+            "meta": meta,
+        }
+
+    parsed_exclude_doc_ids = _parse_string_list(exclude_doc_ids) or []
+    parsed_exclude_source_types = [s.lower() for s in (_parse_string_list(exclude_source_types) or [])]
+    if exclude_glossary:
+        parsed_exclude_doc_ids.extend(["manual/glossary", "scriptreference/glossary"])
+
+    neighbors = docstore.related(
+        doc_id=resolved_doc_id,
+        limit=limit,
+        mode=mode_norm,
+        exclude_doc_ids=parsed_exclude_doc_ids,
+        exclude_source_types=parsed_exclude_source_types,
+    )
     return [
         {
             "doc_id": n.doc_id,

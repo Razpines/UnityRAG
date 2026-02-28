@@ -32,6 +32,7 @@ class DocStore:
         self._canonical_url_index = self._build_canonical_url_index(self.corpus)
         self._doc_source_type_counts = self._count_source_types(self.corpus.values())
         self.link_index = self._load_links(self.paths.baked_dir / "link_graph.jsonl")
+        self.reverse_link_index = self._build_reverse_links(self.link_index)
         self.searcher = HybridSearcher(config, self.paths.index_dir)
         self._chunk_source_type_counts = self._count_source_types(getattr(self.searcher, "chunk_meta", {}).values())
 
@@ -61,6 +62,14 @@ class DocStore:
                 row = json.loads(line)
                 links.setdefault(row["from_doc_id"], []).append(row["to_doc_id"])
         return links
+
+    @staticmethod
+    def _build_reverse_links(links: Dict[str, List[str]]) -> Dict[str, List[str]]:
+        reverse_links: Dict[str, List[str]] = {}
+        for from_doc, neighbors in links.items():
+            for to_doc in neighbors:
+                reverse_links.setdefault(to_doc, []).append(from_doc)
+        return reverse_links
 
     def _build_origin_path_index(self, records: Dict[str, DocRecord]) -> Dict[str, str]:
         index: Dict[str, str] = {}
@@ -148,9 +157,44 @@ class DocStore:
                 break
         return matches
 
-    def related(self, doc_id: str, limit: int = 10) -> List[DocRecord]:
-        neighbors = self.link_index.get(doc_id, [])[:limit]
-        return [self.corpus[n] for n in neighbors if n in self.corpus]
+    def related(
+        self,
+        doc_id: str,
+        limit: int = 10,
+        mode: str = "outgoing",
+        exclude_doc_ids: Optional[List[str]] = None,
+        exclude_source_types: Optional[List[str]] = None,
+    ) -> List[DocRecord]:
+        exclude_doc_ids_set = set(exclude_doc_ids or [])
+        exclude_source_types_set = {s.lower() for s in (exclude_source_types or [])}
+
+        mode_norm = (mode or "outgoing").strip().lower()
+        if mode_norm == "outgoing":
+            candidates = self.link_index.get(doc_id, [])
+        elif mode_norm == "incoming":
+            candidates = self.reverse_link_index.get(doc_id, [])
+        elif mode_norm == "bidirectional":
+            candidates = self.link_index.get(doc_id, []) + self.reverse_link_index.get(doc_id, [])
+        else:
+            return []
+
+        seen = set()
+        related_docs: List[DocRecord] = []
+        for neighbor_id in candidates:
+            if neighbor_id in seen:
+                continue
+            seen.add(neighbor_id)
+            if neighbor_id in exclude_doc_ids_set:
+                continue
+            doc = self.corpus.get(neighbor_id)
+            if not doc:
+                continue
+            if doc.source_type.lower() in exclude_source_types_set:
+                continue
+            related_docs.append(doc)
+            if len(related_docs) >= limit:
+                break
+        return related_docs
 
     def search(self, query: str, k: int = 6, source_types: Optional[List[str]] = None) -> List:
         return self.searcher.search(query=query, k=k, source_types=source_types)
