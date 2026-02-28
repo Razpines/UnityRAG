@@ -6,7 +6,7 @@ import asyncio
 import os
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from mcp.server.fastmcp import FastMCP
 
@@ -76,17 +76,17 @@ def _response_meta(docstore: DocStore, baked_manifest: Optional[dict] = None) ->
     return meta
 
 
-@app.tool()
-def search(
-    query: str,
-    k: int = 6,
-    source_types: Optional[List[str] | str] = None,
-) -> List[dict]:
-    docstore = _get_docstore()
-    meta = _response_meta(docstore)
+def _parse_source_types(source_types: Optional[List[str] | str]) -> Optional[List[str]]:
+    if source_types is None:
+        return None
     if isinstance(source_types, str):
-        source_types = [s.strip() for s in source_types.split(",") if s.strip()]
-    results = docstore.search(query=query, k=k, source_types=source_types)
+        values = [s.strip().lower() for s in source_types.split(",") if s.strip()]
+    else:
+        values = [str(s).strip().lower() for s in source_types if str(s).strip()]
+    return values or None
+
+
+def _serialize_search_results(results: list[Any], meta: dict) -> List[dict]:
     return [
         {
             "chunk_id": r.chunk_id,
@@ -102,6 +102,65 @@ def search(
         }
         for r in results
     ]
+
+
+@app.tool()
+def search(
+    query: str,
+    k: int = 6,
+    source_types: Optional[List[str] | str] = None,
+    debug: bool = False,
+) -> List[dict] | dict:
+    docstore = _get_docstore()
+    meta = _response_meta(docstore)
+    parsed_source_types = _parse_source_types(source_types)
+    available_source_types = docstore.available_source_types()
+    known_source_types = docstore.known_source_types()
+
+    invalid_source_types = []
+    unavailable_source_types = []
+    if parsed_source_types:
+        requested_set = set(parsed_source_types)
+        known_set = set(known_source_types)
+        available_set = set(available_source_types)
+        invalid_source_types = sorted(requested_set - known_set)
+        unavailable_source_types = sorted((requested_set & known_set) - available_set)
+
+    if invalid_source_types or unavailable_source_types:
+        message_parts = []
+        if invalid_source_types:
+            message_parts.append(f"Unsupported source_types: {', '.join(invalid_source_types)}")
+        if unavailable_source_types:
+            message_parts.append(f"Requested source_types not present in this index: {', '.join(unavailable_source_types)}")
+        return {
+            "error": "invalid_source_types",
+            "message": ". ".join(message_parts),
+            "requested_source_types": parsed_source_types or [],
+            "invalid_source_types": invalid_source_types,
+            "unavailable_source_types": unavailable_source_types,
+            "known_source_types": known_source_types,
+            "available_source_types": available_source_types,
+            "results": [],
+            "meta": meta,
+        }
+
+    results = docstore.search(query=query, k=k, source_types=parsed_source_types)
+    serialized = _serialize_search_results(results, meta)
+    if not debug:
+        return serialized
+    return {
+        "results": serialized,
+        "meta": meta,
+        "debug": {
+            "query": query,
+            "k": k,
+            "requested_source_types": parsed_source_types or [],
+            "available_source_types": available_source_types,
+            "known_source_types": known_source_types,
+            "retrieval_mode": meta["retrieval_mode"],
+            "result_count": len(serialized),
+        },
+    }
 
 
 @app.tool()
@@ -177,6 +236,13 @@ def status() -> dict:
     paths = make_paths(config)
     baked_manifest = _read_manifest(paths.baked_dir / "manifest.json")
     index_manifest = _read_manifest(paths.index_dir / "manifest.json")
+    available_source_types = docstore.available_source_types()
+    source_type_counts = docstore.source_type_counts()
+    coverage_warnings: list[str] = []
+    if "scriptref" not in set(available_source_types):
+        coverage_warnings.append(
+            "scriptref source type is not present in the loaded corpus/index; API symbol lookup coverage may be incomplete"
+        )
     return {
         "meta": _response_meta(docstore, baked_manifest=baked_manifest),
         "paths": vars(config.paths),
@@ -184,6 +250,9 @@ def status() -> dict:
         "embedder": vars(config.index.embedder),
         "baked_manifest": baked_manifest,
         "index_manifest": index_manifest,
+        "available_source_types": available_source_types,
+        "source_type_counts": source_type_counts,
+        "coverage_warnings": coverage_warnings,
     }
 
 
