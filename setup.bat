@@ -70,18 +70,6 @@ if defined FREE_GB if %FREE_GB% LSS %REQUIRED_GB% (
   pause
   exit /b 1
 )
-if not exist "%VENV%\Scripts\activate.bat" (
-  call :print_color Cyan "[setup] Creating venv at %VENV%..."
-  call %PY_CMD% -m venv "%VENV%"
-  if errorlevel 1 (
-    call :print_color Red "[setup] Failed to create venv. Ensure Python 3.12+ is installed and on PATH."
-    pause
-    exit /b 1
-  )
-  call "%VENV%\Scripts\activate.bat"
-) else (
-  call "%VENV%\Scripts\activate.bat"
-)
 
 set "SETUP_MODE="
 if /i "%UNITYDOCS_SETUP_MODE%"=="cuda" set "SETUP_MODE=cuda"
@@ -94,7 +82,7 @@ goto after_choose_mode
 
 :choose_mode
 echo.
-call :print_color Green "Select setup mode:"
+call :print_color Green "[detect] Select setup mode:"
 echo   1^) CUDA ^(hybrid retrieval: FTS + vectors^)
 echo   2^) CPU-only ^(FTS-only retrieval; no transformers/faiss^)
 echo.
@@ -112,50 +100,16 @@ if not defined SETUP_MODE (
 
 :after_choose_mode
 
-call :print_color Cyan "[setup] Installing project dependencies..."
-
-python -m pip install -U pip
-if /i "%SETUP_MODE%"=="cuda" (
-  python -m pip install -e ".[dev,vector]"
-) else (
-  python -m pip install -e ".[dev]"
-)
+call :print_color Cyan "[bootstrap] Preparing virtual environment and dependencies..."
+set "PYTHONPATH=%REPO%\src"
+call %PY_CMD% -m unity_docs_mcp.setup.bootstrap --repo-root "%REPO%" --venv "%VENV%" --mode "%SETUP_MODE%"
+set "PYTHONPATH="
 if errorlevel 1 (
-  call :print_color Red "[setup] Failed to install dependencies."
+  call :print_color Red "[bootstrap] Failed to prepare dependencies."
   pause
   exit /b 1
 )
-
-if /i "%SETUP_MODE%"=="cuda" (
-  set "TORCH_OK="
-  set "TORCH_CHANNEL="
-  call :print_color Cyan "[setup] Installing CUDA torch build (cu128 -> cu121 -> cu118)..."
-  call :try_torch_channel cu128
-  if errorlevel 1 (
-    call :try_torch_channel cu121
-  )
-  if errorlevel 1 (
-    call :try_torch_channel cu118
-  )
-
-  if not defined TORCH_OK (
-    call :print_color Red "[setup] Failed to install CUDA torch."
-    pause
-    exit /b 1
-  )
-
-  call :print_color Cyan "[setup] Installed torch from %TORCH_CHANNEL% index."
-
-  python -c "import torch,sys; print('[setup] torch=' + str(torch.__version__) + ' cuda=' + str(torch.version.cuda) + ' available=' + str(torch.cuda.is_available())); raise SystemExit(0 if (torch.cuda.is_available() and torch.version.cuda is not None) else 1)"
-  if errorlevel 1 (
-    call :print_color Red "[setup] CUDA verification failed. Refusing to continue with CPU torch."
-    pause
-    exit /b 1
-  )
-)
-if /i "%SETUP_MODE%"=="cpu" (
-  call :print_color Yellow "[setup] CPU-only mode selected. Index will run in FTS-only mode."
-)
+call "%VENV%\Scripts\activate.bat"
 
 set "DEFAULT_VER=6000.3"
 set "HINT_VER="
@@ -201,7 +155,7 @@ if defined DETECTED_VER (
 
 :choose_version
 echo.
-call :print_color Green "Select Unity docs version (default %DEFAULT_VER%):"
+call :print_color Green "[detect] Select Unity docs version (default %DEFAULT_VER%):"
 echo.
 echo Options: 6000.5, 6000.4, 6000.3, 6000.0
 echo Note: Unity 2022 and older are likely already well-known by LLMs.
@@ -241,10 +195,11 @@ set "UNITY_DOCS_MCP_CONFIG=%TEMP_CFG%"
 set "UNITY_DOCS_MCP_CLEANUP=1"
 set "UNITY_DOCS_MCP_UNITY_VERSION=%SELECTED%"
 
+call :print_color Cyan "[artifacts] Ensuring local docs artifacts..."
 python -c "from unity_docs_mcp.setup.ensure_artifacts import main; main()"
 if errorlevel 1 (
   echo.
-  call :print_color Red "[setup] Failed. Check the output above for details."
+  call :print_color Red "[artifacts] Failed. Check the output above for details."
   pause
   exit /b 1
 )
@@ -270,7 +225,7 @@ if defined MCP_CLIENT goto apply_mcp
 
 :choose_mcp
 echo.
-call :print_color Green "Auto-configure MCP client now?"
+call :print_color Green "[mcp] Auto-configure MCP client now?"
 echo   1^) Codex ^(recommended^)
 echo   2^) Claude Desktop
 echo   3^) Both
@@ -319,25 +274,6 @@ python -m unity_docs_mcp.setup.mcp_config --client claude --repo-root "%REPO%" -
 if errorlevel 1 (
   call :print_color Yellow "[setup] Warning: failed to auto-configure Claude MCP."
 )
-exit /b 0
-
-:try_torch_channel
-set "CHANNEL=%~1"
-call :print_color Cyan "[setup] Trying torch from %CHANNEL%..."
-python -m pip install --force-reinstall torch --index-url https://download.pytorch.org/whl/%CHANNEL%
-if errorlevel 1 (
-  call :print_color DarkYellow "[setup] %CHANNEL% install failed."
-  exit /b 1
-)
-
-python -c "import torch,sys; print('[setup] torch=' + str(torch.__version__) + ' cuda=' + str(torch.version.cuda) + ' available=' + str(torch.cuda.is_available())); raise SystemExit(0 if (torch.cuda.is_available() and torch.version.cuda is not None) else 1)"
-if errorlevel 1 (
-  call :print_color DarkYellow "[setup] %CHANNEL% installed but CUDA runtime verification failed."
-  exit /b 1
-)
-
-set "TORCH_OK=1"
-set "TORCH_CHANNEL=%CHANNEL%"
 exit /b 0
 
 :install_portable_python
