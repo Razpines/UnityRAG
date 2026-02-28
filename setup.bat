@@ -118,46 +118,11 @@ if errorlevel 1 (
 call "%VENV%\Scripts\activate.bat"
 
 set "DEFAULT_VER=6000.3"
-set "HINT_VER="
-set "DETECTED_VER="
-if defined UNITY_VERSION set "HINT_VER=%UNITY_VERSION%"
-if defined UNITY_EDITOR_VERSION set "HINT_VER=%UNITY_EDITOR_VERSION%"
-if not defined HINT_VER call :detect_hint
-
-if defined HINT_VER (
-  for /f "tokens=1,2 delims=." %%A in ("!HINT_VER!") do (
-    set "HINT_SHORT=%%A.%%B"
-  )
-  if defined HINT_SHORT (
-    set "DEFAULT_VER=!HINT_SHORT!"
-    set "DETECTED_VER=!HINT_SHORT!"
-  )
-)
-
-goto :after_hint
-
-:detect_hint
-set "TEMP_PS=%TEMP%\unitydocs_hint_ver.ps1"
-> "%TEMP_PS%" echo $paths = @("C:\Program Files\Unity\Hub\Editor","C:\Program Files\Unity Hub\Editor",($env:LOCALAPPDATA + "\Unity\Hub\Editor"))
->> "%TEMP_PS%" echo $versions = @()
->> "%TEMP_PS%" echo foreach ($p in $paths) {
->> "%TEMP_PS%" echo ^  if (Test-Path $p) {
->> "%TEMP_PS%" echo ^    foreach ($child in Get-ChildItem -Path $p -Directory) {
->> "%TEMP_PS%" echo ^      if ($child.Name -match '^(\\d{4}\\.\\d+)') { $versions += $matches[1] }
->> "%TEMP_PS%" echo ^    }
->> "%TEMP_PS%" echo ^  }
->> "%TEMP_PS%" echo }
->> "%TEMP_PS%" echo if ($versions.Count -gt 0) { $versions ^| Sort-Object { [version]$_ } ^| Select-Object -Last 1 }
-for /f "delims=" %%V in ('powershell -NoProfile -ExecutionPolicy Bypass -File "%TEMP_PS%"') do set "HINT_VER=%%V"
-del "%TEMP_PS%" >nul 2>&1
-exit /b 0
-
-:after_hint
-
-if defined DETECTED_VER (
-  set "SELECTED=%DETECTED_VER%"
-  goto :write_config
-)
+call :print_color Cyan "[detect] Inspecting installed Unity editors..."
+set "PYTHONPATH=%REPO%\src"
+call %PY_CMD% -m unity_docs_mcp.setup.unity_detect
+for /f "delims=" %%V in ('call %PY_CMD% -m unity_docs_mcp.setup.unity_detect --suggest-only 2^>nul') do set "DEFAULT_VER=%%V"
+set "PYTHONPATH="
 
 :choose_version
 echo.
