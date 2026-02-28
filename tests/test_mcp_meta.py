@@ -21,6 +21,28 @@ class _FakeDocStore:
                 source_type="manual",
                 score=0.42,
                 canonical_url="https://docs.unity3d.com/6000.3/Documentation/Manual/job-system-parallel-for-jobs.html",
+            ),
+            SimpleNamespace(
+                chunk_id="chunk-2",
+                doc_id="manual/job-system-parallel-for-jobs",
+                title="Parallel jobs",
+                heading_path=["Parallel jobs", "Batch size guidance"],
+                snippet="Use small batch counts for load balancing.",
+                origin_path="Documentation/en/Manual/job-system-parallel-for-jobs.html",
+                source_type="manual",
+                score=0.33,
+                canonical_url="https://docs.unity3d.com/6000.3/Documentation/Manual/job-system-parallel-for-jobs.html",
+            ),
+            SimpleNamespace(
+                chunk_id="chunk-3",
+                doc_id="manual/job-system-creating-jobs",
+                title="Create and run a job",
+                heading_path=["Create and run a job"],
+                snippet="Schedule jobs and complete dependencies.",
+                origin_path="Documentation/en/Manual/job-system-creating-jobs.html",
+                source_type="manual",
+                score=0.21,
+                canonical_url="https://docs.unity3d.com/6000.3/Documentation/Manual/job-system-creating-jobs.html",
             )
         ]
 
@@ -116,6 +138,7 @@ def test_search_includes_meta(monkeypatch):
     result = mcp_server.search("IJobParallelFor batch size", k=3)
     assert isinstance(result, list)
     assert result
+    assert len(result) == 2
     assert result[0]["doc_id"] == "manual/job-system-parallel-for-jobs"
     assert result[0]["meta"]["unity_version"] == "6000.3"
     assert result[0]["meta"]["retrieval_mode"] == "hybrid"
@@ -161,7 +184,9 @@ def test_search_debug_returns_results_and_debug_block(monkeypatch):
     assert "results" in result
     assert "debug" in result
     assert result["debug"]["query"] == "IJobParallelFor batch size"
-    assert result["debug"]["result_count"] == 1
+    assert result["debug"]["group_by"] == "doc"
+    assert result["debug"]["raw_result_count"] == 3
+    assert result["debug"]["result_count"] == 2
     assert result["results"][0]["doc_id"] == "manual/job-system-parallel-for-jobs"
 
 
@@ -179,6 +204,22 @@ def test_resolve_symbol_rejects_empty_symbol(monkeypatch):
     _install_fake_docstore(monkeypatch)
     result = mcp_server.resolve_symbol("   ", limit=3)
     assert result["error"] == "invalid_symbol"
+
+
+def test_search_group_by_chunk_preserves_chunk_level_hits(monkeypatch):
+    _install_fake_docstore(monkeypatch)
+    result = mcp_server.search("IJobParallelFor batch size", k=3, group_by="chunk")
+    assert isinstance(result, list)
+    assert len(result) == 3
+    assert result[0]["doc_id"] == "manual/job-system-parallel-for-jobs"
+    assert result[1]["doc_id"] == "manual/job-system-parallel-for-jobs"
+
+
+def test_search_rejects_invalid_group_by(monkeypatch):
+    _install_fake_docstore(monkeypatch)
+    result = mcp_server.search("IJobParallelFor batch size", k=3, group_by="weird")
+    assert result["error"] == "invalid_group_by"
+    assert "doc" in result["allowed_group_by"]
 
 
 def test_list_files_and_related_include_meta(monkeypatch):

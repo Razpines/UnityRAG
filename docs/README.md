@@ -26,7 +26,7 @@ Reset a version:
 - macOS/Linux: `rm -rf data/unity/6000.3`
 
 ## MCP tools (summary)
-- `unity_docs.search(query, k?, source_types?, debug?)`
+- `unity_docs.search(query, k?, source_types?, group_by?, debug?)`
 - `unity_docs.resolve_symbol(symbol, limit?)`
 - `unity_docs.open(doc_id?, path?, max_chars?, full?)`
 - `unity_docs.list_files(pattern, limit?)`
@@ -34,7 +34,8 @@ Reset a version:
 - `unity_docs.status()`
 
 Notes:
-- `search(...)` returns a list for normal successful calls. It returns a structured object for `debug=true` or invalid/unavailable `source_types`.
+- `search(...)` defaults to `group_by="doc"` (one result per doc). Use `group_by="chunk"` for raw chunk-level results.
+- `search(...)` returns a list for normal successful calls. It returns a structured object for `debug=true`, invalid `group_by`, or invalid/unavailable `source_types`.
 - `open(...)` returns a structured `{ error: "not_found", ... }` object when the document cannot be resolved.
 - `related(...)` returns a structured error for invalid modes or unresolved `doc_id`/`path`.
 
