@@ -174,7 +174,11 @@ def open(
     meta = _response_meta(docstore)
     record = docstore.open_doc(doc_id=doc_id, path=path)
     if not record:
-        return {"meta": meta}
+        return {
+            "error": "not_found",
+            "attempted": {"doc_id": doc_id, "path": path},
+            "meta": meta,
+        }
     text = record.text_md
     if not full:
         cap = max_chars if max_chars is not None else docstore.config.mcp.open_max_chars

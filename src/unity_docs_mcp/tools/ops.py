@@ -28,6 +28,8 @@ class DocStore:
         self.config = config
         self.paths = make_paths(config)
         self.corpus = self._load_corpus(self.paths.baked_dir / "corpus.jsonl")
+        self._origin_path_index = self._build_origin_path_index(self.corpus)
+        self._canonical_url_index = self._build_canonical_url_index(self.corpus)
         self._doc_source_type_counts = self._count_source_types(self.corpus.values())
         self.link_index = self._load_links(self.paths.baked_dir / "link_graph.jsonl")
         self.searcher = HybridSearcher(config, self.paths.index_dir)
@@ -60,6 +62,41 @@ class DocStore:
                 links.setdefault(row["from_doc_id"], []).append(row["to_doc_id"])
         return links
 
+    def _build_origin_path_index(self, records: Dict[str, DocRecord]) -> Dict[str, str]:
+        index: Dict[str, str] = {}
+        for doc in records.values():
+            if not doc.origin_path:
+                continue
+            index[doc.origin_path] = doc.doc_id
+            index[self._normalize_path_lookup_key(doc.origin_path)] = doc.doc_id
+        return index
+
+    def _build_canonical_url_index(self, records: Dict[str, DocRecord]) -> Dict[str, str]:
+        index: Dict[str, str] = {}
+        for doc in records.values():
+            if doc.canonical_url:
+                index[doc.canonical_url.strip()] = doc.doc_id
+        return index
+
+    @staticmethod
+    def _normalize_path_lookup_key(path: str) -> str:
+        return path.strip().replace("\\", "/").lower()
+
+    @staticmethod
+    def _maybe_doc_id_from_path(path: str) -> Optional[str]:
+        cleaned = path.strip().replace("\\", "/")
+        if not cleaned:
+            return None
+        if cleaned.lower().startswith(("http://", "https://")):
+            return None
+        if "/" in cleaned and cleaned.lower().startswith("documentation/en/"):
+            cleaned = cleaned[len("Documentation/en/") :]
+        if cleaned.lower().endswith(".html"):
+            cleaned = cleaned[:-5]
+        if "/" not in cleaned:
+            return None
+        return cleaned.replace(" ", "-").lower()
+
     @staticmethod
     def _count_source_types(rows) -> Dict[str, int]:
         counts: Dict[str, int] = {}
@@ -74,15 +111,33 @@ class DocStore:
         return counts
 
     def open_doc(self, doc_id: Optional[str] = None, path: Optional[str] = None) -> Optional[DocRecord]:
-        target_id = doc_id
-        if not target_id and path:
-            # derive doc_id from relative path
-            target_id = path.replace("\\", "/")
-            target_id = target_id.replace(".html", "")
-            target_id = target_id.lower()
-        if not target_id:
-            return None
-        return self.corpus.get(target_id)
+        if doc_id:
+            # Prefer exact doc_id match first to preserve current behavior.
+            record = self.corpus.get(doc_id) or self.corpus.get(doc_id.strip().lower())
+            if record:
+                return record
+
+        if path:
+            path_key_exact = path.strip()
+            if path_key_exact in self._canonical_url_index:
+                record = self.corpus.get(self._canonical_url_index[path_key_exact])
+                if record:
+                    return record
+
+            normalized_path = self._normalize_path_lookup_key(path)
+            target_id = self._origin_path_index.get(path_key_exact) or self._origin_path_index.get(normalized_path)
+            if target_id:
+                record = self.corpus.get(target_id)
+                if record:
+                    return record
+
+            maybe_doc_id = self._maybe_doc_id_from_path(path)
+            if maybe_doc_id:
+                record = self.corpus.get(maybe_doc_id)
+                if record:
+                    return record
+
+        return None
 
     def list_files(self, pattern: str, limit: int = 20) -> List[DocRecord]:
         matches: List[DocRecord] = []

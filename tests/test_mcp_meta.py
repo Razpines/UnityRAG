@@ -98,7 +98,8 @@ def test_open_includes_meta_even_when_missing(monkeypatch):
     assert found["meta"]["unity_version"] == "6000.3"
     assert "doc_id" in found
     assert missing["meta"]["unity_version"] == "6000.3"
-    assert "doc_id" not in missing
+    assert missing["error"] == "not_found"
+    assert missing["attempted"]["doc_id"] == "missing"
 
 
 def test_search_invalid_source_types_returns_actionable_error(monkeypatch):
