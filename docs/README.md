@@ -26,11 +26,16 @@ Reset a version:
 - macOS/Linux: `rm -rf data/unity/6000.3`
 
 ## MCP tools (summary)
-- `unity_docs.search(query, k?, source_types?, path_prefix?, include_snippets?, debug?)`
-- `unity_docs.open(doc_id?, path?, include_toc?, max_chars?)`
+- `unity_docs.search(query, k?, source_types?, debug?)`
+- `unity_docs.open(doc_id?, path?, max_chars?, full?)`
 - `unity_docs.list_files(pattern, limit?)`
-- `unity_docs.related(doc_id?, path?, mode?, limit?)`
+- `unity_docs.related(doc_id?, path?, mode?, limit?, exclude_doc_ids?, exclude_source_types?, exclude_glossary?)`
 - `unity_docs.status()`
+
+Notes:
+- `search(...)` returns a list for normal successful calls. It returns a structured object for `debug=true` or invalid/unavailable `source_types`.
+- `open(...)` returns a structured `{ error: "not_found", ... }` object when the document cannot be resolved.
+- `related(...)` returns a structured error for invalid modes or unresolved `doc_id`/`path`.
 
 Example response metadata (present in all tools):
 ```json
