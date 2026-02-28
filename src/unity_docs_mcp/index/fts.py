@@ -5,6 +5,8 @@ from pathlib import Path
 import re
 from typing import Iterable, List, Tuple
 
+_FTS_QUERY = "SELECT chunk_id, bm25(chunks_fts) as score FROM chunks_fts WHERE chunks_fts MATCH ? ORDER BY score LIMIT ?"
+
 
 def init_db(db_path: Path) -> sqlite3.Connection:
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -51,23 +53,53 @@ def ingest_chunks(conn: sqlite3.Connection, rows: Iterable[Tuple[str, str, str, 
 
 
 def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20) -> List[Tuple[str, float]]:
-    try:
-        cursor = conn.execute(
-            "SELECT chunk_id, bm25(chunks_fts) as score FROM chunks_fts WHERE chunks_fts MATCH ? ORDER BY score LIMIT ?",
-            (query, limit),
-        )
-        return cursor.fetchall()
-    except sqlite3.OperationalError:
-        safe_query = _sanitize_fts_query(query)
-        if not safe_query:
-            return []
-        cursor = conn.execute(
-            "SELECT chunk_id, bm25(chunks_fts) as score FROM chunks_fts WHERE chunks_fts MATCH ? ORDER BY score LIMIT ?",
-            (safe_query, limit),
-        )
-        return cursor.fetchall()
+    for candidate in _query_variants(query):
+        try:
+            cursor = conn.execute(_FTS_QUERY, (candidate, limit))
+            rows = cursor.fetchall()
+        except sqlite3.OperationalError:
+            # Keep trying normalized variants if a candidate is invalid syntax.
+            continue
+        if rows:
+            return rows
+    return []
 
 
 def _sanitize_fts_query(query: str) -> str:
     tokens = re.findall(r"[A-Za-z0-9_]+", query)
     return " ".join(tokens)
+
+
+def _split_camel_tokens(query: str) -> str:
+    if not query:
+        return ""
+    parts: List[str] = []
+    for token in query.split():
+        split = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", token)
+        parts.extend(split.split())
+    return " ".join(parts).strip()
+
+
+def _query_variants(query: str) -> List[str]:
+    raw = (query or "").strip()
+    variants: List[str] = []
+    if raw:
+        variants.append(raw)
+
+    safe_query = _sanitize_fts_query(raw)
+    if safe_query:
+        variants.append(safe_query)
+
+    camel_split = _split_camel_tokens(safe_query)
+    if camel_split:
+        variants.append(camel_split)
+
+    # Preserve order while deduplicating.
+    deduped: List[str] = []
+    seen = set()
+    for variant in variants:
+        if not variant or variant in seen:
+            continue
+        deduped.append(variant)
+        seen.add(variant)
+    return deduped
