@@ -5,6 +5,8 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_DIR="$REPO_DIR/.venv"
 SETUP_MODE="${UNITYDOCS_SETUP_MODE:-}"
 SETUP_DIAG_LATEST="$REPO_DIR/reports/setup/setup-diagnostics-latest.json"
+VERSION_FROM_ARG=0
+VERSION="6000.3"
 
 report_failure_hint() {
   local report_version="${UNITY_DOCS_MCP_UNITY_VERSION:-${VERSION:-6000.3}}"
@@ -32,48 +34,9 @@ write_setup_diagnostics() {
 
 trap 'status=$?; if [ $status -ne 0 ]; then write_setup_diagnostics failed setup.sh-failed || true; echo "[setup] Summary: mode=${SETUP_MODE:-unknown} unity_version=${VERSION:-unknown}"; if [ -f "$SETUP_DIAG_LATEST" ]; then echo "[setup] Diagnostics snapshot: $SETUP_DIAG_LATEST"; fi; report_failure_hint; else write_setup_diagnostics success setup.sh-success || true; fi' EXIT
 
-detect_version() {
-  if [ -n "${UNITY_VERSION:-}" ]; then
-    echo "$UNITY_VERSION"
-    return
-  fi
-  if [ -n "${UNITY_EDITOR_VERSION:-}" ]; then
-    echo "$UNITY_EDITOR_VERSION"
-    return
-  fi
-  if command -v python3 >/dev/null 2>&1; then
-    python3 - <<'PY'
-import os, re, pathlib, sys
-paths = [
-    "/Applications/Unity/Hub/Editor",
-    os.path.expanduser("~/Applications/Unity/Hub/Editor"),
-    os.path.join(os.environ.get("HOME",""), ".local", "share", "UnityHub", "Editor"),
-]
-versions = set()
-for base in paths:
-    p = pathlib.Path(base)
-    if p.is_dir():
-        for child in p.iterdir():
-            if child.is_dir():
-                m = re.search(r"(\\d{4}\\.\\d+)", child.name)
-                if m:
-                    versions.add(m.group(1))
-if versions:
-    def key(v): return tuple(int(x) for x in v.split("."))
-    sys.stdout.write(sorted(versions, key=key)[-1])
-PY
-  fi
-}
-
 if [ -n "${1:-}" ]; then
   VERSION="$1"
-else
-  DETECTED="$(detect_version || true)"
-  if [ -n "$DETECTED" ]; then
-    VERSION="$DETECTED"
-  else
-    VERSION="6000.3"
-  fi
+  VERSION_FROM_ARG=1
 fi
 
 if [ -z "$SETUP_MODE" ]; then
@@ -117,6 +80,22 @@ fi
 import sys
 sys.exit(0 if sys.version_info >= (3, 12) else 1)
 PY
+
+echo "[detect] Inspecting installed Unity editors..."
+PYTHONPATH="$REPO_DIR/src" "$PYTHON" -m unity_docs_mcp.setup.unity_detect || true
+if [ "$VERSION_FROM_ARG" -eq 0 ]; then
+  SUGGESTED_VERSION="$(PYTHONPATH="$REPO_DIR/src" "$PYTHON" -m unity_docs_mcp.setup.unity_detect --suggest-only 2>/dev/null || true)"
+  if [ -n "$SUGGESTED_VERSION" ]; then
+    VERSION="$SUGGESTED_VERSION"
+  fi
+  echo
+  read -r -p "[detect] Unity docs version [$VERSION]: " VERSION_CHOICE
+  VERSION_CHOICE="${VERSION_CHOICE:-}"
+  if [ -n "$VERSION_CHOICE" ]; then
+    VERSION="$VERSION_CHOICE"
+  fi
+fi
+echo "[detect] Using Unity docs version: $VERSION"
 
 echo "[bootstrap] Preparing virtual environment and dependencies..."
 PYTHONPATH="$REPO_DIR/src" "$PYTHON" -m unity_docs_mcp.setup.bootstrap \

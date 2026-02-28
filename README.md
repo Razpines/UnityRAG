@@ -31,6 +31,7 @@ bash setup.sh
 
 Setup will prompt you for:
 - Retrieval mode: `CUDA` (hybrid) or `CPU-only` (FTS-only)
+- Unity docs version (auto-suggested from detected local Unity editor installs; you can override)
 - MCP client auto-config: `Codex`, `Claude Desktop`, `Both`, or `Skip`
 - Setup writes machine-local mode overrides to `config.local.yaml` (untracked), while `config.yaml` remains tracked defaults.
 - MCP server configs include `UNITY_DOCS_MCP_UNITY_VERSION` so clients run against your selected docs version.

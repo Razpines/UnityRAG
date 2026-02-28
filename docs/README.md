@@ -74,6 +74,10 @@ Example response metadata (present in all tools):
 - Setup scripts now prompt for mode:
   - `CUDA`: installs `.[dev,vector]`, then validates CUDA torch (`cu128 -> cu121 -> cu118` fallback).
   - `CPU-only`: installs `.[dev]` and configures `index.vector: none` (FTS-only, no vector deps).
+- Setup scripts detect local Unity editor installs and suggest docs version using a deterministic fallback:
+  - exact major.minor match if supported
+  - otherwise highest supported version with the same major
+  - otherwise `6000.3`
 - Setup writes mode into repo-local `config.local.yaml` and writes `UNITY_DOCS_MCP_UNITY_VERSION` into generated MCP client configs.
 - If all CUDA channels fail runtime validation, CUDA mode exits; rerun setup and choose CPU-only if desired.
 - Search returns garbage: delete `data/unity/<version>/baked` and re-run `unitydocs-bake` to validate extraction quality.
