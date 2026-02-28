@@ -149,20 +149,13 @@ fi
 
 export UNITY_DOCS_MCP_ROOT="$REPO_DIR"
 export UNITY_DOCS_MCP_CLEANUP=1
+export UNITY_DOCS_MCP_UNITY_VERSION="$VERSION"
 CFG_PATH="$REPO_DIR/config.local.yaml"
 VECTOR_MODE="faiss"
 if [ "$SETUP_MODE" = "cpu" ]; then
   VECTOR_MODE="none"
 fi
 cat >"$CFG_PATH" <<EOF
-unity_version: "$VERSION"
-download_url: "https://cloudmedia-docs.unity3d.com/docscloudstorage/en/$VERSION/UnityDocumentation.zip"
-paths:
-  root: "data/unity/$VERSION"
-  raw_zip: "data/unity/$VERSION/raw/UnityDocumentation.zip"
-  raw_unzipped: "data/unity/$VERSION/raw/UnityDocumentation"
-  baked_dir: "data/unity/$VERSION/baked"
-  index_dir: "data/unity/$VERSION/index"
 index:
   lexical: "sqlite_fts5"
   vector: "$VECTOR_MODE"
@@ -207,12 +200,12 @@ if [ "$MCP_CLIENT" = "none" ]; then
   MCP_CLIENT="skip"
 fi
 if [ "$MCP_CLIENT" = "codex" ] || [ "$MCP_CLIENT" = "both" ]; then
-  if ! python -m unity_docs_mcp.setup.mcp_config --client codex --repo-root "$REPO_DIR"; then
+  if ! python -m unity_docs_mcp.setup.mcp_config --client codex --repo-root "$REPO_DIR" --unity-version "$VERSION"; then
     echo "[setup] Warning: failed to auto-configure Codex MCP."
   fi
 fi
 if [ "$MCP_CLIENT" = "claude" ] || [ "$MCP_CLIENT" = "both" ]; then
-  if ! python -m unity_docs_mcp.setup.mcp_config --client claude --repo-root "$REPO_DIR"; then
+  if ! python -m unity_docs_mcp.setup.mcp_config --client claude --repo-root "$REPO_DIR" --unity-version "$VERSION"; then
     echo "[setup] Warning: failed to auto-configure Claude MCP."
   fi
 fi

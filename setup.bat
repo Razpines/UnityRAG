@@ -219,14 +219,6 @@ if not defined SELECTED (
 :write_config
 set "TEMP_CFG=%REPO%\config.local.yaml"
 (
-  echo unity_version: "%SELECTED%"
-  echo download_url: "https://cloudmedia-docs.unity3d.com/docscloudstorage/en/%SELECTED%/UnityDocumentation.zip"
-  echo paths:
-  echo   root: "data/unity/%SELECTED%"
-  echo   raw_zip: "data/unity/%SELECTED%/raw/UnityDocumentation.zip"
-  echo   raw_unzipped: "data/unity/%SELECTED%/raw/UnityDocumentation"
-  echo   baked_dir: "data/unity/%SELECTED%/baked"
-  echo   index_dir: "data/unity/%SELECTED%/index"
   echo index:
   echo   lexical: "sqlite_fts5"
   if /i "%SETUP_MODE%"=="cuda" (
@@ -239,6 +231,7 @@ set "TEMP_CFG=%REPO%\config.local.yaml"
 set "UNITY_DOCS_MCP_ROOT=%REPO%"
 set "UNITY_DOCS_MCP_CONFIG=%TEMP_CFG%"
 set "UNITY_DOCS_MCP_CLEANUP=1"
+set "UNITY_DOCS_MCP_UNITY_VERSION=%SELECTED%"
 
 python -c "from unity_docs_mcp.setup.ensure_artifacts import main; main()"
 if errorlevel 1 (
@@ -306,7 +299,7 @@ if /i "%MCP_CLIENT%"=="both" (
 exit /b 0
 
 :install_codex
-python -m unity_docs_mcp.setup.mcp_config --client codex --repo-root "%REPO%"
+python -m unity_docs_mcp.setup.mcp_config --client codex --repo-root "%REPO%" --unity-version "%SELECTED%"
 if errorlevel 1 (
   call :print_color Yellow "[setup] Warning: failed to auto-configure Codex MCP."
 )
@@ -314,7 +307,7 @@ if /i "%MCP_CLIENT%"=="both" goto install_claude
 exit /b 0
 
 :install_claude
-python -m unity_docs_mcp.setup.mcp_config --client claude --repo-root "%REPO%"
+python -m unity_docs_mcp.setup.mcp_config --client claude --repo-root "%REPO%" --unity-version "%SELECTED%"
 if errorlevel 1 (
   call :print_color Yellow "[setup] Warning: failed to auto-configure Claude MCP."
 )

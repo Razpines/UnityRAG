@@ -2,7 +2,10 @@
   "servers": {
     "unity-docs": {
       "command": "/path/to/UnityRAG/.venv/bin/unitydocs-mcp",
-      "args": []
+      "args": [],
+      "env": {
+        "UNITY_DOCS_MCP_UNITY_VERSION": "6000.3"
+      }
     }
   }
 }

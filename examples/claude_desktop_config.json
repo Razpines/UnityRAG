@@ -2,7 +2,10 @@
   "mcpServers": {
     "unity-docs": {
       "command": "C:\\path\\to\\UnityRAG\\.venv\\Scripts\\unitydocs-mcp.exe",
-      "args": []
+      "args": [],
+      "env": {
+        "UNITY_DOCS_MCP_UNITY_VERSION": "6000.3"
+      }
     }
   }
 }

@@ -25,6 +25,7 @@ def test_install_mcp_config_creates_new_file(tmp_path: Path):
     target, backup = install_mcp_config(
         client="codex",
         repo_root=repo_root,
+        unity_version="6000.3",
         config_path=str(cfg_path),
     )
 
@@ -35,7 +36,7 @@ def test_install_mcp_config_creates_new_file(tmp_path: Path):
     assert "unity-docs" in data["servers"]
     assert data["servers"]["unity-docs"]["command"] == str(launcher.resolve())
     assert data["servers"]["unity-docs"]["args"] == []
-    assert "env" not in data["servers"]["unity-docs"]
+    assert data["servers"]["unity-docs"]["env"]["UNITY_DOCS_MCP_UNITY_VERSION"] == "6000.3"
 
 
 def test_install_mcp_config_preserves_other_servers_and_creates_backup(tmp_path: Path):
@@ -60,6 +61,7 @@ def test_install_mcp_config_preserves_other_servers_and_creates_backup(tmp_path:
     target, backup = install_mcp_config(
         client="claude",
         repo_root=repo_root,
+        unity_version="6000.4",
         config_path=str(cfg_path),
     )
 
@@ -71,6 +73,7 @@ def test_install_mcp_config_preserves_other_servers_and_creates_backup(tmp_path:
     assert "other-server" in data["mcpServers"]
     assert "unity-docs" in data["mcpServers"]
     assert data["mcpServers"]["unity-docs"]["command"] == str(launcher.resolve())
+    assert data["mcpServers"]["unity-docs"]["env"]["UNITY_DOCS_MCP_UNITY_VERSION"] == "6000.4"
 
 
 def test_install_mcp_config_rejects_invalid_root_section(tmp_path: Path):
@@ -83,6 +86,24 @@ def test_install_mcp_config_rejects_invalid_root_section(tmp_path: Path):
     cfg_path.write_text(json.dumps({"servers": []}), encoding="utf-8")
 
     with pytest.raises(ValueError):
+        install_mcp_config(
+            client="codex",
+            repo_root=repo_root,
+            unity_version="6000.3",
+            config_path=str(cfg_path),
+        )
+
+
+def test_install_mcp_config_requires_unity_version(monkeypatch, tmp_path: Path):
+    repo_root = tmp_path / "repo"
+    repo_root.mkdir(parents=True)
+    launcher = repo_root / _launcher_relpath()
+    launcher.parent.mkdir(parents=True, exist_ok=True)
+    launcher.write_text("echo hi\n", encoding="utf-8")
+    cfg_path = tmp_path / "codex_mcp.json"
+    monkeypatch.delenv("UNITY_DOCS_MCP_UNITY_VERSION", raising=False)
+
+    with pytest.raises(ValueError, match="UNITY_DOCS_MCP_UNITY_VERSION"):
         install_mcp_config(
             client="codex",
             repo_root=repo_root,
