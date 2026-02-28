@@ -114,16 +114,40 @@ def _serialize_search_results(results: list[Any], meta: dict) -> List[dict]:
     ]
 
 
+def _group_results_by_doc(results: list[Any], limit: int) -> list[Any]:
+    grouped: list[Any] = []
+    seen_doc_ids = set()
+    for item in results:
+        if item.doc_id in seen_doc_ids:
+            continue
+        seen_doc_ids.add(item.doc_id)
+        grouped.append(item)
+        if len(grouped) >= limit:
+            break
+    return grouped
+
+
 @app.tool()
 def search(
     query: str,
     k: int = 6,
     source_types: Optional[List[str] | str] = None,
+    group_by: str = "doc",
     debug: bool = False,
 ) -> List[dict] | dict:
     docstore = _get_docstore()
     meta = _response_meta(docstore)
     parsed_source_types = _parse_source_types(source_types)
+    group_by_norm = (group_by or "doc").strip().lower()
+    allowed_group_by = {"doc", "chunk"}
+    if group_by_norm not in allowed_group_by:
+        return {
+            "error": "invalid_group_by",
+            "message": f"Unsupported group_by: {group_by}",
+            "allowed_group_by": sorted(allowed_group_by),
+            "meta": meta,
+        }
+
     available_source_types = docstore.available_source_types()
     known_source_types = docstore.known_source_types()
 
@@ -154,7 +178,9 @@ def search(
             "meta": meta,
         }
 
-    results = docstore.search(query=query, k=k, source_types=parsed_source_types)
+    raw_k = k if group_by_norm == "chunk" else max(k * 5, k)
+    raw_results = docstore.search(query=query, k=raw_k, source_types=parsed_source_types)
+    results = raw_results[:k] if group_by_norm == "chunk" else _group_results_by_doc(raw_results, limit=k)
     serialized = _serialize_search_results(results, meta)
     if not debug:
         return serialized
@@ -164,10 +190,12 @@ def search(
         "debug": {
             "query": query,
             "k": k,
+            "group_by": group_by_norm,
             "requested_source_types": parsed_source_types or [],
             "available_source_types": available_source_types,
             "known_source_types": known_source_types,
             "retrieval_mode": meta["retrieval_mode"],
+            "raw_result_count": len(raw_results),
             "result_count": len(serialized),
         },
     }
