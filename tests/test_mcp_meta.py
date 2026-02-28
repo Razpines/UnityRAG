@@ -89,6 +89,21 @@ class _FakeDocStore:
     def source_type_counts(self):
         return {"docs": {"manual": 1}, "chunks": {"manual": 1}}
 
+    def resolve_symbol(self, symbol: str, limit: int = 5):
+        if symbol == "Rigidbody.AddForce":
+            return [
+                {
+                    "doc_id": "scriptreference/rigidbody-addforce",
+                    "title": "Rigidbody.AddForce",
+                    "source_type": "scriptref",
+                    "origin_path": "Documentation/en/ScriptReference/Rigidbody.AddForce.html",
+                    "canonical_url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Rigidbody.AddForce.html",
+                    "score": 0.95,
+                    "match_kind": "symbol_exact",
+                }
+            ]
+        return []
+
 
 def _install_fake_docstore(monkeypatch):
     fake = _FakeDocStore()
@@ -148,6 +163,22 @@ def test_search_debug_returns_results_and_debug_block(monkeypatch):
     assert result["debug"]["query"] == "IJobParallelFor batch size"
     assert result["debug"]["result_count"] == 1
     assert result["results"][0]["doc_id"] == "manual/job-system-parallel-for-jobs"
+
+
+def test_resolve_symbol_returns_structured_results(monkeypatch):
+    _install_fake_docstore(monkeypatch)
+    result = mcp_server.resolve_symbol("Rigidbody.AddForce", limit=3)
+    assert result["symbol"] == "Rigidbody.AddForce"
+    assert result["results"]
+    assert result["results"][0]["doc_id"] == "scriptreference/rigidbody-addforce"
+    assert result["results"][0]["match_kind"] == "symbol_exact"
+    assert result["results"][0]["meta"]["unity_version"] == "6000.3"
+
+
+def test_resolve_symbol_rejects_empty_symbol(monkeypatch):
+    _install_fake_docstore(monkeypatch)
+    result = mcp_server.resolve_symbol("   ", limit=3)
+    assert result["error"] == "invalid_symbol"
 
 
 def test_list_files_and_related_include_meta(monkeypatch):

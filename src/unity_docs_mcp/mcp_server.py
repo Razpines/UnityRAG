@@ -174,6 +174,25 @@ def search(
 
 
 @app.tool()
+def resolve_symbol(symbol: str, limit: int = 5) -> dict:
+    docstore = _get_docstore()
+    meta = _response_meta(docstore)
+    symbol_text = (symbol or "").strip()
+    if not symbol_text:
+        return {
+            "error": "invalid_symbol",
+            "message": "symbol must be a non-empty string.",
+            "meta": meta,
+        }
+    matches = docstore.resolve_symbol(symbol=symbol_text, limit=limit)
+    return {
+        "symbol": symbol_text,
+        "results": [{**m, "meta": meta} for m in matches],
+        "meta": meta,
+    }
+
+
+@app.tool()
 def open(
     doc_id: Optional[str] = None,
     path: Optional[str] = None,

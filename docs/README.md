@@ -27,6 +27,7 @@ Reset a version:
 
 ## MCP tools (summary)
 - `unity_docs.search(query, k?, source_types?, debug?)`
+- `unity_docs.resolve_symbol(symbol, limit?)`
 - `unity_docs.open(doc_id?, path?, max_chars?, full?)`
 - `unity_docs.list_files(pattern, limit?)`
 - `unity_docs.related(doc_id?, path?, mode?, limit?, exclude_doc_ids?, exclude_source_types?, exclude_glossary?)`
