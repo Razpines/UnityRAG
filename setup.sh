@@ -60,7 +60,7 @@ fi
 
 if [ -z "$SETUP_MODE" ]; then
   echo
-  echo "Select setup mode:"
+  echo "[detect] Select setup mode:"
   echo "  1) CUDA (hybrid retrieval: FTS + vectors)"
   echo "  2) CPU-only (FTS-only retrieval; no transformers/faiss)"
   read -r -p "Mode [1]: " MODE_CHOICE
@@ -100,61 +100,13 @@ import sys
 sys.exit(0 if sys.version_info >= (3, 12) else 1)
 PY
 
-if [ ! -f "$VENV_DIR/bin/activate" ]; then
-  echo "[setup] Creating venv at $VENV_DIR..."
-  "$PYTHON" -m venv "$VENV_DIR"
-fi
+echo "[bootstrap] Preparing virtual environment and dependencies..."
+PYTHONPATH="$REPO_DIR/src" "$PYTHON" -m unity_docs_mcp.setup.bootstrap \
+  --repo-root "$REPO_DIR" \
+  --venv "$VENV_DIR" \
+  --mode "$SETUP_MODE"
 
 source "$VENV_DIR/bin/activate"
-
-echo "[setup] Installing project dependencies..."
-python -m pip install -U pip
-if [ "$SETUP_MODE" = "cuda" ]; then
-  python -m pip install -e ".[dev,vector]"
-else
-  python -m pip install -e ".[dev]"
-fi
-
-verify_cuda_torch() {
-  python - <<'PY'
-import sys
-import torch
-
-print(f"[setup] torch={torch.__version__} cuda={torch.version.cuda} available={torch.cuda.is_available()}")
-sys.exit(0 if (torch.cuda.is_available() and torch.version.cuda is not None) else 1)
-PY
-}
-
-try_cuda_channel() {
-  local channel="$1"
-  echo "[setup] Trying torch from ${channel}..."
-  if ! python -m pip install --force-reinstall torch --index-url "https://download.pytorch.org/whl/${channel}"; then
-    echo "[setup] ${channel} install failed."
-    return 1
-  fi
-  if ! verify_cuda_torch; then
-    echo "[setup] ${channel} installed but CUDA runtime verification failed."
-    return 1
-  fi
-  TORCH_CHANNEL="$channel"
-  return 0
-}
-
-TORCH_CHANNEL=""
-if [ "$SETUP_MODE" = "cuda" ]; then
-  echo "[setup] Installing CUDA torch build (cu128 -> cu121 -> cu118)..."
-  if ! try_cuda_channel "cu128"; then
-    if ! try_cuda_channel "cu121"; then
-      if ! try_cuda_channel "cu118"; then
-        echo "[setup] Failed to install a CUDA-capable torch build."
-        exit 1
-      fi
-    fi
-  fi
-  echo "[setup] Installed torch from ${TORCH_CHANNEL} index."
-else
-  echo "[setup] CPU-only mode selected. Index will run in FTS-only mode."
-fi
 
 export UNITY_DOCS_MCP_ROOT="$REPO_DIR"
 export UNITY_DOCS_MCP_CLEANUP=1
@@ -171,12 +123,13 @@ index:
 EOF
 export UNITY_DOCS_MCP_CONFIG="$CFG_PATH"
 
+echo "[artifacts] Ensuring local docs artifacts..."
 python -c "from unity_docs_mcp.setup.ensure_artifacts import main; main()"
 
 MCP_CLIENT="${UNITYDOCS_MCP_CLIENT:-}"
 if [ -z "$MCP_CLIENT" ]; then
   echo
-  echo "Auto-configure MCP client now?"
+  echo "[mcp] Auto-configure MCP client now?"
   echo "  1) Codex (recommended)"
   echo "  2) Claude Desktop"
   echo "  3) Both"
@@ -208,6 +161,8 @@ fi
 if [ "$MCP_CLIENT" = "none" ]; then
   MCP_CLIENT="skip"
 fi
+
+echo "[detect] Using Unity docs version: $VERSION"
 if [ "$MCP_CLIENT" = "codex" ] || [ "$MCP_CLIENT" = "both" ]; then
   if ! python -m unity_docs_mcp.setup.mcp_config --client codex --repo-root "$REPO_DIR" --unity-version "$VERSION"; then
     echo "[setup] Warning: failed to auto-configure Codex MCP."
