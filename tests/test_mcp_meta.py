@@ -7,6 +7,7 @@ from unity_docs_mcp.config import Config
 class _FakeDocStore:
     def __init__(self) -> None:
         self.config = Config()
+        self._available_source_types = ["manual"]
 
     def search(self, query: str, k: int = 6, source_types=None):
         return [
@@ -57,6 +58,15 @@ class _FakeDocStore:
             )
         ]
 
+    def available_source_types(self):
+        return list(self._available_source_types)
+
+    def known_source_types(self):
+        return ["manual", "scriptref"]
+
+    def source_type_counts(self):
+        return {"docs": {"manual": 1}, "chunks": {"manual": 1}}
+
 
 def _install_fake_docstore(monkeypatch):
     fake = _FakeDocStore()
@@ -91,6 +101,32 @@ def test_open_includes_meta_even_when_missing(monkeypatch):
     assert "doc_id" not in missing
 
 
+def test_search_invalid_source_types_returns_actionable_error(monkeypatch):
+    _install_fake_docstore(monkeypatch)
+    result = mcp_server.search("Rigidbody.AddForce", source_types="scripting")
+    assert result["error"] == "invalid_source_types"
+    assert result["invalid_source_types"] == ["scripting"]
+    assert "manual" in result["available_source_types"]
+
+
+def test_search_unavailable_source_types_returns_actionable_error(monkeypatch):
+    _install_fake_docstore(monkeypatch)
+    result = mcp_server.search("Rigidbody.AddForce", source_types="scriptref")
+    assert result["error"] == "invalid_source_types"
+    assert result["invalid_source_types"] == []
+    assert result["unavailable_source_types"] == ["scriptref"]
+
+
+def test_search_debug_returns_results_and_debug_block(monkeypatch):
+    _install_fake_docstore(monkeypatch)
+    result = mcp_server.search("IJobParallelFor batch size", k=3, debug=True)
+    assert "results" in result
+    assert "debug" in result
+    assert result["debug"]["query"] == "IJobParallelFor batch size"
+    assert result["debug"]["result_count"] == 1
+    assert result["results"][0]["doc_id"] == "manual/job-system-parallel-for-jobs"
+
+
 def test_list_files_and_related_include_meta(monkeypatch):
     _install_fake_docstore(monkeypatch)
     files = mcp_server.list_files("*parallel-for*")
@@ -118,3 +154,6 @@ def test_status_includes_meta_and_manifest_fields(monkeypatch):
     assert status["meta"]["built_on"] == "2026-02-20"
     assert "paths" in status
     assert "index_manifest" in status
+    assert status["available_source_types"] == ["manual"]
+    assert status["source_type_counts"]["docs"]["manual"] == 1
+    assert status["coverage_warnings"]

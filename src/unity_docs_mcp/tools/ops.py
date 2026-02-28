@@ -10,6 +10,8 @@ from unity_docs_mcp.config import Config
 from unity_docs_mcp.index.search import HybridSearcher
 from unity_docs_mcp.paths import make_paths
 
+_DEFAULT_SOURCE_TYPES = ("manual", "scriptref")
+
 
 @dataclass
 class DocRecord:
@@ -26,8 +28,10 @@ class DocStore:
         self.config = config
         self.paths = make_paths(config)
         self.corpus = self._load_corpus(self.paths.baked_dir / "corpus.jsonl")
+        self._doc_source_type_counts = self._count_source_types(self.corpus.values())
         self.link_index = self._load_links(self.paths.baked_dir / "link_graph.jsonl")
         self.searcher = HybridSearcher(config, self.paths.index_dir)
+        self._chunk_source_type_counts = self._count_source_types(getattr(self.searcher, "chunk_meta", {}).values())
 
     def _load_corpus(self, path: Path) -> Dict[str, DocRecord]:
         records: Dict[str, DocRecord] = {}
@@ -56,6 +60,19 @@ class DocStore:
                 links.setdefault(row["from_doc_id"], []).append(row["to_doc_id"])
         return links
 
+    @staticmethod
+    def _count_source_types(rows) -> Dict[str, int]:
+        counts: Dict[str, int] = {}
+        for row in rows:
+            if isinstance(row, dict):
+                source_type = row.get("source_type", "")
+            else:
+                source_type = getattr(row, "source_type", "")
+            if not source_type:
+                continue
+            counts[source_type] = counts.get(source_type, 0) + 1
+        return counts
+
     def open_doc(self, doc_id: Optional[str] = None, path: Optional[str] = None) -> Optional[DocRecord]:
         target_id = doc_id
         if not target_id and path:
@@ -82,3 +99,16 @@ class DocStore:
 
     def search(self, query: str, k: int = 6, source_types: Optional[List[str]] = None) -> List:
         return self.searcher.search(query=query, k=k, source_types=source_types)
+
+    def available_source_types(self) -> List[str]:
+        all_types = set(self._doc_source_type_counts) | set(self._chunk_source_type_counts)
+        return sorted(all_types)
+
+    def known_source_types(self) -> List[str]:
+        return sorted(set(_DEFAULT_SOURCE_TYPES) | set(self.available_source_types()))
+
+    def source_type_counts(self) -> Dict[str, Dict[str, int]]:
+        return {
+            "docs": dict(sorted(self._doc_source_type_counts.items())),
+            "chunks": dict(sorted(self._chunk_source_type_counts.items())),
+        }
