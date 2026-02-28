@@ -17,6 +17,9 @@ data/
 *.sqlite
 *.faiss
 *.jsonl
+benchmarks/results/
+!benchmarks/eval/
+!benchmarks/eval/*.jsonl
 **/fts.sqlite
 **/baked/**/*.jsonl
 **/index/**/*.jsonl

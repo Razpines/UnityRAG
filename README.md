@@ -140,6 +140,7 @@ unitydocs install --version 6000.3
 unitydocs mcp
 unitydocs doctor
 unitydocs report --summary "search returned bad results" --prefill-issue
+unitydocs-benchmark --dataset benchmarks/eval/unity_queries_v1.jsonl --output benchmarks/results/latest.json
 unitydocs-bake
 unitydocs-index --dry-run
 pytest

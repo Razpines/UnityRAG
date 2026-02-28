@@ -104,6 +104,13 @@ Example response metadata (present in all tools):
 pytest
 ```
 
+## Benchmarking
+```
+unitydocs-benchmark --dataset benchmarks/eval/unity_queries_v1.jsonl --output benchmarks/results/latest.json
+```
+- Requires local baked/index artifacts for the selected `UNITY_DOCS_MCP_UNITY_VERSION`.
+- In warn-only mode (default), missing artifacts produce a `skipped_missing_artifacts` result JSON instead of failing.
+
 Optional real-doc extraction integration tests:
 ```
 UNITYDOCS_E2E=1 pytest tests/test_extraction.py

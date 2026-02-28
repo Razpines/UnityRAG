@@ -35,6 +35,7 @@ unitydocs-mcp = "unity_docs_mcp.mcp_server:main"
 unitydocs-mcp-http = "unity_docs_mcp.mcp_server:main_http"
 unitydocs = "unity_docs_mcp.cli:main"
 unitydocs-mcp-config = "unity_docs_mcp.setup.mcp_config:main"
+unitydocs-benchmark = "unity_docs_mcp.bench.benchmark_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
