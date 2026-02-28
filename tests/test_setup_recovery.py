@@ -32,13 +32,16 @@ def test_unzip_failure_redownloads_and_retries(monkeypatch, tmp_path: Path):
         destination.write_bytes(b"fresh")
         return destination
 
-    def fake_unzip(zip_path: Path, target_dir: Path) -> Path:
+    def fake_unzip(zip_path: Path, target_dir: Path, include_globs=None) -> Path:
         calls["unzip"] += 1
+        assert include_globs == ensure_artifacts._BAKE_INPUT_GLOBS
         if calls["unzip"] == 1:
             target_dir.mkdir(parents=True, exist_ok=True)
             (target_dir / "partial.txt").write_text("partial", encoding="utf-8")
             raise RuntimeError("bad zip payload")
-        (target_dir / "Documentation" / "en").mkdir(parents=True, exist_ok=True)
+        manual_dir = target_dir / "Documentation" / "en" / "Manual"
+        manual_dir.mkdir(parents=True, exist_ok=True)
+        (manual_dir / "index.html").write_text("<html></html>", encoding="utf-8")
         return target_dir
 
     monkeypatch.setattr(ensure_artifacts, "download_zip", fake_download)
@@ -50,7 +53,7 @@ def test_unzip_failure_redownloads_and_retries(monkeypatch, tmp_path: Path):
 
     assert calls["unzip"] == 2
     assert calls["download_overwrite"] == [True]
-    assert (raw_unzipped / "Documentation" / "en").is_dir()
+    assert (raw_unzipped / "Documentation" / "en" / "Manual" / "index.html").is_file()
     assert not (raw_unzipped / "partial.txt").exists()
 
 
@@ -65,10 +68,13 @@ def test_nonready_unzip_dir_is_cleared_before_unzip(monkeypatch, tmp_path: Path)
 
     calls = {"unzip": 0}
 
-    def fake_unzip(zip_path: Path, target_dir: Path) -> Path:
+    def fake_unzip(zip_path: Path, target_dir: Path, include_globs=None) -> Path:
         calls["unzip"] += 1
+        assert include_globs == ensure_artifacts._BAKE_INPUT_GLOBS
         assert not (target_dir / "stale.tmp").exists()
-        (target_dir / "Documentation" / "en").mkdir(parents=True, exist_ok=True)
+        manual_dir = target_dir / "Documentation" / "en" / "Manual"
+        manual_dir.mkdir(parents=True, exist_ok=True)
+        (manual_dir / "index.html").write_text("<html></html>", encoding="utf-8")
         return target_dir
 
     monkeypatch.setattr(ensure_artifacts, "safe_unzip", fake_unzip)
@@ -79,4 +85,4 @@ def test_nonready_unzip_dir_is_cleared_before_unzip(monkeypatch, tmp_path: Path)
     ensure_artifacts.ensure(cfg)
 
     assert calls["unzip"] == 1
-    assert (raw_unzipped / "Documentation" / "en").is_dir()
+    assert (raw_unzipped / "Documentation" / "en" / "Manual" / "index.html").is_file()

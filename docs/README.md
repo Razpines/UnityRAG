@@ -11,7 +11,7 @@ This file contains the advanced, developer-oriented details that were removed fr
 
 ## Where files are stored / disk usage
 - Zip file: `data/unity/<version>/raw/UnityDocumentation.zip`
-- Unzipped HTML: `data/unity/<version>/raw/UnityDocumentation/`
+- Unzipped HTML: `data/unity/<version>/raw/UnityDocumentation/` (currently Manual HTML pages only)
 - Baked artifacts: `data/unity/<version>/baked/`
 - Index artifacts: `data/unity/<version>/index/`
 
