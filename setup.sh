@@ -4,6 +4,7 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_DIR="$REPO_DIR/.venv"
 SETUP_MODE="${UNITYDOCS_SETUP_MODE:-}"
+SETUP_DIAG_LATEST="$REPO_DIR/reports/setup/setup-diagnostics-latest.json"
 
 report_failure_hint() {
   local report_version="${UNITY_DOCS_MCP_UNITY_VERSION:-${VERSION:-6000.3}}"
@@ -12,7 +13,24 @@ report_failure_hint() {
   echo "  UNITY_DOCS_MCP_UNITY_VERSION=${report_version} unitydocs report --summary setup.sh-failed --prefill-issue"
 }
 
-trap 'status=$?; if [ $status -ne 0 ]; then report_failure_hint; fi' EXIT
+write_setup_diagnostics() {
+  local status="$1"
+  local outcome="$2"
+  local diag_python="${PYTHON:-python3}"
+  if ! command -v "$diag_python" >/dev/null 2>&1; then
+    return 1
+  fi
+  PYTHONPATH="$REPO_DIR/src" "$diag_python" -m unity_docs_mcp.setup.diagnostics \
+    --repo-root "$REPO_DIR" \
+    --status "$status" \
+    --mode "${SETUP_MODE:-}" \
+    --unity-version "${VERSION:-}" \
+    --config-path "${UNITY_DOCS_MCP_CONFIG:-}" \
+    --outcome "$outcome" \
+    --print-latest-path-only >/dev/null 2>&1
+}
+
+trap 'status=$?; if [ $status -ne 0 ]; then write_setup_diagnostics failed setup.sh-failed || true; echo "[setup] Summary: mode=${SETUP_MODE:-unknown} unity_version=${VERSION:-unknown}"; if [ -f "$SETUP_DIAG_LATEST" ]; then echo "[setup] Diagnostics snapshot: $SETUP_DIAG_LATEST"; fi; report_failure_hint; else write_setup_diagnostics success setup.sh-success || true; fi' EXIT
 
 detect_version() {
   if [ -n "${UNITY_VERSION:-}" ]; then
