@@ -48,6 +48,7 @@ If setup fails, run:
 ```bash
 unitydocs doctor
 unitydocs doctor --json
+unitydocs report --summary setup-failure --prefill-issue
 ```
 
 ## Docker Quick Start (CPU-only)
@@ -136,6 +137,7 @@ Optional advanced overrides:
 unitydocs install --version 6000.3
 unitydocs mcp
 unitydocs doctor
+unitydocs report --summary "search returned bad results" --prefill-issue
 unitydocs-bake
 unitydocs-index --dry-run
 pytest

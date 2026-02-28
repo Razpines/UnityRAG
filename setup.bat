@@ -12,6 +12,14 @@ set "PY_PORTABLE_VER=3.12.8"
 set "PY_PORTABLE_ZIP=python-%PY_PORTABLE_VER%-embed-amd64.zip"
 set "PY_PORTABLE_URL=https://www.python.org/ftp/python/%PY_PORTABLE_VER%/%PY_PORTABLE_ZIP%"
 
+call :__setup_main
+set "SETUP_EXIT=%ERRORLEVEL%"
+if not "%SETUP_EXIT%"=="0" (
+  call :report_hint
+)
+exit /b %SETUP_EXIT%
+
+:__setup_main
 if exist "%REPO%\banner.txt" (
   type "%REPO%\banner.txt"
 ) else (
@@ -354,6 +362,13 @@ if errorlevel 1 exit /b 1
 "%PY_PORTABLE_EXE%" "%TEMP_PIP%" >nul 2>&1
 if errorlevel 1 exit /b 1
 del "%TEMP_PIP%" >nul 2>&1
+exit /b 0
+
+:report_hint
+set "REPORT_VER=6000.3"
+if defined SELECTED set "REPORT_VER=%SELECTED%"
+call :print_color Yellow "[setup] Setup failed. Generate diagnostics with:"
+call :print_color Yellow "        set UNITY_DOCS_MCP_UNITY_VERSION=%REPORT_VER% && unitydocs report --summary setup.bat-failed --prefill-issue"
 exit /b 0
 
 :print_color

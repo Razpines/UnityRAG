@@ -69,6 +69,7 @@ Example response metadata (present in all tools):
 - Run preflight diagnostics first:
   - `unitydocs doctor`
   - `unitydocs doctor --json` (for structured bug reports/automation)
+  - `unitydocs report --summary <short-problem> --prefill-issue` (writes a redacted support bundle)
 - Setup scripts now prompt for mode:
   - `CUDA`: installs `.[dev,vector]`, then validates CUDA torch (`cu128 -> cu121 -> cu118` fallback).
   - `CPU-only`: installs `.[dev]` and configures `index.vector: none` (FTS-only, no vector deps).
@@ -79,6 +80,16 @@ Example response metadata (present in all tools):
 - Download blocked or slow: download UnityDocumentation.zip manually, place it under `data/unity/<version>/raw/`, then re-run setup.
 - `python` not found: install Python 3.12+ or run `setup.bat` to use the repo-local portable Python.
 - Data artifacts accidentally tracked: run `python scripts/check_no_data_tracked.py` and remove listed files from git.
+
+## How To Report
+- Generate a bundle:
+  - `unitydocs report --summary "setup failed on CUDA validation" --prefill-issue`
+- Attach/share files from `reports/latest` (or your `--output` directory).
+- The report includes:
+  - redacted config layers
+  - effective config / doctor JSON
+  - environment + system snapshot
+  - copied local setup logs when present
 
 ## Testing
 ```
