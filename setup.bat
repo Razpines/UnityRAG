@@ -11,10 +11,16 @@ set "PY_PORTABLE_EXE=%PY_PORTABLE%\python.exe"
 set "PY_PORTABLE_VER=3.12.8"
 set "PY_PORTABLE_ZIP=python-%PY_PORTABLE_VER%-embed-amd64.zip"
 set "PY_PORTABLE_URL=https://www.python.org/ftp/python/%PY_PORTABLE_VER%/%PY_PORTABLE_ZIP%"
+set "SETUP_DIAG_PATH=%REPO%\reports\setup\setup-diagnostics-latest.json"
 
 call :__setup_main
 set "SETUP_EXIT=%ERRORLEVEL%"
+call :write_setup_diagnostics %SETUP_EXIT%
 if not "%SETUP_EXIT%"=="0" (
+  call :print_color Yellow "[setup] Summary: mode=%SETUP_MODE% unity_version=%SELECTED%"
+  if exist "%SETUP_DIAG_PATH%" (
+    call :print_color Yellow "[setup] Diagnostics snapshot: %SETUP_DIAG_PATH%"
+  )
   call :report_hint
 )
 exit /b %SETUP_EXIT%
@@ -298,6 +304,19 @@ if errorlevel 1 exit /b 1
 "%PY_PORTABLE_EXE%" "%TEMP_PIP%" >nul 2>&1
 if errorlevel 1 exit /b 1
 del "%TEMP_PIP%" >nul 2>&1
+exit /b 0
+
+:write_setup_diagnostics
+set "SNAP_STATUS=success"
+set "SNAP_OUTCOME=setup.bat-success"
+if not "%~1"=="0" (
+  set "SNAP_STATUS=failed"
+  set "SNAP_OUTCOME=setup.bat-failed"
+)
+if not defined PY_CMD exit /b 0
+set "PYTHONPATH=%REPO%\src"
+call %PY_CMD% -m unity_docs_mcp.setup.diagnostics --repo-root "%REPO%" --status "%SNAP_STATUS%" --mode "%SETUP_MODE%" --unity-version "%SELECTED%" --config-path "%UNITY_DOCS_MCP_CONFIG%" --outcome "%SNAP_OUTCOME%" --print-latest-path-only >nul 2>nul
+set "PYTHONPATH="
 exit /b 0
 
 :report_hint

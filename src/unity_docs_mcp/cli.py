@@ -23,7 +23,13 @@ def _cmd_mcp(_: argparse.Namespace) -> None:
 
 
 def _cmd_doctor(args: argparse.Namespace) -> None:
-    raise SystemExit(doctor_main(json_output=args.json, config_path=args.config))
+    raise SystemExit(
+        doctor_main(
+            json_output=args.json,
+            config_path=args.config,
+            include_setup_snapshot=args.with_setup_snapshot,
+        )
+    )
 
 
 def _cmd_report(args: argparse.Namespace) -> None:
@@ -58,6 +64,11 @@ def main() -> None:
     doctor_parser = subparsers.add_parser("doctor", help="Run preflight diagnostics.")
     doctor_parser.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
     doctor_parser.add_argument("--config", default=None, help="Optional config file path override.")
+    doctor_parser.add_argument(
+        "--with-setup-snapshot",
+        action="store_true",
+        help="Include reference metadata for the latest setup diagnostics snapshot.",
+    )
     doctor_parser.set_defaults(func=_cmd_doctor)
 
     report_parser = subparsers.add_parser("report", help="Create a redacted diagnostics bundle.")

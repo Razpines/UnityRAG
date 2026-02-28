@@ -31,6 +31,25 @@ def _resolve_config_paths(config_path: Optional[Path | str] = None) -> list[Path
     return existing_config_layer_paths(config_path)
 
 
+def _latest_setup_snapshot_reference() -> dict[str, Any]:
+    repo_root = Path(os.environ.get("UNITY_DOCS_MCP_ROOT") or Path(__file__).resolve().parents[2])
+    latest_path = repo_root / "reports" / "setup" / "setup-diagnostics-latest.json"
+    ref: dict[str, Any] = {
+        "path": str(latest_path),
+        "exists": latest_path.exists(),
+    }
+    if not latest_path.exists():
+        return ref
+    try:
+        data = json.loads(latest_path.read_text())
+        ref["status"] = data.get("status")
+        ref["generated_at_utc"] = data.get("generated_at_utc")
+        ref["selected_unity_docs_version"] = data.get("selected_unity_docs_version")
+    except Exception as exc:
+        ref["error"] = str(exc)
+    return ref
+
+
 def _check_config_source(config_paths: list[Path]) -> CheckResult:
     if not config_paths:
         return CheckResult(
@@ -269,7 +288,10 @@ def _check_artifacts(cfg: Config) -> CheckResult:
     )
 
 
-def run_doctor(config_path: Optional[Path | str] = None) -> dict[str, Any]:
+def run_doctor(
+    config_path: Optional[Path | str] = None,
+    include_setup_snapshot: bool = False,
+) -> dict[str, Any]:
     cfg_paths = _resolve_config_paths(config_path)
     cfg = load_config(config_path)
     checks = [
@@ -284,12 +306,15 @@ def run_doctor(config_path: Optional[Path | str] = None) -> dict[str, Any]:
     for check in checks:
         counts[check.status] = counts.get(check.status, 0) + 1
     overall = "fail" if counts["fail"] else ("warn" if counts["warn"] else "pass")
-    return {
+    report: dict[str, Any] = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "overall": overall,
         "counts": counts,
         "checks": [asdict(c) for c in checks],
     }
+    if include_setup_snapshot:
+        report["setup_snapshot"] = _latest_setup_snapshot_reference()
+    return report
 
 
 def exit_code_from_report(report: dict[str, Any]) -> int:
@@ -311,8 +336,15 @@ def print_human_report(report: dict[str, Any]) -> None:
     )
 
 
-def main(json_output: bool = False, config_path: Optional[str] = None) -> int:
-    report = run_doctor(config_path=config_path)
+def main(
+    json_output: bool = False,
+    config_path: Optional[str] = None,
+    include_setup_snapshot: bool = False,
+) -> int:
+    report = run_doctor(
+        config_path=config_path,
+        include_setup_snapshot=include_setup_snapshot,
+    )
     if json_output:
         print(json.dumps(report, indent=2))
     else:

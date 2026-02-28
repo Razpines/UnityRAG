@@ -48,6 +48,7 @@ If setup fails, run:
 ```bash
 unitydocs doctor
 unitydocs doctor --json
+unitydocs doctor --json --with-setup-snapshot
 unitydocs report --summary setup-failure --prefill-issue
 ```
 

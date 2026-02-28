@@ -67,3 +67,25 @@ def test_doctor_skips_vector_dependencies_in_fts_only_mode(monkeypatch):
     result = doctor._check_dependencies(cfg)
     assert result.status == "pass"
     assert "FTS-only mode" in result.message
+
+
+def test_doctor_can_include_latest_setup_snapshot(monkeypatch, tmp_path: Path):
+    _isolate_config_root(monkeypatch, tmp_path)
+    monkeypatch.setenv("UNITY_DOCS_MCP_PORT", "0")
+    snapshot = tmp_path / "reports" / "setup" / "setup-diagnostics-latest.json"
+    snapshot.parent.mkdir(parents=True, exist_ok=True)
+    snapshot.write_text(
+        json.dumps(
+            {
+                "status": "failed",
+                "generated_at_utc": "2026-02-28T10:00:00Z",
+                "selected_unity_docs_version": "6000.3",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    report = doctor.run_doctor(include_setup_snapshot=True)
+    assert "setup_snapshot" in report
+    assert report["setup_snapshot"]["exists"] is True
+    assert report["setup_snapshot"]["status"] == "failed"
