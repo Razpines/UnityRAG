@@ -10,7 +10,7 @@
 ## Build, Test, Run
 - Create env:
   - CPU/FTS-only: `python -m venv .venv && .venv\Scripts\activate && pip install -e .[dev]`
-  - CUDA/hybrid: `python -m venv .venv && .venv\Scripts\activate && pip install -e .[dev,vector]`
+  - CUDA/hybrid (WIP): `python -m venv .venv && .venv\Scripts\activate && pip install -e .[dev,vector]` (manual/experimental; setup scripts currently force CPU-only)
 - Ensure artifacts: `unitydocs-setup` (downloads if missing, bakes, indexes).
 - Bake only: `unitydocs-bake`.
 - Index only: `unitydocs-index` (use `--dry-run` to verify device/model without embedding).
@@ -38,4 +38,4 @@
 ## Security & Config Tips
 - Keep secrets out of repo; no tokens in config.
 - Use `UNITY_DOCS_MCP_ROOT`/`UNITY_DOCS_MCP_CONFIG` only when you need advanced root/config overrides.
-- For GPU: install CUDA-enabled torch in the venv (setup probes `cu128`, then `cu121`, then `cu118`) and verifies `torch.cuda.is_available()` at runtime.
+- CUDA/hybrid setup is temporarily WIP. `setup.bat`/`setup.sh` currently force CPU-only; use manual GPU setup only for experimental testing.
