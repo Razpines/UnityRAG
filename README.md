@@ -30,11 +30,11 @@ bash setup.sh
 ```
 
 Setup will prompt you for:
-- Retrieval mode: `CUDA` (hybrid) or `CPU-only` (FTS-only)
 - Unity docs version (auto-suggested from detected local Unity editor installs; you can override)
 - MCP client auto-config: `Codex`, `Claude Desktop`, `Both`, or `Skip`
 - Setup writes machine-local mode overrides to `config.local.yaml` (untracked), while `config.yaml` remains tracked defaults.
 - MCP server configs include `UNITY_DOCS_MCP_UNITY_VERSION` so clients run against your selected docs version.
+- Setup currently forces `CPU-only` (`index.vector: none`) while CUDA/hybrid setup is WIP.
 
 2. Restart your agent.
 
@@ -115,7 +115,8 @@ python -m venv .venv
 # Windows: .\.venv\Scripts\activate
 # macOS/Linux: source .venv/bin/activate
 pip install -e .[dev]
-# For CUDA/hybrid installs, use:
+# CUDA/hybrid path is currently WIP in setup scripts.
+# Manual experimental install:
 # pip install -e .[dev,vector]
 export UNITY_DOCS_MCP_UNITY_VERSION=6000.3  # Windows PowerShell: $env:UNITY_DOCS_MCP_UNITY_VERSION='6000.3'
 unitydocs install --version 6000.3 --cleanup
@@ -123,8 +124,8 @@ unitydocs mcp
 ```
 
 Notes:
-- In `CUDA` mode, setup scripts enforce CUDA torch and fail if no working CUDA runtime is detected.
-- In `CPU-only` mode, setup configures `index.vector: none` and skips vector dependencies.
+- Setup scripts currently force `CPU-only` mode and configure `index.vector: none`.
+- CUDA/hybrid setup is temporarily WIP; use manual vector installs only if you are testing that path.
 
 Optional advanced overrides:
 - `UNITY_DOCS_MCP_UNITY_VERSION` (required for runtime commands such as `unitydocs mcp`)

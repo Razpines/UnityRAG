@@ -77,34 +77,13 @@ if defined FREE_GB if %FREE_GB% LSS %REQUIRED_GB% (
   exit /b 1
 )
 
-set "SETUP_MODE="
-if /i "%UNITYDOCS_SETUP_MODE%"=="cuda" set "SETUP_MODE=cuda"
-if /i "%UNITYDOCS_SETUP_MODE%"=="1" set "SETUP_MODE=cuda"
-if /i "%UNITYDOCS_SETUP_MODE%"=="cpu" set "SETUP_MODE=cpu"
-if /i "%UNITYDOCS_SETUP_MODE%"=="2" set "SETUP_MODE=cpu"
-
-if not defined SETUP_MODE goto choose_mode
-goto after_choose_mode
-
-:choose_mode
-echo.
-call :print_color Green "[detect] Select setup mode:"
-echo   1^) CUDA ^(hybrid retrieval: FTS + vectors^)
-echo   2^) CPU-only ^(FTS-only retrieval; no transformers/faiss^)
-echo.
-set "SETUP_MODE="
-set /p MODE_CHOICE=Mode [1]:
-if "%MODE_CHOICE%"=="" set "MODE_CHOICE=1"
-if /i "%MODE_CHOICE%"=="1" set "SETUP_MODE=cuda"
-if /i "%MODE_CHOICE%"=="cuda" set "SETUP_MODE=cuda"
-if /i "%MODE_CHOICE%"=="2" set "SETUP_MODE=cpu"
-if /i "%MODE_CHOICE%"=="cpu" set "SETUP_MODE=cpu"
-if not defined SETUP_MODE (
-  call :print_color Red "Invalid mode selection."
-  goto choose_mode
+set "SETUP_MODE=cpu"
+if defined UNITYDOCS_SETUP_MODE (
+  if /i "%UNITYDOCS_SETUP_MODE%"=="cuda" call :print_color Yellow "[setup] CUDA setup is temporarily disabled (WIP). Forcing CPU-only mode."
+  if /i "%UNITYDOCS_SETUP_MODE%"=="1" call :print_color Yellow "[setup] CUDA setup is temporarily disabled (WIP). Forcing CPU-only mode."
+) else (
+  call :print_color Yellow "[setup] CUDA setup is temporarily disabled (WIP). Using CPU-only mode."
 )
-
-:after_choose_mode
 
 call :print_color Cyan "[bootstrap] Preparing virtual environment and dependencies..."
 set "PYTHONPATH=%REPO%\src"

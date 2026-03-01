@@ -3,7 +3,8 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_DIR="$REPO_DIR/.venv"
-SETUP_MODE="${UNITYDOCS_SETUP_MODE:-}"
+REQUESTED_SETUP_MODE="${UNITYDOCS_SETUP_MODE:-}"
+SETUP_MODE="cpu"
 SETUP_DIAG_LATEST="$REPO_DIR/reports/setup/setup-diagnostics-latest.json"
 VERSION_FROM_ARG=0
 VERSION="6000.3"
@@ -39,32 +40,20 @@ if [ -n "${1:-}" ]; then
   VERSION_FROM_ARG=1
 fi
 
-if [ -z "$SETUP_MODE" ]; then
-  echo
-  echo "[detect] Select setup mode:"
-  echo "  1) CUDA (hybrid retrieval: FTS + vectors)"
-  echo "  2) CPU-only (FTS-only retrieval; no transformers/faiss)"
-  read -r -p "Mode [1]: " MODE_CHOICE
-  MODE_CHOICE="${MODE_CHOICE:-1}"
-  MODE_CHOICE_LOWER="$(printf '%s' "$MODE_CHOICE" | tr '[:upper:]' '[:lower:]')"
-  case "$MODE_CHOICE_LOWER" in
-    1|cuda) SETUP_MODE="cuda" ;;
-    2|cpu) SETUP_MODE="cpu" ;;
+if [ -n "$REQUESTED_SETUP_MODE" ]; then
+  REQUESTED_SETUP_MODE_LOWER="$(printf '%s' "$REQUESTED_SETUP_MODE" | tr '[:upper:]' '[:lower:]')"
+  case "$REQUESTED_SETUP_MODE_LOWER" in
+    1|cuda)
+      echo "[setup] CUDA setup is temporarily disabled (WIP). Forcing CPU-only mode."
+      ;;
+    2|cpu)
+      ;;
     *)
-      echo "[setup] Invalid mode selection."
-      exit 1
+      echo "[setup] UNITYDOCS_SETUP_MODE currently supports CPU-only setup while CUDA is WIP. Forcing CPU-only mode."
       ;;
   esac
 else
-  SETUP_MODE_LOWER="$(printf '%s' "$SETUP_MODE" | tr '[:upper:]' '[:lower:]')"
-  case "$SETUP_MODE_LOWER" in
-    1|cuda) SETUP_MODE="cuda" ;;
-    2|cpu) SETUP_MODE="cpu" ;;
-    *)
-      echo "[setup] UNITYDOCS_SETUP_MODE must be cuda or cpu."
-      exit 1
-      ;;
-  esac
+  echo "[setup] CUDA setup is temporarily disabled (WIP). Using CPU-only mode."
 fi
 
 if command -v python3.12 >/dev/null 2>&1; then
